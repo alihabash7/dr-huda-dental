@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>عيادات د. هدى ياسين لطب الأسنان</title>
+<meta name="description" content="مجموعة عيادات د. هدى ياسين لطب الأسنان: فحص، حشوات، علاج عصب، تيجان وزيركون، زراعة وتقويم. احجز موعدك بالواتساب.">
+<meta property="og:title" content="عيادات د. هدى ياسين لطب الأسنان">
+<meta property="og:description" content="ابتسامتك بأيدٍ أمينة. احجز موعدك بالواتساب في أقرب عيادة لك.">
+<meta name="theme-color" content="#0E3533">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Emerald + gold, the same identity as the clinics' management system. Long single page, sections separated by tone, not boxes. */
+:root{
+  --bg:#F6F8F7;--surface:#FFFFFF;--surface-2:#EEF3F1;--line:#DCE5E2;
+  --ink:#0F201E;--ink-2:#465955;--ink-3:#71827E;
+  --deep:#0E3533;--deep-2:#13413E;--on-deep:#E6F0ED;--on-deep-2:#A9C4BE;
+  --gold:#B08A4E;--gold-ink:#7A5B28;--gold-soft:#F4EDE0;
+  --wa:#1F9D55;--wa-ink:#fff;
+  --radius:18px;--shadow:0 1px 2px rgba(15,32,30,.05),0 10px 30px -12px rgba(15,32,30,.18);
+  --f-display:'El Messiri',serif;--f-body:'IBM Plex Sans Arabic',system-ui,sans-serif;--f-sig:'Aref Ruqaa',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1514;--surface:#111F1D;--surface-2:#162724;--line:#243935;
+  --ink:#E4EEEB;--ink-2:#B3C5C1;--ink-3:#86A09A;
+  --deep:#071110;--deep-2:#0F1F1D;--on-deep:#DCE9E5;--on-deep-2:#8FB0A9;
+  --gold:#D2AF76;--gold-ink:#E0C28F;--gold-soft:#2A2419;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --bg:#0B1514;--surface:#111F1D;--surface-2:#162724;--line:#243935;
+  --ink:#E4EEEB;--ink-2:#B3C5C1;--ink-3:#86A09A;
+  --deep:#071110;--deep-2:#0F1F1D;--on-deep:#DCE9E5;--on-deep-2:#8FB0A9;
+  --gold:#D2AF76;--gold-ink:#E0C28F;--gold-soft:#2A2419;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3{font-family:var(--f-display);line-height:1.3;margin:0;font-weight:600}
+p{margin:0}
+.wrap{width:min(1120px,100% - 32px);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .wrap{display:flex;align-items:center;gap:20px;height:68px}
+.brand{display:flex;flex-direction:column;text-decoration:none;line-height:1.1}
+.brand b{font-family:var(--f-sig);font-size:26px;color:var(--gold-ink);font-weight:700}
+.brand small{font-size:11.5px;color:var(--ink-3);letter-spacing:.2px}
+.nav{display:flex;gap:4px;margin-inline-start:auto}
+.nav a{text-decoration:none;font-size:14.5px;color:var(--ink-2);padding:8px 12px;border-radius:999px}
+.nav a:hover{background:var(--surface-2);color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 20px;border-radius:999px;border:1px solid transparent;font:600 15px var(--f-body);text-decoration:none;cursor:pointer;white-space:nowrap;transition:transform .15s,background .15s}
+.btn:active{transform:translateY(1px)}
+.btn svg{width:19px;height:19px;flex:none}
+.btn.wa{background:var(--wa);color:var(--wa-ink)}
+.btn.wa:hover{background:color-mix(in srgb,var(--wa) 88%,#000)}
+.btn.gold{background:var(--gold);color:#fff}
+.btn.gold:hover{background:color-mix(in srgb,var(--gold) 88%,#000)}
+.btn.ghost{border-color:var(--line);background:var(--surface);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--gold)}
+.btn.sm{height:38px;padding:0 14px;font-size:13.5px}
+.top .btn{height:40px;font-size:14px;padding:0 16px}
+@media (max-width:860px){.nav{display:none}.top .btn span{display:none}.top .btn{width:40px;padding:0}.top .wrap{justify-content:space-between}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:var(--deep);color:var(--on-deep)}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 15% 20%,color-mix(in srgb,var(--gold) 22%,transparent),transparent 70%),radial-gradient(50% 70% at 90% 100%,rgba(255,255,255,.06),transparent 70%);pointer-events:none}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding:72px 0 84px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--gold);letter-spacing:.3px;margin-bottom:14px}
+.eyebrow::before{content:"";width:22px;height:1px;background:currentColor}
+.hero h1{font-size:clamp(34px,5.4vw,58px);color:#fff;font-weight:700}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p.lead{font-size:clamp(16px,1.6vw,19px);color:var(--on-deep-2);margin-top:18px;max-width:34em}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.hero .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.28)}
+.hero .btn.ghost:hover{border-color:var(--gold)}
+.hero-art{justify-self:center;width:min(360px,100%)}
+.hero-art .sig{font-family:var(--f-sig);font-size:30px;color:var(--gold);text-align:center;margin-top:10px}
+.facts{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:34px;padding-top:24px;border-top:1px solid rgba(255,255,255,.12);font-size:14px;color:var(--on-deep-2)}
+.facts span{display:inline-flex;align-items:center;gap:8px}
+.facts svg{width:18px;height:18px;color:var(--gold)}
+@media (max-width:860px){.hero .wrap{grid-template-columns:1fr;padding:44px 0 56px;gap:28px}.hero-art{order:-1;width:200px}.hero-art .sig{font-size:24px}}
+
+/* sections */
+section.band{padding:84px 0}
+section.band.alt{background:var(--surface)}
+.head{max-width:640px;margin-bottom:40px}
+.head h2{font-size:clamp(26px,3.4vw,38px)}
+.head p{color:var(--ink-2);margin-top:10px}
+.head .eyebrow{color:var(--gold-ink)}
+@media (max-width:640px){section.band{padding:56px 0}.head{margin-bottom:28px}}
+
+/* services */
+.services{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.svc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s,transform .2s}
+.svc:hover{border-color:color-mix(in srgb,var(--gold) 55%,var(--line));transform:translateY(-2px)}
+.svc i{width:44px;height:44px;border-radius:12px;background:var(--gold-soft);color:var(--gold-ink);display:grid;place-items:center;margin-bottom:6px}
+.svc i svg{width:24px;height:24px}
+.svc h3{font-size:18px}
+.svc p{font-size:14.5px;color:var(--ink-2)}
+.band.alt .svc{background:var(--bg)}
+
+/* journey */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s;list-style:none;margin:0;padding:0}
+.steps li{position:relative;padding-top:56px}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;top:0;inset-inline-start:0;width:40px;height:40px;border-radius:50%;background:var(--deep);color:var(--gold);font:700 18px var(--f-display);display:grid;place-items:center}
+.steps li::after{content:"";position:absolute;top:20px;inset-inline-start:52px;inset-inline-end:-6px;height:1px;background:var(--line)}
+.steps li:last-child::after{display:none}
+.steps h3{font-size:18px;margin-bottom:6px}
+.steps p{font-size:14.5px;color:var(--ink-2)}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr;gap:30px 18px}.steps li::after{display:none}}
+@media (max-width:480px){.steps{grid-template-columns:1fr}}
+
+/* payment */
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.pay ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.pay li{display:flex;gap:14px;align-items:flex-start}
+.pay li svg{width:22px;height:22px;color:var(--gold-ink);flex:none;margin-top:3px}
+.pay li b{display:block;font-family:var(--f-display);font-size:17px;font-weight:600}
+.pay li span{color:var(--ink-2);font-size:14.5px}
+.methods{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.methods span{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:500}
+.pay-card{background:var(--deep);color:var(--on-deep);border-radius:24px;padding:30px;box-shadow:var(--shadow)}
+.pay-card h3{color:#fff;font-size:22px;margin-bottom:8px}
+.pay-card p{color:var(--on-deep-2);font-size:15px}
+.pay-card .methods span{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#fff}
+@media (max-width:860px){.pay{grid-template-columns:1fr;gap:28px}}
+
+/* clinics */
+.clinics{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.clinic{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;gap:12px}
+.clinic h3{font-size:20px}
+.clinic .area{display:flex;gap:8px;align-items:center;color:var(--ink-2);font-size:15px}
+.clinic .area svg{width:18px;height:18px;color:var(--gold-ink)}
+.clinic .ph{font-size:15px;color:var(--ink-2)}
+.clinic .ph b{color:var(--ink);font-weight:600;unicode-bidi:isolate;direction:ltr;display:inline-block}
+.clinic .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:6px}
+
+/* booking */
+.book{display:grid;grid-template-columns:.9fr 1.1fr;gap:44px;align-items:start}
+.book-side h2{font-size:clamp(26px,3.4vw,38px)}
+.book-side p{color:var(--ink-2);margin-top:12px}
+.book-side ul{margin:22px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:15px;color:var(--ink-2)}
+.book-side li{display:flex;gap:10px;align-items:flex-start}
+.book-side li svg{width:20px;height:20px;color:var(--wa);flex:none;margin-top:4px}
+form.bk{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow);display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.f{display:flex;flex-direction:column;gap:6px}
+.f.full{grid-column:1/-1}
+.f label{font-size:14px;font-weight:500;color:var(--ink-2)}
+.f input,.f select,.f textarea{font:16px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;min-height:48px}
+.f textarea{min-height:84px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 22%,transparent)}
+.f .err{font-size:13px;color:#B03E38;display:none}
+.f.bad .err{display:block}.f.bad input,.f.bad select{border-color:#B03E38}
+.seg{display:flex;gap:8px}
+.seg label{flex:1;position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0}
+.seg span{display:flex;align-items:center;justify-content:center;height:48px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:15px;color:var(--ink-2)}
+.seg input:checked+span{border-color:var(--gold);background:var(--gold-soft);color:var(--gold-ink);font-weight:600}
+.seg input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+form.bk .btn{grid-column:1/-1;height:52px;font-size:16px}
+form.bk .note{grid-column:1/-1;font-size:13px;color:var(--ink-3);text-align:center}
+form.bk .note.bad{color:#B03E38}
+form.bk .bk-wa{grid-column:1/-1;height:44px;font-size:14.5px;margin-top:-6px}
+.hp{position:absolute;top:0;inset-inline-start:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0;pointer-events:none}form.bk{position:relative}
+.bk-done{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:34px 28px;box-shadow:var(--shadow);text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.bk-done[hidden]{display:none}
+.bk-done .ok{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--wa) 14%,transparent);color:var(--wa);display:grid;place-items:center}
+.bk-done .ok svg{width:34px;height:34px}.bk-done h3{font-size:24px}.bk-done p{color:var(--ink-2)}.bk-done .muted{font-size:14px;color:var(--ink-3)}
+.bk-done .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px}
+.clinic .map{margin:-24px -24px 4px;height:180px;border-radius:var(--radius) var(--radius) 0 0;overflow:hidden;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.clinic .map iframe{width:100%;height:100%;border:0;display:block}
+.clinic .hrs,.clinic .addr{display:flex;gap:8px;align-items:flex-start;color:var(--ink-2);font-size:14.5px}
+.clinic .hrs svg,.clinic .addr svg{width:18px;height:18px;color:var(--gold-ink);flex:none;margin-top:4px}
+.clinic .btn.gold{flex:1 1 100%}
+@media (max-width:860px){.book{grid-template-columns:1fr;gap:28px}form.bk{grid-template-columns:1fr;padding:20px}}
+
+/* faq */
+.faq{max-width:780px;display:flex;flex-direction:column;gap:10px}
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 20px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 0;font:600 17px var(--f-display);display:flex;justify-content:space-between;gap:16px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font:400 24px var(--f-body);color:var(--gold-ink);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding:0 0 18px;color:var(--ink-2);font-size:15px}
+
+/* footer */
+footer{background:var(--deep);color:var(--on-deep-2);padding:56px 0 calc(28px + env(safe-area-inset-bottom,0px))}
+footer .grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:32px}
+footer .sig{font-family:var(--f-sig);font-size:30px;color:var(--gold)}
+footer h4{font:600 15px var(--f-display);color:#fff;margin:0 0 12px}
+footer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:14.5px}
+footer a{text-decoration:none}footer a:hover{color:#fff}
+footer .copy{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (max-width:860px){footer .grid{grid-template-columns:1fr}}
+
+/* floating whatsapp */
+.fab{position:fixed;inset-inline-start:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;width:58px;height:58px;border-radius:50%;background:var(--wa);color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);text-decoration:none}
+.fab svg{width:28px;height:28px}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.2-.2-.4-.3z"/></symbol>
+ <symbol id="i-phone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+ <symbol id="i-pin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+ <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
+ <symbol id="i-heart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 20s-7.5-4.6-9-9.6C2 6.8 4.4 4 7.4 4c2 0 3.6 1.2 4.6 2.8C13 5.2 14.6 4 16.6 4 19.6 4 22 6.8 21 10.4 19.5 15.4 12 20 12 20z"/></symbol>
+ <symbol id="i-wallet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="2.5"/><path d="M3 10h18M16 15h2"/></g></symbol>
+ <symbol id="i-tooth" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M7.5 3.5c-2.5 0-4 2-4 4.6 0 2.4 1 4 1.6 6.1.6 2.3.8 6.3 2.6 6.3 1.6 0 1.6-4.6 4.3-4.6s2.7 4.6 4.3 4.6c1.8 0 2-4 2.6-6.3.6-2.1 1.6-3.7 1.6-6.1 0-2.6-1.5-4.6-4-4.6-1.9 0-2.7 1-4.5 1s-2.6-1-4.5-1z"/></symbol>
+ <symbol id="i-spark" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M12 3l8 3v6c0 4.6-3.4 8-8 9-4.6-1-8-4.4-8-9V6z"/></symbol>
+ <symbol id="i-root" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M7.5 3.5c-2.5 0-4 2-4 4.6 0 2.4 1 4 1.6 6.1.6 2.3.8 6.3 2.6 6.3 1.6 0 1.6-4.6 4.3-4.6s2.7 4.6 4.3 4.6c1.8 0 2-4 2.6-6.3.6-2.1 1.6-3.7 1.6-6.1 0-2.6-1.5-4.6-4-4.6-1.9 0-2.7 1-4.5 1s-2.6-1-4.5-1zM10 9v6M14 9v6"/></symbol>
+ <symbol id="i-crown" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M4 8l4 3 4-6 4 6 4-3-2 10H6z"/></symbol>
+ <symbol id="i-implant" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M7 4h10l-1 4H8zM9 8v3h6V8M10 11l-1 9h6l-1-9M9.5 14h5M9.2 17h5.6"/></symbol>
+ <symbol id="i-align" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="8" width="5" height="8" rx="1.5"/><rect x="9.5" y="8" width="5" height="8" rx="1.5"/><rect x="16" y="8" width="5" height="8" rx="1.5"/><path d="M2 12h20"/></g></symbol>
+ <symbol id="i-child" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="9" r="5"/><path d="M10 9h.01M14 9h.01M10 11.5c1 .8 3 .8 4 0M6 21c.8-3 3.2-5 6-5s5.2 2 6 5"/></g></symbol>
+ <symbol id="i-clean" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M4 20l7-7M11 13l3-3 4 4-3 3zM14 10l2-6 4 4-6 2M5 14h2M7 11h2"/></symbol>
+ <symbol id="i-scan" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 12h8"/></symbol>
+</svg>
+
+<header class="top" id="top">
+ <div class="wrap">
+  <a class="brand" href="#"><b>د. هدى ياسين</b><small>مجموعة عيادات طب الأسنان</small></a>
+  <nav class="nav" aria-label="أقسام الموقع"><a href="#services">خدماتنا</a><a href="#journey">كيف نعمل</a><a href="#payment">الدفع والأقساط</a><a href="#clinics">عياداتنا</a><a href="#faq">أسئلة شائعة</a></nav>
+  <a class="btn gold" href="#book"><svg><use href="#i-cal"/></svg><span>احجز موعدك</span></a>
+ </div>
+</header>
+
+<main>
+<section class="hero">
+ <div class="wrap">
+  <div>
+   <div class="eyebrow">مجموعة عيادات د. هدى ياسين لطب الأسنان</div>
+   <h1>ابتسامتك <em>بأيدٍ أمينة</em><br>وعيادتنا قريبة منك</h1>
+   <p class="lead">من الفحص الأول حتى آخر جلسة: خطة علاج واضحة بكلفتها، مواعيد منظمة مع تذكير قبل كل جلسة، وطرق دفع مريحة تناسبك.</p>
+   <div class="ctas"><a class="btn gold" href="#book"><svg><use href="#i-cal"/></svg>احجز موعدك الآن</a><a class="btn wa" data-wa="main" href="#"><svg><use href="#i-wa"/></svg>راسلنا على الواتساب</a></div>
+   <div class="facts"><span><svg><use href="#i-pin"/></svg><span id="fact-clinics">عيادات في عدة مناطق</span></span><span><svg><use href="#i-wallet"/></svg>دفعات وأقساط شهرية</span><span><svg><use href="#i-cal"/></svg>تذكير بالمواعيد</span><span><svg><use href="#i-heart"/></svg>متابعة بعد العلاج</span></div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+   <svg viewBox="0 0 240 240" fill="none">
+    <circle cx="120" cy="120" r="112" stroke="currentColor" stroke-opacity=".14"/>
+    <circle cx="120" cy="120" r="92" stroke="#B08A4E" stroke-opacity=".5" stroke-dasharray="2 6"/>
+    <path d="M86 58c-17 0-27 13.5-27 31 0 16.2 6.8 27 10.8 41.2 4 15.5 5.4 42.5 17.6 42.5 10.8 0 10.8-31 29-31s18.2 31 29 31c12.2 0 13.5-27 17.6-42.5 4-14.2 10.8-25 10.8-41.2 0-17.5-10.1-31-27-31-12.8 0-18.2 6.8-30.4 6.8S98.8 58 86 58z" fill="#B08A4E" fill-opacity=".12" stroke="#D2AF76" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M150 74c6 2 10 8 10 16" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+    <path d="M182 44l3.5 9.5L195 57l-9.5 3.5L182 70l-3.5-9.5L169 57l9.5-3.5z" fill="#D2AF76"/>
+    <path d="M56 170l2.2 6 6 2.2-6 2.2-2.2 6-2.2-6-6-2.2 6-2.2z" fill="#D2AF76" fill-opacity=".7"/>
+   </svg>
+   <div class="sig">د. هدى ياسين</div>
+  </div>
+ </div>
+</section>
+
+<section class="band" id="services">
+ <div class="wrap">
+  <div class="head"><div class="eyebrow">خدماتنا</div><h2>كل ما تحتاجه أسنانك في مكان واحد</h2><p>نبدأ بفحص وتشخيص، ونشرح لك الخيارات والكلفة قبل أي علاج.</p></div>
+  <div class="services" id="svc-grid"></div>
+ </div>
+</section>
+
+<section class="band alt" id="journey">
+ <div class="wrap">
+  <div class="head"><div class="eyebrow">كيف نعمل</div><h2>رحلة علاج واضحة من البداية</h2><p>نرتّب كل خطوة حتى لا تضيع جلسة ولا يتأخر موعد.</p></div>
+  <ol class="steps">
+   <li><h3>احجز بالواتساب</h3><p>اختر العيادة والوقت المناسب، ويصلك تأكيد الحجز باليوم والساعة واسم الطبيب.</p></li>
+   <li><h3>فحص وخطة علاج</h3><p>يفحصك الطبيب ويشرح لك العلاج وعدد الجلسات والكلفة الكلية قبل البدء.</p></li>
+   <li><h3>جلسات بمواعيد ثابتة</h3><p>نحجز موعد جلستك القادمة قبل أن تغادر، ونذكّرك قبلها بيوم.</p></li>
+   <li><h3>متابعة بعد العلاج</h3><p>نطمئن عليك بعد القلع أو العلاج، ونذكّرك بالفحص الدوري كل ستة أشهر.</p></li>
+  </ol>
+ </div>
+</section>
+
+<section class="band" id="payment">
+ <div class="wrap pay">
+  <div>
+   <div class="head" style="margin-bottom:24px"><div class="eyebrow">الدفع والأقساط</div><h2>ادفع بالطريقة التي تناسبك</h2></div>
+   <ul>
+    <li><svg><use href="#i-check"/></svg><div><b>نقداً دفعة واحدة</b><span>للعلاجات القصيرة والجلسة الواحدة.</span></div></li>
+    <li><svg><use href="#i-check"/></svg><div><b>دفعات حسب الجلسات</b><span>تدفع مع كل جلسة، ويصلك وصل يبيّن المدفوع والمتبقي.</span></div></li>
+    <li><svg><use href="#i-check"/></svg><div><b>أقساط شهرية</b><span>للتيجان والزراعة والتقويم، بمقدّمة وأقساط واضحة التواريخ.</span></div></li>
+   </ul>
+  </div>
+  <div class="pay-card">
+   <h3>وصل وكشف حساب لكل مريض</h3>
+   <p>بعد كل دفعة نرسل لك وصلاً بالواتساب فيه تفاصيل جلساتك والمبلغ المتبقي وموعدك القادم.</p>
+   <p style="margin-top:18px;color:#fff;font-weight:500">طرق الدفع المتاحة</p>
+   <div class="methods"><span>نقد</span><span>زين كاش</span><span>FIB</span><span>كي كارد</span><span>تحويل مصرفي</span></div>
+  </div>
+ </div>
+</section>
+
+<section class="band alt" id="clinics">
+ <div class="wrap">
+  <div class="head"><div class="eyebrow">عياداتنا</div><h2>اختر العيادة الأقرب لك</h2><p>شوف مكان كل عيادة على الخريطة وأوقات دوامها، واحجز فيها مباشرة.</p></div>
+  <div class="clinics" id="clinic-grid"></div>
+ </div>
+</section>
+
+<section class="band" id="book">
+ <div class="wrap book">
+  <div class="book-side">
+   <div class="eyebrow" style="color:var(--gold-ink)">احجز موعدك</div>
+   <h2>اطلب موعداً خلال دقيقة</h2>
+   <p>املأ النموذج واضغط «إرسال طلب الحجز». يصل طلبك مباشرة إلى العيادة، ونتواصل معك لتأكيد اليوم والساعة.</p>
+   <ul>
+    <li><svg><use href="#i-check"/></svg>يصلك تأكيد الحجز باليوم والساعة واسم الطبيب</li>
+    <li><svg><use href="#i-check"/></svg>تذكير قبل موعدك بيوم</li>
+    <li><svg><use href="#i-check"/></svg>لتغيير الموعد يكفي الرد على رسالة التذكير</li>
+   </ul>
+  </div>
+  <form class="bk" id="bk" novalidate>
+   <div class="f"><label for="bk-name">الاسم الكامل</label><input id="bk-name" autocomplete="name" required><small class="err">اكتب اسمك</small></div>
+   <div class="f"><label for="bk-phone">رقم الهاتف</label><input id="bk-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07xxxxxxxxx" dir="ltr" style="text-align:right" required><small class="err">اكتب رقم هاتف صحيح</small></div>
+   <div class="f"><label for="bk-clinic">العيادة</label><select id="bk-clinic" required></select></div>
+   <div class="f"><label for="bk-svc">سبب الزيارة</label><select id="bk-svc"></select></div>
+   <div class="f"><label for="bk-date">اليوم المفضّل</label><input id="bk-date" type="date"></div>
+   <div class="f"><span id="bk-when-l" style="font-size:14px;font-weight:500;color:var(--ink-2)">الوقت المفضّل</span><div class="seg" role="radiogroup" aria-labelledby="bk-when-l"><label><input type="radio" name="when" value="صباحاً"><span>صباحاً</span></label><label><input type="radio" name="when" value="عصراً" checked><span>عصراً</span></label><label><input type="radio" name="when" value="مساءً"><span>مساءً</span></label></div></div>
+   <div class="f full"><label for="bk-note">ملاحظات (اختياري)</label><textarea id="bk-note" placeholder="مثال: ألم في الضرس السفلي منذ يومين"></textarea></div>
+   <div class="hp" aria-hidden="true"><label for="bk-web">اترك هذا الحقل فارغاً</label><input id="bk-web" tabindex="-1" autocomplete="off"></div>
+   <button class="btn gold" type="submit" id="bk-send"><svg><use href="#i-cal"/></svg>إرسال طلب الحجز</button>
+   <a class="btn ghost bk-wa" id="bk-wa" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>أو احجز عبر الواتساب</a>
+   <p class="note" id="bk-msg" role="status">نستخدم اسمك ورقمك فقط للتواصل معك بخصوص موعدك.</p>
+  </form>
+  <div class="bk-done" id="bk-done" hidden tabindex="-1">
+   <div class="ok"><svg><use href="#i-check"/></svg></div>
+   <h3>وصل طلبك، شكراً لك</h3>
+   <p id="bk-done-sum"></p>
+   <p class="muted">سنتواصل معك على رقمك قريباً لتأكيد اليوم والساعة. للاستعجال يمكنك مراسلتنا بالواتساب.</p>
+   <div class="row"><a class="btn wa" id="bk-done-wa" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>مراسلة العيادة</a><button class="btn ghost" type="button" id="bk-again">طلب حجز آخر</button></div>
+  </div>
+ </div>
+</section>
+
+<section class="band alt" id="faq">
+ <div class="wrap">
+  <div class="head"><div class="eyebrow">أسئلة شائعة</div><h2>قبل أن تزورنا</h2></div>
+  <div class="faq">
+   <details><summary>هل يمكن تقسيط كلفة العلاج؟</summary><p>نعم. للعلاجات الطويلة مثل التيجان والزراعة والتقويم يمكن الدفع بمقدّمة وأقساط شهرية، أو دفعات مع كل جلسة. نتفق على الطريقة قبل البدء.</p></details>
+   <details><summary>كيف أعرف كلفة علاجي؟</summary><p>بعد الفحص يشرح لك الطبيب العلاج المناسب وعدد الجلسات والكلفة الكلية، ولا نبدأ إلا بعد موافقتك.</p></details>
+   <details><summary>أريد تغيير موعدي، ماذا أفعل؟</summary><p>راسل العيادة على الواتساب أو رد على رسالة التذكير، ونحدد لك موعداً آخر.</p></details>
+   <details><summary>ماذا أحضر معي في الزيارة الأولى؟</summary><p>أي صور أشعة سابقة إن وجدت، وأسماء الأدوية التي تتناولها، وأخبر الطبيب عن أي حالة صحية مثل السكري أو ضغط الدم أو الحمل أو حساسية الأدوية.</p></details>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer>
+ <div class="wrap">
+  <div class="grid">
+   <div><div class="sig">د. هدى ياسين</div><p style="margin-top:8px;font-size:14.5px">مجموعة عيادات طب الأسنان. نعتني بابتسامتك من الفحص الأول حتى آخر جلسة.</p><a class="btn wa sm" data-wa="main" href="#" style="margin-top:18px"><svg><use href="#i-wa"/></svg>واتساب</a></div>
+   <div><h4>عياداتنا</h4><ul id="foot-clinics"></ul></div>
+   <div><h4>روابط</h4><ul><li><a href="#services">خدماتنا</a></li><li><a href="#payment">الدفع والأقساط</a></li><li><a href="#book">احجز موعدك</a></li><li><a href="#faq">أسئلة شائعة</a></li></ul></div>
+  </div>
+  <div class="copy"><span>© <span id="yr"></span> عيادات د. هدى ياسين لطب الأسنان</span><span id="foot-phone"></span></div>
+ </div>
+</footer>
+
+<a class="fab" data-wa="main" href="#" aria-label="مراسلة العيادة على الواتساب"><svg><use href="#i-wa"/></svg></a>
+
+<script>
+"use strict";
+/* ===== Edit this block to update the site: clinics, phone numbers and services ===== */
+const SITE={
+  whatsapp:'+964 776 087 5919',          // main WhatsApp number for the whole group
+  clinics:[
+    {name:'عيادة العريج',area:'حمام العليل · العريج',phone:'+964 776 087 5919',map:''},
+    {name:'عيادة حي التنك',area:'حي التنك',phone:'+964 776 087 5919',map:''},
+    {name:'عيادة تل الرمان',area:'تل الرمان',phone:'',map:''}   // empty phone uses the main number
+  ],
+  services:[
+    ['i-scan','فحص واستشارة','فحص شامل وتشخيص، مع خطة علاج مكتوبة بالكلفة وعدد الجلسات.'],
+    ['i-clean','تنظيف وتلميع','إزالة الجير والتصبغات للحفاظ على صحة اللثة ونضارة الابتسامة.'],
+    ['i-tooth','حشوات تجميلية','حشوات بلون السن الطبيعي تعيد شكل السن ووظيفته.'],
+    ['i-root','علاج العصب','علاج جذور الأسنان للتخلص من الألم والحفاظ على السن الطبيعي.'],
+    ['i-shield','قلع بسيط وجراحي','قلع آمن مع تعليمات واضحة بعده ومتابعة للاطمئنان عليك.'],
+    ['i-crown','تيجان وجسور','تيجان زيركون وبورسلين لتعويض الأسنان المتضررة أو المفقودة.'],
+    ['i-spark','فينير وتجميل','قشور تجميلية وتبييض لابتسامة متناسقة ومشرقة.'],
+    ['i-implant','زراعة الأسنان','تعويض الأسنان المفقودة بزرعات ثابتة تشبه الأسنان الطبيعية.'],
+    ['i-align','تقويم الأسنان','تنظيم الأسنان المزدحمة أو المتباعدة مع متابعة دورية.'],
+    ['i-child','أسنان الأطفال','تعامل لطيف مع الصغار، وقاية وحشوات وفحوصات دورية.']
+  ]
+};
+/* ============================================================================ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const waNum=ph=>{let d=String(ph||'').replace(/\D/g,'');if(d.startsWith('00'))d=d.slice(2);if(d.startsWith('0'))d='964'+d.slice(1);else if(d.length===10&&d.startsWith('7'))d='964'+d;return d};
+const waLink=(ph,text)=>`https://wa.me/${waNum(ph)}${text?'?text='+encodeURIComponent(text):''}`;
+const phoneOf=c=>c.phone||SITE.whatsapp;
+const pretty=ph=>{const d=waNum(ph);return d.startsWith('964')?'0'+d.slice(3).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'):ph};
+const mapOf=c=>c.map||`https://www.google.com/maps/search/${encodeURIComponent('عيادة أسنان '+c.area)}`;
+
+$('#svc-grid').innerHTML=SITE.services.map(([i,t,d])=>`<article class="svc"><i><svg><use href="#${i}"/></svg></i><h3>${esc(t)}</h3><p>${esc(d)}</p></article>`).join('');
+function renderClinics(){
+  const L=SITE.clinics;
+  $('#clinic-grid').innerHTML=L.map((c,i)=>{const has=c.lat!=null&&c.lng!=null;const dir=has?`https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`:(c.mapUrl||mapOf(c));
+    return `<article class="clinic">${has?`<div class="map"><iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="خريطة ${esc(c.name)}" src="https://maps.google.com/maps?q=${c.lat},${c.lng}&z=16&output=embed"></iframe></div>`:''}
+    <h3>${esc(c.name)}</h3><div class="area"><svg><use href="#i-pin"/></svg>${esc([c.area,c.address].filter(Boolean).join(' · '))}</div>
+    ${c.hours?`<div class="hrs"><svg><use href="#i-cal"/></svg>${esc(c.hours)}</div>`:''}<div class="ph">الهاتف: <b>${esc(pretty(phoneOf(c)))}</b></div>
+    <div class="acts"><button class="btn gold sm" type="button" data-pick="${i}"><svg><use href="#i-cal"/></svg>احجز في هذه العيادة</button><a class="btn ghost sm" href="${esc(dir)}" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg>${has?'الاتجاهات':'الموقع'}</a><a class="btn ghost sm" href="tel:+${waNum(phoneOf(c))}"><svg><use href="#i-phone"/></svg>اتصال</a><a class="btn wa sm" href="${waLink(phoneOf(c),`مرحباً، أود الاستفسار عن موعد في ${c.name}`)}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>واتساب</a></div></article>`}).join('');
+  $('#foot-clinics').innerHTML=L.map(c=>`<li>${esc(c.name)} · ${esc(c.area)}</li>`).join('');
+  $('#fact-clinics').textContent=L.length>1?`${L.length} عيادات قريبة منك`:'عيادة قريبة منك';
+  const sel=$('#bk-clinic');const keep=sel.value;sel.innerHTML=L.map((c,i)=>`<option value="${i}">${esc(c.name)}${c.area?' · '+esc(c.area):''}</option>`).join('');if(keep&&+keep<L.length)sel.value=keep;
+}
+renderClinics();
+document.addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(!b)return;$('#bk-clinic').value=b.dataset.pick;$('#book').scrollIntoView({behavior:'smooth'});setTimeout(()=>$('#bk-name').focus({preventScroll:true}),500)});
+$('#foot-phone').innerHTML=`<span dir="ltr">${esc(pretty(SITE.whatsapp))}</span>`;
+$('#yr').textContent=new Date().getFullYear();
+$('#bk-svc').innerHTML=['فحص واستشارة','ألم في السن'].concat(SITE.services.slice(1).map(s=>s[1])).concat(['أخرى']).map(s=>`<option>${esc(s)}</option>`).join('');
+const today=new Date();const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+$('#bk-date').min=iso(today);
+document.querySelectorAll('[data-wa="main"]').forEach(a=>{a.href=waLink(SITE.whatsapp,'مرحباً، أود حجز موعد في عيادات د. هدى ياسين');a.target='_blank';a.rel='noopener'});
+
+const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const MONTHS=['كانون الثاني','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
+const normDigits=s=>String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+let DB=null;
+function initDB(){try{const C=window.FIREBASE_CONFIG;if(!window.firebase||!C||!C.firebase)return;firebase.initializeApp(C.firebase);DB=firebase.firestore();
+  DB.collection('publicSite').doc('clinics').get().then(d=>{const l=d.exists&&(d.data()||{}).clinics;if(Array.isArray(l)&&l.length){SITE.clinics=l;renderClinics()}}).catch(()=>{})}catch(e){DB=null}}
+document.addEventListener('DOMContentLoaded',initDB);
+const bkData=()=>{const f=$('#bk');const c=SITE.clinics[+$('#bk-clinic').value]||SITE.clinics[0]||{};const dv=$('#bk-date').value;
+  let day='أقرب موعد متاح';if(dv){const d=new Date(dv+'T12:00');day=`${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`}
+  return {c,dv,day,name:$('#bk-name').value.trim(),phone:normDigits($('#bk-phone').value).replace(/[^\d+]/g,''),svc:$('#bk-svc').value,when:(f.querySelector('input[name=when]:checked')||{}).value||'',note:$('#bk-note').value.trim()}};
+const bkText=x=>`مرحباً، أود حجز موعد\nالاسم: ${x.name}\nالهاتف: ${x.phone}\nالعيادة: ${x.c.name||''}\nسبب الزيارة: ${x.svc}\nاليوم المفضّل: ${x.day}${x.when?' · '+x.when:''}${x.note?'\nملاحظات: '+x.note:''}`;
+const updWa=()=>{const x=bkData();$('#bk-wa').href=waLink(phoneOf(x.c),bkText(x))};
+$('#bk').addEventListener('input',updWa);$('#bk').addEventListener('change',updWa);updWa();
+const msgEl=$('#bk-msg');const say=(t,bad)=>{msgEl.textContent=t;msgEl.classList.toggle('bad',!!bad)};
+function showDone(x){$('#bk').hidden=true;const d=$('#bk-done');d.hidden=false;$('#bk-done-sum').textContent=`${x.name} · ${x.c.name||''} · ${x.day}${x.when?' '+x.when:''}`;$('#bk-done-wa').href=waLink(phoneOf(x.c),bkText(x));d.focus()}
+$('#bk-again').addEventListener('click',()=>{$('#bk-done').hidden=true;const f=$('#bk');f.hidden=false;f.reset();$('#bk-send').disabled=false;say('نستخدم اسمك ورقمك فقط للتواصل معك بخصوص موعدك.');updWa()});
+$('#bk').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.currentTarget;let ok=true;const x=bkData();
+  const mark=(id,bad)=>{$(id).closest('.f').classList.toggle('bad',bad);if(bad)ok=false};
+  mark('#bk-name',x.name.length<2||x.name.length>70);mark('#bk-phone',x.phone.replace(/\D/g,'').length<10||x.phone.length>20);
+  if(!ok){f.querySelector('.bad input')?.focus();return}
+  if($('#bk-web').value){showDone(x);return}
+  let last=0;try{last=+localStorage.getItem('bk-last')||0}catch(_){}
+  if(Date.now()-last<60000){say('أرسلت طلباً قبل قليل. سنتواصل معك قريباً، أو راسلنا بالواتساب.',true);return}
+  if(!DB){say('تعذّر الاتصال، أرسل طلبك عبر الواتساب من الزر أدناه.',true);return}
+  const btn=$('#bk-send');btn.disabled=true;say('جارِ إرسال طلبك…');
+  try{
+    await Promise.race([DB.collection('bookings').add({name:x.name,phone:x.phone,clinicId:x.c.id||'',clinicName:x.c.name||'',service:x.svc.slice(0,60),date:x.dv||'',period:x.when,note:x.note.slice(0,400),status:'new',source:'site',createdAt:new Date().toISOString()}),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),12000))]);
+    try{localStorage.setItem('bk-last',String(Date.now()))}catch(_){}
+    showDone(x);
+  }catch(err){btn.disabled=false;say('تعذّر إرسال الطلب الآن. أرسله عبر الواتساب من الزر أدناه وسنرد عليك.',true)}
+});
+['#bk-name','#bk-phone'].forEach(id=>$(id).addEventListener('input',e=>e.target.closest('.f').classList.remove('bad')));
+const topBar=$('#top');addEventListener('scroll',()=>topBar.classList.toggle('scrolled',scrollY>8),{passive:true});
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
+<script src="system/firebase-config.js" defer></script>
+</body>
+</html>
