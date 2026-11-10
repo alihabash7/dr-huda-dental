@@ -388,6 +388,19 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 
 
 
+
+/* ---- treatment departments ---- */
+.cat-dot{width:9px;height:9px;border-radius:50%;background:var(--cc);display:inline-block;flex:none}
+.cat-tag{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;color:var(--cc);background:color-mix(in srgb,var(--cc) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--cc) 35%,transparent);vertical-align:middle}
+.cat-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 2px 8px;padding-bottom:6px;border-bottom:2px solid color-mix(in srgb,var(--cc) 45%,var(--line));font-size:15px}
+.cat-head b{font-size:16px}
+.cat-seg{margin-bottom:12px}.cat-seg button{gap:6px}.cat-seg button.on .cat-dot{background:var(--on-primary)}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:0 16px 16px}
+.cat-box{border:1px solid var(--line);border-top:4px solid var(--cc);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.cat-h{display:flex;align-items:center;gap:8px}.cat-h b{font-size:15px}
+.cat-n{display:flex;justify-content:space-between;align-items:baseline}.cat-n span{font-size:12px;color:var(--ink-3)}.cat-n b{font-size:20px;font-variant-numeric:tabular-nums}
+.cat-s{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--ink-2)}
+@media (max-width:560px){.cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 10px 12px}.cat-box{padding:10px;gap:6px}.cat-n{flex-direction:column;align-items:flex-start}.cat-n b{font-size:17px}.cat-s{font-size:11.5px}.cat-h b{font-size:14px}}
 /* ---- clear (x) buttons inside fields ---- */
 .clr-wrap{position:relative}
 .clr-wrap>input,.clr-wrap>textarea{width:100%;padding-inline-end:38px}
@@ -1117,12 +1130,12 @@ PAGES.appointments=()=>{
   ${list.length?Object.keys(groups).sort((a,b)=>clinicName(a).localeCompare(clinicName(b),'ar')).map(c=>`<section class="card"><div class="card-h"><h3>${esc(clinicName(c))}</h3><span class="chip">${groups[c].length} موعد</span></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>الوقت</th><th>المريض</th><th>الإجراء</th><th>الطبيب</th><th>الحالة</th><th></th></tr></thead><tbody>${groups[c].map(a=>{const p=get('patients',a.patientId)||{};return `<tr><td class="time">${t12(a.time)}<div class="muted" style="font-weight:400;font-size:12px">${a.dur||30} دقيقة</div></td><td><div class="who"><a href="#patient" data-act="openPatient" data-id="${p.id||''}" style="text-decoration:none;font-weight:500">${esc(p.name||'—')}</a><small dir="ltr" style="text-align:end">${esc(p.phone||'')}</small></div></td><td>${esc(a.procedure||'—')}${a.notes?`<div class="muted" style="font-size:12px">${esc(a.notes)}</div>`:''}</td><td>${esc(docName(a.doctorId))}${a.chair?`<span class="chair-tag">${chairLbl(a.chair)}</span>`:''}</td><td><select class="inline-sel" data-chg="apptStatus" data-id="${a.id}" aria-label="حالة الموعد">${Object.entries(APPT_ST).map(([k,[l]])=>`<option value="${k}" ${a.status===k?'selected':''}>${l}</option>`).join('')}</select></td><td><div class="acts">${apptGo(a)}${remBtn(a)}<button class="icon-btn" data-act="editAppt" data-id="${a.id}" aria-label="تعديل">${ic('edit',16)}</button></div></td></tr>`}).join('')}</tbody></table></div></section>`).join(''):`<section class="card">${empty('لا مواعيد في هذا اليوم',state.clinic==='all'?'':'للعيادة المختارة',`<button class="btn primary sm" data-act="newAppt">${ic('plus',16)} حجز موعد</button>`)}</section>`}`;
 };
 
-PAGES.patients=()=>`${secHead(isDoctor()?'مرضاي':'سجل المرضى',`${all('patients').filter(pf).length} مريض${state.clinic!=='all'?' في '+esc(clinicName(state.clinic)):''}`,`<label class="search">${ic('search',16)}<input id="q-pat" data-inp="q" value="${esc(state.q)}" placeholder="بحث بالاسم أو رقم الهاتف" aria-label="بحث"></label>${seeMoney()?`<button class="btn" data-act="dupTool">${ic('users',16)} فحص التكرار${dupGroups().length?` <b class="chip bad" style="height:20px">${dupGroups().length}</b>`:''}</button><a class="btn" href="#import" data-act="go" data-page="import">${ic('file',16)} من السجلات القديمة</a>`:''}${seeMoney()&&can('addPatient')?`<button class="btn" data-act="oldPatient">${ic('file',16)} مريض قديم</button>`:''}<button class="btn primary" data-act="newPatient">${ic('plus',16)} مريض جديد</button>`)}<section class="card" id="pat-list">${patientTable()}</section>`;
+PAGES.patients=()=>`${secHead(isDoctor()?'مرضاي':'سجل المرضى',`${all('patients').filter(pf).length} مريض${state.clinic!=='all'?' في '+esc(clinicName(state.clinic)):''}`,`<label class="search">${ic('search',16)}<input id="q-pat" data-inp="q" value="${esc(state.q)}" placeholder="بحث بالاسم أو رقم الهاتف" aria-label="بحث"></label>${seeMoney()?`<button class="btn" data-act="dupTool">${ic('users',16)} فحص التكرار${dupGroups().length?` <b class="chip bad" style="height:20px">${dupGroups().length}</b>`:''}</button><a class="btn" href="#import" data-act="go" data-page="import">${ic('file',16)} من السجلات القديمة</a>`:''}${seeMoney()&&can('addPatient')?`<button class="btn" data-act="oldPatient">${ic('file',16)} مريض قديم</button>`:''}<button class="btn primary" data-act="newPatient">${ic('plus',16)} مريض جديد</button>`)}${catSeg('pcat',state.pcat,k=>all('patients').filter(pf).filter(p=>patientCats(p.id).has(k)).length)}<section class="card" id="pat-list">${patientTable()}</section>`;
 const clinicChips=p=>{const rs=patientClinics(p.id);if(rs.length<2)return esc(clinicName(p.clinicId));return `<div class="pc-chips">${rs.map(r=>`<span class="pc-tag" style="--ch:${clinicHue(r.cid)}"><span class="scope-dot"></span>${esc(clinicName(r.cid))}</span>`).join('')}</div>`};
 function patientTable(){return otherClinicBox(state.q)+patientTableIn()}
 function patientTableIn(){
   const q=state.q.trim();const st=patientStats();
-  let ps=all('patients').filter(pf);if(q)ps=ps.filter(p=>(p.name||'').includes(q)||(p.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,'')));
+  let ps=all('patients').filter(pf);if(state.pcat&&state.pcat!=='all')ps=ps.filter(p=>patientCats(p.id).has(state.pcat));if(q)ps=ps.filter(p=>(p.name||'').includes(q)||(p.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,'')));
   ps.sort((a,b)=>((st.get(b.id)?.last||b.createdAt||'')).localeCompare(st.get(a.id)?.last||a.createdAt||''));
   if(!ps.length)return empty(q?'لا نتائج مطابقة':'لا يوجد مرضى بعد',q?'جرّب جزءاً من الاسم أو آخر أرقام الهاتف':'أضف أول مريض أو احجز موعداً لمريض جديد',q?'':`<button class="btn primary sm" data-act="newPatient">${ic('plus',16)} مريض جديد</button>`);
   if(!seeMoney())return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">عدد الأعمال</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{count:0,last:''};return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${s.count}</td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>`;
@@ -1149,13 +1162,15 @@ PAGES.patient=()=>{
   ${pcTop?'':patientClinicsCard(p)}
   ${patientLedger(p,ts)}
   ${isDoctor()?'':patientFollowCard(p)}
-  <div class="sec">${secHead(seeMoney()?'خطط العلاج والحسابات':'الأعمال المسجلة','')}${ts.length?ts.map(treatmentCard).join(''):`<section class="card">${empty('لا توجد خطة علاج بعد','أضف العلاج مع كلفته وطريقة الدفع: نقد، دفعات، أو أقساط شهرية.',`<button class="btn primary sm" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} علاج جديد</button>`)}</section>`}</div>
+  <div class="sec">${secHead(seeMoney()?'خطط العلاج والحسابات':'الأعمال المسجلة','')}${ts.length?groupByCat(ts):`<section class="card">${empty('لا توجد خطة علاج بعد','أضف العلاج مع كلفته وطريقة الدفع: نقد، دفعات، أو أقساط شهرية.',`<button class="btn primary sm" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} علاج جديد</button>`)}</section>`}</div>
   <div class="two even">
    <section class="card"><div class="card-h"><h3>أعمال المختبر</h3><span class="chip">${labs.length}</span></div>${labs.length?`<div class="list">${labs.map(o=>`<div class="li"><div class="grow"><div class="t">${esc(o.work)} ${o.teeth?.length?`<span class="teeth-tag">${o.teeth.join('، ')}</span>`:''}</div><div class="s">${esc(get('labs',o.labId)?.name||'')} · أُرسل ${fmtDate(o.sentDate)}${(o.redos||[]).length?` · ${o.redos.length} إعادة`:''}</div></div>${chip(LAB_ST[o.status]?.[0]||'',LAB_ST[o.status]?.[1])}<button class="icon-btn" data-act="editLab" data-id="${o.id}" aria-label="تعديل">${ic('edit',16)}</button></div>`).join('')}</div>`:empty('لا أعمال مختبر','')}</section>
    <section class="card"><div class="card-h"><h3>المواعيد</h3></div>${ap.length?`<div class="list">${ap.map(a=>`<div class="li"><div class="grow"><div class="t">${dayLabel(a.date)} · ${t12(a.time)}</div><div class="s">${esc(a.procedure||'')} · ${esc(docName(a.doctorId))} · ${esc(clinicName(a.clinicId))}</div></div>${chip(APPT_ST[a.status]?.[0]||'',APPT_ST[a.status]?.[1])}</div>`).join('')}</div>`:empty('لا مواعيد','')}</section>
   </div>`;
 };
 const planChip=t=>t.legacy?chip('رصيد سابق من السجلات','accent'):t.plan==='installments'?chip(`أقساط · ${t.count||(t.schedule||[]).length} شهر`,'accent'):t.plan==='partial'?chip('دفعات','info'):chip('نقد');
+function groupByCat(ts){const g={};ts.forEach(t=>{(g[txCat(t)]=g[txCat(t)]||[]).push(t)});const keys=TX_CATS.map(c=>c[0]).filter(k=>g[k]);
+  return keys.map(k=>{const l=g[k];const rem=sum(l,t=>Math.max(0,tBal(t)));return `<div class="cat-head" style="--cc:${catHue(k)}"><span class="cat-dot"></span><b>${esc(catLbl(k))}</b><span class="muted">${l.length} ${l.length===1?'علاج':'علاجات'}</span>${seeMoney()&&rem>0?`<span class="bad-t">متبقٍ ${fmt(rem)}</span>`:''}</div>`+l.map(treatmentCard).join('')}).join('')}
 function treatmentCard(t){
   if(!seeMoney())return `<article class="card tx"><div class="tx-h"><div><h4>${esc(t.procedure)}${(t.teeth||[]).length?`<span class="teeth-tag">${t.teeth.join('، ')}</span>`:''}</h4><p class="muted">${fmtDate(t.date)} · ${esc(docName(t.doctorId))} · ${esc(clinicName(t.clinicId))}</p></div></div>${(()=>{const d=sessDone(t),pl=num(t.plannedSessions);return `<div class="sess-bar">${ic('calendar',15)}<span>${sessLabel(t)}</span>${pl?`<span class="sess-dots">${Array.from({length:Math.min(pl,20)},(_,i)=>`<i class="${i<d?'on':''}"></i>`).join('')}</span>`:''}</div>`})()}${sessionPanel(t)}${t.notes?`<p class="note" style="margin:0">${esc(t.notes)}</p>`:''}<div class="tx-f"><button class="btn primary sm" data-act="addSession" data-tid="${t.id}">${ic('plus',16)} تسجيل جلسة</button><button class="btn sm" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} حجز الجلسة القادمة</button>${can('price')&&!t.legacy?`<button class="btn sm" data-act="extendTx" data-tid="${t.id}">${ic('tooth',16)} أسنان / عمل إضافي</button>`:''}<button class="btn ghost sm" data-act="editTreatment" data-id="${t.id}">${ic('edit',16)} تعديل</button></div>${extrasHTML(t)}</article>`;
   const tot=tTotal(t),pd=tPaid(t),bal=tot-pd,sch=schedStatus(t),p=get('patients',t.patientId)||{};
@@ -1274,6 +1289,7 @@ PAGES.reports=()=>{
   const cost=[['رواتب الموظفين',T.staff],['مستحقات الأطباء',T.doctors],['الإيجارات',T.rent],['المختبرات',T.lab],['المواد والمشتريات',T.supplies],['المصاريف التشغيلية',T.opex]];
   return `${secHead(`التقرير المالي${rcid?' · '+esc(clinicName(rcid)):''} · ${monthLabel(m)}`,'الإيرادات = ما حُصّل فعلاً من المرضى. الكلف تشمل الرواتب والإيجار الشهري المقسّط والمختبر والمواد.',`<button class="btn" data-act="exportCsv">${ic('down',16)} تصدير Excel (CSV)</button>`)}
   <div class="kpis">${kpi('الإيرادات',money(T.revenue))}${kpi('الكلف',money(T.cost))}${kpi('صافي الربح',money(T.net),T.revenue?'الهامش '+pctOf(T.net,T.revenue)+'%':'','hl')}${kpi('أعلى بند كلفة',(cost.slice().sort((a,b)=>b[1]-a[1])[0]||['—'])[0],fmt((cost.slice().sort((a,b)=>b[1]-a[1])[0]||[,0])[1])+' د.ع')}</div>
+  ${catReportCard(m,rcid)}
   <section class="card"><div class="card-h"><h3>${rcid?'الأرباح والخسائر':'الأرباح والخسائر حسب العيادة'}</h3></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>العيادة</th><th class="n">الإيرادات</th><th class="n">رواتب</th><th class="n">أطباء</th><th class="n">إيجار</th><th class="n">مختبر</th><th class="n">مواد</th><th class="n">تشغيلية</th><th class="n">الصافي</th><th class="n">الهامش</th></tr></thead><tbody>${rows.map(([n,p])=>trs(n,p)).join('')}${hasUn?trs('عام / غير مخصص لعيادة',Object.assign({},un),false):''}</tbody><tfoot>${trs('المجموع',T,true).replace(/^<tr[^>]*>/,'<tr>')}</tfoot></table></div></section>
   <div class="two even">
    <section class="card"><div class="card-h"><h3>توزيع الكلف</h3></div><div class="pad">${cost.map(([l,v])=>`<div class="stat-line"><span>${l}</span><b>${fmt(v)} <small class="cur">${T.cost?pctOf(v,T.cost)+'%':''}</small></b></div>`).join('')}${Object.keys(byCat).length?`<div class="cat-row" style="margin-top:12px">${EXP_CATS.filter(([k])=>byCat[k]).map(([k,l])=>chip(`${l}: ${fmt(byCat[k])}`,'accent')).join('')}</div>`:''}</div></section>
@@ -1452,7 +1468,7 @@ const debtors=()=>M('debtors',()=>{const st=new Map();
     s.promise=s.p.followUp&&s.p.followUp.date||'';out.push(s)}
   return out});
 function filteredDebtors(){
-  let ds=debtors().slice();const q=normDigits(state.dq||'').trim();
+  let ds=debtors().slice();const q=normDigits(state.dq||'').trim();if(state.dcat&&state.dcat!=='all')ds=ds.filter(s=>s.tx.some(t=>txCat(t)===state.dcat));
   if(q)ds=ds.filter(s=>(s.p.name||'').includes(q)||(s.p.phone||'').includes(q));
   if(state.dbucket!=null&&state.dbucket!=='all')ds=ds.filter(s=>s.bucket===Number(state.dbucket));
   if(state.dstat&&state.dstat!=='all')ds=ds.filter(s=>state.dstat==='promise'?(s.promise&&s.promise<=TODAY):s.status===state.dstat);
@@ -1482,6 +1498,7 @@ PAGES.debts=()=>{
   const st=myStaff();const head=isAdmin()?(state.clinic==='all'?'ذمم المرضى · كل العيادات':'ذمم مرضى '+clinicName(state.clinic)):'ديون مرضى '+(st?clinicName(st.clinicId):'العيادة');
   return `${secHead(esc(head),isAdmin()?'تظهر للإدارة كل العيادات، ولكل سكرتيرة ديون عيادتها فقط · لا تظهر للأطباء':'مستحقات مرضى عيادتك وأطبائها',`<button class="btn wa" data-act="bulkDemand">${ic('chat',16)} مطالبة جماعية للقائمة الحالية</button><button class="btn" data-act="exportDebts">${ic('down',16)} تصدير Excel</button>`)}
   ${filt}
+  ${catSeg('dcat',state.dcat,k=>debtors().filter(s=>s.tx.some(t=>txCat(t)===k)).length)}
   <div class="kpis">${kpi('إجمالي ديون المرضى',money(tot),`${ds.length} مريض مدين`,'hl')}${kpi('أقساط فات موعدها',money(lateAmt),`${ds.filter(s=>s.late>0).length} مريض`)}${kpi('ديون متعثرة',money(sum(stuck,s=>s.bal)),`${stuck.length} مريض · بدون دفع أكثر من 90 يوم`)}${kpi('وعود دفع مستحقة',String(prom.length),`المحصّل في ${monthLabel(m)}: ${fmt(collected)}`)}</div>
   <section class="card"><div class="card-h"><h3>أعمار الديون</h3><span class="muted" style="font-size:12.5px">حسب المدة منذ آخر دفعة · اضغط للتصفية</span></div><div class="pad" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px" id="aging">
    ${bk.map((b,i)=>`<button class="age-cell ${String(B)===String(i)?'on':''}" data-act="dbucket" data-v="${String(B)===String(i)?'all':i}"><span>${BUCKETS[i]}</span><b>${fmt(b.amt)}</b><small>${b.n} مريض</small><i style="--w:${Math.round(b.amt/mx*100)}%;--o:${.45+i*.18}"></i></button>`).join('')}
@@ -2973,6 +2990,7 @@ function clReport(c){
     ${kpi('صافي الربح',money(P.net),P.revenue?`الهامش ${pctOf(P.net,P.revenue)}% · ${delta(P.net,prev.net)}`:'لا إيرادات بعد','hl')}
     ${kpi('ترتيب العيادة',rank.length>1?`${pos} من ${rank.length}`:'—','حسب صافي الربح هذا الشهر')}
   </div>
+  ${catReportCard(m,cid)}
   <div class="two">${trendChart(cid)}
    <section class="card"><div class="card-h"><h3>أين ذهبت الكلف؟</h3></div><div class="pad">${parts.length?parts.sort((a,b)=>b[1]-a[1]).map(([l,v])=>`<div class="cl-bar"><span>${l}</span><div class="bar warn"><i style="width:${pctOf(v,P.cost)}%"></i></div><b class="num">${fmt(v)}</b></div>`).join(''):'<p class="muted" style="margin:0">لا كلف مسجلة</p>'}</div></section>
   </div>
@@ -3060,7 +3078,7 @@ function visitNow(p){
     if(money_&&can('price')&&!legacyOnly)acts.push(`<button class="btn ghost" data-act="extendTx" data-tid="${t.id}">${ic('plus',15)} أسنان / عمل إضافي</button>`);
     if(s.todayDone&&!finished&&!legacyOnly)acts.push(`<button class="btn ghost" data-act="addSession" data-tid="${t.id}">${ic('plus',15)} جلسة أخرى</button>`);
     return `<article class="vn-card" style="--ch:${clinicHue(t.clinicId)}">
-      <div class="vn-h"><div style="min-width:0"><h4>${esc(t.procedure||'علاج')}${(t.teeth||[]).length?`<span class="teeth-tag">${t.teeth.join('، ')}</span>`:''}</h4><p>${esc(docName(t.doctorId))} · <span class="pc-tag"><span class="scope-dot"></span>${esc(clinicName(t.clinicId))}</span>${s.prev&&s.prev.date?` · آخر جلسة ${fmtDate(s.prev.date)}`:''}</p></div>${nxAp?`<span class="chip ${nxAp.date===TODAY?'accent':'info'}">${ic('calendar',12)} ${nxAp.date===TODAY?'اليوم '+t12(nxAp.time):dayLabel(nxAp.date)}</span>`:''}</div>
+      <div class="vn-h"><div style="min-width:0"><h4>${catChip(txCat(t))} ${esc(t.procedure||'علاج')}${(t.teeth||[]).length?`<span class="teeth-tag">${t.teeth.join('، ')}</span>`:''}</h4><p>${esc(docName(t.doctorId))} · <span class="pc-tag"><span class="scope-dot"></span>${esc(clinicName(t.clinicId))}</span>${s.prev&&s.prev.date?` · آخر جلسة ${fmtDate(s.prev.date)}`:''}</p></div>${nxAp?`<span class="chip ${nxAp.date===TODAY?'accent':'info'}">${ic('calendar',12)} ${nxAp.date===TODAY?'اليوم '+t12(nxAp.time):dayLabel(nxAp.date)}</span>`:''}</div>
       <div class="vn-row">${sessBox}${moneyBox}</div>${dots}
       ${acts.length?`<div class="vn-acts">${acts.join('')}</div>`:''}</article>`};
   return `<section class="card vn"><div class="card-h"><h3>${ic('tooth',18)} ${todayAp?`موعده اليوم ${t12(todayAp.time)} · ابدأ من هنا`:'متابعة العلاج'}</h3>${ts.length>1?chip(ts.length+' علاجات مفتوحة','info'):''}</div><div class="vn-list">${ts.slice(0,4).map(card).join('')}</div></section>`;
@@ -3114,6 +3132,31 @@ function extendForm(tid){
 }
 ACTIONS.extendTx=d=>extendForm(d.tid);
 const extrasHTML=t=>(t.extras||[]).length?`<div class="tx-extras">${t.extras.map(e=>`<span class="chip accent">${ic('plus',12)} ${fmtDate(e.date)}${e.what?' · '+esc(e.what):''}${(e.teeth||[]).length?' · أسنان '+e.teeth.join('، '):''}${seeMoney()?' · '+fmt(e.amount):''}</span>`).join('')}</div>`:'';
+
+/* ---------- Treatment departments: fillings & extractions / crowns / orthodontics / other ---------- */
+const TX_CATS=[['fill','حشوات وقلع','tooth','#0f766e'],['crown','تلبيسات','box','#b45309'],['ortho','تقويم','chair','#7c3aed'],['other','علاجات أخرى','plus','#64748b']];
+const TX_CAT_RE={ortho:/تقويم|حاصر|ريتينر|مثبت|تقويمي/,crown:/تلبيس|تاج|تيجان|زيركون|زركون|بورسلين|بورسلان|جسر|جسور|فينير|قشور|طقم|أطقم|اطقم|إيماكس|ايماكس|كراون|crown/i,fill:/حشو|حشوة|قلع|خلع|عصب|جذور|لثة|تنظيف|تلميع|جراح|أطفال|اطفال|سحب/};
+const guessCat=proc=>{const s=String(proc||'');for(const k of ['ortho','crown','fill'])if(TX_CAT_RE[k].test(s))return k;return 'other'};
+const txCat=t=>t&&TX_CATS.some(c=>c[0]===t.cat)?t.cat:guessCat(t&&t.procedure);
+const catLbl=k=>(TX_CATS.find(c=>c[0]===k)||TX_CATS[3])[1];
+const catHue=k=>(TX_CATS.find(c=>c[0]===k)||TX_CATS[3])[3];
+const catChip=k=>`<span class="cat-tag" style="--cc:${catHue(k)}">${esc(catLbl(k))}</span>`;
+/* per-department numbers for a month (and clinic) */
+function catStats(month,cid){return M('cat:'+month+':'+(cid||''),()=>{const o={};TX_CATS.forEach(([k])=>o[k]={k,tx:0,value:0,collected:0,remaining:0,patients:new Set(),open:0});
+  for(const t of all('treatments')){if(cid&&t.clinicId!==cid)continue;if(!isAdmin()&&!cf(t))continue;const r=o[txCat(t)];
+    if(monthOf(t.date)===month&&!t.legacy){r.tx++;r.value+=tTotal(t);r.patients.add(t.patientId)}
+    const b=tBal(t);if(b>0){r.remaining+=b;r.open++}
+    for(const p of t.payments||[])if(!p.old&&monthOf(p.date)===month)r.collected+=num(p.amount)}
+  return TX_CATS.map(([k])=>o[k])})}
+function catReportCard(month,cid){const rows=catStats(month,cid);const mx=Math.max(1,...rows.map(r=>r.collected));if(!rows.some(r=>r.tx||r.collected||r.remaining))return '';
+  return `<section class="card"><div class="card-h"><h3>${ic('tooth',17)} حسب القسم · ${monthLabel(month)}</h3></div><div class="cat-grid">${rows.map(r=>`<div class="cat-box" style="--cc:${catHue(r.k)}"><div class="cat-h"><span class="cat-dot"></span><b>${esc(catLbl(r.k))}</b></div>
+    <div class="cat-n"><span>المحصّل</span><b>${fmt(r.collected)}</b></div><div class="bar"><i style="width:${pctOf(r.collected,mx)}%;background:var(--cc)"></i></div>
+    <div class="cat-s"><span>${r.tx} علاج جديد · ${r.patients.size} مريض</span><span>قيمة الأعمال ${fmt(r.value)}</span><span class="${r.remaining?'bad-t':''}">ديون متبقية ${fmt(r.remaining)}${r.open?' ('+r.open+')':''}</span></div></div>`).join('')}</div></section>`}
+/* filter strip used on patients and debts pages */
+const catSeg=(act,cur,count)=>`<div class="seg cat-seg" role="tablist" aria-label="تصفية حسب القسم"><button class="${!cur||cur==='all'?'on':''}" data-act="${act}" data-v="all">كل الأقسام</button>${TX_CATS.map(([k,l])=>{const n=count?count(k):null;return `<button class="${cur===k?'on':''}" data-act="${act}" data-v="${k}" style="--cc:${catHue(k)}"><span class="cat-dot"></span>${esc(l)}${n!=null?` <b>${n}</b>`:''}</button>`}).join('')}</div>`;
+ACTIONS.pcat=d=>{state.pcat=d.v;render()};
+ACTIONS.dcat=d=>{state.dcat=d.v;render()};
+const patientCats=pid=>M('pcats:'+pid,()=>new Set(all('treatments').filter(t=>t.patientId===pid&&(isAdmin()||cf(t))).map(txCat)));
 
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
@@ -3268,7 +3311,7 @@ function patientForm(p,after){
 function treatmentForm(t,pid,pre){
   const isNew=!t;t=t||{};pid=t.patientId||pid;pre=pre||{};const mC=maxChairs();const pt=get('patients',pid);const money_=seeMoney()&&can('price');const payOk=can('pay');
   const fields=[
-    {k:'procedure',label:'العلاج',req:true,list:'dl-procs',ph:'مثال: تاج زيركون'},
+    {k:'cat',label:'القسم',type:'select',opts:TX_CATS.map(c=>[c[0],c[1]]),empty:'تلقائي حسب اسم العلاج',hint:'حشوات وقلع · تلبيسات · تقويم · أخرى'},{k:'procedure',label:'العلاج',req:true,list:'dl-procs',ph:'مثال: تاج زيركون'},
     {k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},{k:'doctorId',label:'الطبيب المعالج',type:'select',opts:optDoctors(),empty:'— اختر —',req:true,half:true},
     {k:'chair',label:'الكرسي',type:'select',opts:chairOpts(mC),empty:'—',half:true,show:v=>chairCount(v.clinicId)>1,hint:'الكرسي الذي يُعالَج عليه المريض'},
     {k:'teeth',label:'الأسنان المعالجة (اختياري)',type:'teeth'},
@@ -3291,9 +3334,9 @@ function treatmentForm(t,pid,pre){
       else el.textContent=tot>0&&num(t.discount)?`الصافي بعد الخصم: ${fmt(tot)} د.ع`:''},
     danger:isNew||!isAdmin()?null:{label:'حذف العلاج',onClick:()=>confirmBox('سيُحذف هذا العلاج مع كل دفعاته.',async()=>{await del('treatments',t.id);toast('تم الحذف')})},
     onSubmit:async v=>{if(isNew)nextCheck(v,nxCtx);const nxProc=()=>`${v.procedure} · الجلسة القادمة`;
-      if(!money_){const doc=Object.assign(isNew?{payments:[],schedule:[],fee:0,discount:0,plan:'partial',down:0}:clone(t),{patientId:pid,procedure:v.procedure,clinicId:v.clinicId,doctorId:v.doctorId,chair:v.chair||'',date:v.date,teeth:v.teeth,notes:v.notes,plannedSessions:num(v.plannedSessions)||''});if(isNew)doc.byDoctor=true;const tid=await put('treatments',doc);markApptDone(pre.apptId);const nid=isNew?await nextBook(v,nxCtx,pid,nxProc(),tid):null;toast('تم تسجيل العمل'+(nid?' · وحُجزت الجلسة القادمة':''));if(nid)setTimeout(()=>bookedModal(nid),60);return}
+      if(!money_){const doc=Object.assign(isNew?{payments:[],schedule:[],fee:0,discount:0,plan:'partial',down:0}:clone(t),{patientId:pid,procedure:v.procedure,cat:v.cat||guessCat(v.procedure),clinicId:v.clinicId,doctorId:v.doctorId,chair:v.chair||'',date:v.date,teeth:v.teeth,notes:v.notes,plannedSessions:num(v.plannedSessions)||''});if(isNew)doc.byDoctor=true;const tid=await put('treatments',doc);markApptDone(pre.apptId);const nid=isNew?await nextBook(v,nxCtx,pid,nxProc(),tid):null;toast('تم تسجيل العمل'+(nid?' · وحُجزت الجلسة القادمة':''));if(nid)setTimeout(()=>bookedModal(nid),60);return}
       const total=Math.max(0,num(v.fee)-num(t.discount));if(total<=0)fail('أدخل كلفة العلاج');
-      const doc=Object.assign(isNew?{}:clone(t),{patientId:pid,procedure:v.procedure,clinicId:v.clinicId,doctorId:v.doctorId,chair:v.chair||'',date:v.date,teeth:v.teeth,fee:num(v.fee),discount:num(t.discount),plan:v.plan,notes:v.notes,plannedSessions:num(v.plannedSessions)||''});
+      const doc=Object.assign(isNew?{}:clone(t),{patientId:pid,procedure:v.procedure,cat:v.cat||guessCat(v.procedure),clinicId:v.clinicId,doctorId:v.doctorId,chair:v.chair||'',date:v.date,teeth:v.teeth,fee:num(v.fee),discount:num(t.discount),plan:v.plan,notes:v.notes,plannedSessions:num(v.plannedSessions)||''});
       if(v.plan==='installments'){doc.down=num(v.down);if(doc.down>=total)fail('المقدّمة تساوي أو تتجاوز الكلفة، اختر الدفع نقداً');doc.count=Math.max(1,Math.round(num(v.count)||1));doc.firstDue=v.firstDue||addMonths(v.date,1);doc.schedule=buildSchedule(total-doc.down,doc.count,doc.firstDue)}else{doc.schedule=[];doc.down=0;delete doc.count}
       if(isNew){doc.payments=[];const amt=!payOk?0:v.plan==='installments'?doc.down:(v.plan==='cash'&&v.paidNow===''?total:num(v.paidNow));if(amt>total)fail('المبلغ المستلم أكبر من الكلفة');if(amt>0)doc.payments.push({id:uid(),amount:amt,date:v.date,method:v.method,chair:v.chair||'',by:Store.me||null})}
       const tid=await put('treatments',doc);markApptDone(pre.apptId);const nid=isNew?await nextBook(v,nxCtx,pid,nxProc(),tid):null;toast('تم حفظ العلاج'+(nid?' · وحُجزت الجلسة القادمة':''));if(nid)setTimeout(()=>bookedModal(nid),60)}});
