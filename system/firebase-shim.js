@@ -34,7 +34,7 @@
   document.body.appendChild(box);
   var mode='in';
   function msg(t,k){var m=box.querySelector('.msg');if(m){m.textContent=t||'';m.className='msg '+(k||'')}}
-  function arErr(e){var c=(e&&e.code)||'';return c.indexOf('wrong-password')>=0||c.indexOf('invalid-credential')>=0||c.indexOf('user-not-found')>=0?'البريد أو كلمة المرور غير صحيحة':c.indexOf('email-already')>=0?'هذا البريد مسجّل مسبقاً، اختر «لدي حساب»':c.indexOf('weak-password')>=0?'كلمة المرور قصيرة، 8 أحرف على الأقل':c.indexOf('invalid-email')>=0?'البريد الإلكتروني غير صحيح':c.indexOf('popup')>=0?'أُغلقت نافذة Google قبل إكمال الدخول':c.indexOf('network')>=0?'لا يوجد اتصال بالإنترنت':c.indexOf('too-many')>=0?'محاولات كثيرة، انتظر قليلاً':'تعذّر الدخول ('+c+')'}
+  function arErr(e){var c=(e&&e.code)||'';return c.indexOf('wrong-password')>=0||c.indexOf('invalid-credential')>=0||c.indexOf('user-not-found')>=0?'البريد أو كلمة المرور غير صحيحة':c.indexOf('email-already')>=0?'هذا البريد مسجّل مسبقاً، اختر «لدي حساب»':c.indexOf('weak-password')>=0?'كلمة المرور قصيرة، 8 أحرف على الأقل':c.indexOf('invalid-email')>=0?'البريد الإلكتروني غير صحيح':c.indexOf('unauthorized-domain')>=0?'الدخول بحساب Google غير مفعّل لهذا الرابط بعد. أضيفي «'+location.hostname+'» في Firebase ← Authentication ← Settings ← Authorized domains، أو ادخلي الآن بالبريد وكلمة المرور.':c.indexOf('popup')>=0?'أُغلقت نافذة Google قبل إكمال الدخول':c.indexOf('network')>=0?'لا يوجد اتصال بالإنترنت':c.indexOf('too-many')>=0?'محاولات كثيرة، انتظر قليلاً':'تعذّر الدخول ('+c+')'}
   function head(){return '<div class="sig">د. هدى ياسين</div><div class="sub">نظام إدارة عيادات طب الأسنان</div>'}
   function showLogin(){
     box.hidden=false;
