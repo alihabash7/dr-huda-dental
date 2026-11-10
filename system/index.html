@@ -387,6 +387,17 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 
 
 
+
+/* ---- clear (x) buttons inside fields ---- */
+.clr-wrap{position:relative}
+.clr-wrap>input,.clr-wrap>textarea{width:100%;padding-inline-end:38px}
+.clr-btn{position:absolute;inset-inline-end:7px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:0;background:var(--surface-2);color:var(--ink-3);display:none;place-items:center;cursor:pointer;padding:0}
+.clr-btn:hover,.clr-btn:active{background:color-mix(in srgb,var(--bad) 18%,var(--surface-2));color:var(--bad)}
+.clr-wrap.has-v>.clr-btn,.money-in.has-v>.clr-btn{display:grid}
+.clr-wrap.ta>.clr-btn{top:8px;transform:none}
+.money-in .clr-btn{inset-inline-end:40px}
+.money-in input{padding-inline-end:72px}
+.tx-extras{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 14px}
 /* ---- visit now ---- */
 .vn{border-color:color-mix(in srgb,var(--primary) 35%,var(--line))}
 .vn .card-h h3{display:flex;align-items:center;gap:8px}
@@ -948,6 +959,8 @@ function fieldHTML(f,v){
     case 'patient':{const p=get('patients',v);input=`<input id="${id}" name="${f.k}" list="dl-patients" autocomplete="off" value="${esc(p?patientLabel(p):'')}" placeholder="اكتب اسم المريض للبحث، أو اسماً جديداً لإضافته">`;break}
     default:input=`<input id="${id}" name="${f.k}" type="${f.type==='number'?'text':(f.type||'text')}" ${f.type==='number'?'inputmode="decimal" data-inp="digits"':''}${f.type==='tel'?' data-inp="digits"':''} value="${esc(v??'')}" placeholder="${esc(f.ph||'')}" ${f.list?`list="${f.list}"`:''} ${f.min!=null?`min="${f.min}"`:''} ${f.max!=null?`max="${f.max}"`:''} ${f.type==='tel'?'dir="ltr" inputmode="tel" style="text-align:right"':''} autocomplete="off">`;
   }
+  if(!f.noClear&&(!f.type||['text','tel','number','patient','textarea','email'].includes(f.type)))input=`<div class="clr-wrap ${v!=null&&v!==''?'has-v':''} ${f.type==='textarea'?'ta':''}">${input}<button type="button" class="clr-btn" data-act="clrField" tabindex="-1" aria-label="مسح الخانة" title="مسح">${ic('x',14)}</button></div>`;
+  else if(f.type==='money')input=input.replace('<div class="money-in">',`<div class="money-in ${v!=null&&v!==''&&num(v)?'has-v':''}">`).replace('<span>د.ع</span>',`<button type="button" class="clr-btn" data-act="clrField" tabindex="-1" aria-label="مسح المبلغ" title="مسح">${ic('x',14)}</button><span>د.ع</span>`);
   return `<div class="fld ${f.half?'half':''} ${f.third?'third':''}" data-k="${f.k}"><label for="${id}">${esc(f.label)}${f.req?' <b class="req">*</b>':''}</label>${input}${f.hint?`<small class="hint">${esc(f.hint)}</small>`:''}</div>`;
 }
 /* Tooth chart: real tooth silhouettes (roots up for the upper jaw, down for the lower), FDI number inside the crown */
@@ -1144,7 +1157,7 @@ PAGES.patient=()=>{
 };
 const planChip=t=>t.legacy?chip('رصيد سابق من السجلات','accent'):t.plan==='installments'?chip(`أقساط · ${t.count||(t.schedule||[]).length} شهر`,'accent'):t.plan==='partial'?chip('دفعات','info'):chip('نقد');
 function treatmentCard(t){
-  if(!seeMoney())return `<article class="card tx"><div class="tx-h"><div><h4>${esc(t.procedure)}${(t.teeth||[]).length?`<span class="teeth-tag">${t.teeth.join('، ')}</span>`:''}</h4><p class="muted">${fmtDate(t.date)} · ${esc(docName(t.doctorId))} · ${esc(clinicName(t.clinicId))}</p></div></div>${(()=>{const d=sessDone(t),pl=num(t.plannedSessions);return `<div class="sess-bar">${ic('calendar',15)}<span>${sessLabel(t)}</span>${pl?`<span class="sess-dots">${Array.from({length:Math.min(pl,20)},(_,i)=>`<i class="${i<d?'on':''}"></i>`).join('')}</span>`:''}</div>`})()}${sessionPanel(t)}${t.notes?`<p class="note" style="margin:0">${esc(t.notes)}</p>`:''}<div class="tx-f"><button class="btn primary sm" data-act="addSession" data-tid="${t.id}">${ic('plus',16)} تسجيل جلسة</button><button class="btn sm" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} حجز الجلسة القادمة</button><button class="btn ghost sm" data-act="editTreatment" data-id="${t.id}">${ic('edit',16)} تعديل</button></div></article>`;
+  if(!seeMoney())return `<article class="card tx"><div class="tx-h"><div><h4>${esc(t.procedure)}${(t.teeth||[]).length?`<span class="teeth-tag">${t.teeth.join('، ')}</span>`:''}</h4><p class="muted">${fmtDate(t.date)} · ${esc(docName(t.doctorId))} · ${esc(clinicName(t.clinicId))}</p></div></div>${(()=>{const d=sessDone(t),pl=num(t.plannedSessions);return `<div class="sess-bar">${ic('calendar',15)}<span>${sessLabel(t)}</span>${pl?`<span class="sess-dots">${Array.from({length:Math.min(pl,20)},(_,i)=>`<i class="${i<d?'on':''}"></i>`).join('')}</span>`:''}</div>`})()}${sessionPanel(t)}${t.notes?`<p class="note" style="margin:0">${esc(t.notes)}</p>`:''}<div class="tx-f"><button class="btn primary sm" data-act="addSession" data-tid="${t.id}">${ic('plus',16)} تسجيل جلسة</button><button class="btn sm" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} حجز الجلسة القادمة</button>${can('price')&&!t.legacy?`<button class="btn sm" data-act="extendTx" data-tid="${t.id}">${ic('tooth',16)} أسنان / عمل إضافي</button>`:''}<button class="btn ghost sm" data-act="editTreatment" data-id="${t.id}">${ic('edit',16)} تعديل</button></div>${extrasHTML(t)}</article>`;
   const tot=tTotal(t),pd=tPaid(t),bal=tot-pd,sch=schedStatus(t),p=get('patients',t.patientId)||{};
   return `<article class="card tx"><div class="tx-h"><div><h4>${esc(t.procedure)}${(t.teeth||[]).length?`<span class="teeth-tag">${t.teeth.join('، ')}</span>`:''}</h4><p class="muted">${fmtDate(t.date)} · ${esc(docName(t.doctorId))} · ${esc(clinicName(t.clinicId))}</p></div><div class="tx-meta">${planChip(t)}${bal<=0&&tot>0?chip('مسدّد بالكامل','good'):''}</div></div>
   <div class="tx-nums"><div><span>الكلفة</span><b>${money(tot)}</b>${num(t.discount)?`<small>بعد خصم ${fmt(t.discount)}</small>`:''}</div><div><span>المدفوع</span><b class="good-t">${money(pd)}</b></div><div><span>المتبقي</span><b class="${bal>0?'bad-t':''}">${money(bal)}</b></div></div>
@@ -1152,7 +1165,7 @@ function treatmentCard(t){
   <div class="progress" role="img" aria-label="نسبة السداد ${pctOf(pd,tot)}%"><i style="width:${Math.min(100,pctOf(pd,tot))}%"></i></div>
   ${sch.length?`<div class="sched">${num(t.down)?`<div class="inst ${pd>=num(t.down)?'paid':'open'}"><span class="n">م</span><span>المقدّمة</span><b>${fmt(t.down)}</b><em>${pd>=num(t.down)?'مدفوعة':'غير مدفوعة'}</em></div>`:''}${sch.map((x,i)=>`<div class="inst ${x.state}"><span class="n">${i+1}</span><span>${fmtDate(x.due)}</span><b>${fmt(x.amount)}</b><em>${INST_ST[x.state]}${x.state!=='paid'&&x.paid?` · دُفع ${fmt(x.paid)}`:''}</em></div>`).join('')}</div>`:''}
   ${t.notes?`<p class="note" style="margin:0">${esc(t.notes)}</p>`:''}
-  <div class="tx-f"><button class="btn sm" data-act="addSession" data-tid="${t.id}">${ic('plus',16)} تسجيل جلسة</button><button class="btn sm" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} الجلسة القادمة</button>${bal>0&&can('pay')?`<button class="btn primary sm" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} تسجيل دفعة</button>`:''}<button class="btn ghost sm" data-act="editTreatment" data-id="${t.id}">${ic('edit',16)} تعديل</button></div></article>`;
+  <div class="tx-f"><button class="btn sm" data-act="addSession" data-tid="${t.id}">${ic('plus',16)} تسجيل جلسة</button><button class="btn sm" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} الجلسة القادمة</button>${bal>0&&can('pay')?`<button class="btn primary sm" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} تسجيل دفعة</button>`:''}${can('price')&&!t.legacy?`<button class="btn sm" data-act="extendTx" data-tid="${t.id}">${ic('tooth',16)} أسنان / عمل إضافي</button>`:''}<button class="btn ghost sm" data-act="editTreatment" data-id="${t.id}">${ic('edit',16)} تعديل</button></div>${extrasHTML(t)}</article>`;
 }
 
 PAGES.accounts=()=>{
@@ -1697,12 +1710,12 @@ CHANGES.cdate=v=>{if(v){state.cdate=v;render()}};
 
 /* ---------- Payment demands: compose, send on WhatsApp, log the contact ---------- */
 const DEMAND_TPL=[
- ['soft','تذكير لطيف','مرحباً {الاسم}،\nنود تذكيركم بأن المبلغ المتبقي من حساب علاجكم في {العيادة} هو {المبلغ} دينار.\nيسعدنا استقبالكم لتسديده في الوقت المناسب لكم. شكراً لثقتكم.'],
- ['inst','قسط مستحق','مرحباً {الاسم}،\nنذكّركم بوجود أقساط مستحقة بقيمة {المتأخر} دينار، والمتبقي الكلي من حسابكم {المبلغ} دينار.\nنرجو التسديد في أقرب وقت أو التواصل معنا لتحديد موعد مناسب.'],
- ['firm','مطالبة رسمية','السيد/السيدة {الاسم} المحترم/ة،\nنود إعلامكم بأن المبلغ المستحق عليكم لدى {العيادة} بلغ {المبلغ} دينار، وقد مضى {الأيام} يوماً على آخر دفعة.\nنرجو تسديد المبلغ خلال أسبوع من تاريخ هذه الرسالة أو مراجعة إدارة العيادة.'],
+ ['soft','تذكير لطيف','مرحباً {الاسم} 🌷\nنتمنى أن تكونوا بخير.\nنود تذكيركم بلطف أن المبلغ المتبقي من حساب علاجكم في {العيادة} لطب الأسنان هو:\n💳 {المبلغ} دينار\n\nيسعدنا استقبالكم لتسديده في الوقت المناسب لكم، ويمكن الاتفاق على دفعات مريحة مع إدارة العيادة.\nشكراً لثقتكم بنا 🤍'],
+ ['inst','قسط مستحق','مرحباً {الاسم} 🌷\nنذكّركم بوجود قسط مستحق في {العيادة} لطب الأسنان:\n💳 القسط المستحق: {المتأخر} دينار\n📋 المتبقي الكلي: {المبلغ} دينار\n\nنرجو التسديد في أقرب وقت، أو التواصل معنا لترتيب موعد يناسبكم.\nشكراً لتعاونكم 🤍'],
+ ['firm','مطالبة رسمية','السيد/السيدة {الاسم} المحترم/ة،\nتحية طيبة وبعد،\nنود إعلامكم بأن المبلغ المستحق عليكم لدى {العيادة} لطب الأسنان بلغ {المبلغ} دينار، وقد مضى {الأيام} يوماً على آخر دفعة.\nنرجو تسديد المبلغ خلال أسبوع من تاريخ هذه الرسالة أو مراجعة إدارة العيادة.\nمع التقدير.'],
 ];
 function debtFor(pid){return debtors().find(x=>x.pid===pid)||(()=>{const ts=all('treatments').filter(t=>t.patientId===pid&&tBal(t)>0);const p=get('patients',pid)||{};let last='';ts.forEach(t=>(t.payments||[]).forEach(x=>{if((x.date||'')>last)last=x.date}));return {pid,p,bal:sum(ts,tBal),late:sum(ts,t=>sum(schedStatus(t).filter(x=>x.state==='late'),x=>num(x.amount)-x.paid)),clinics:new Set(ts.map(t=>t.clinicId)),age:Math.max(0,daysBetween(last||ts[0]?.date||TODAY,TODAY))}})()}
-function fillDemand(t,s){const p=s.p||{};return t.replace(/{الاسم}/g,p.name||'').replace(/{المبلغ}/g,fmt(s.bal)).replace(/{المتأخر}/g,fmt(s.late||s.bal)).replace(/{العيادة}/g,[...s.clinics].map(clinicName).join(' و ')||clinicName(p.clinicId)).replace(/{الأيام}/g,String(s.age))+'\n'+SIGN}
+function fillDemand(t,s){const p=s.p||{};const txt=t.replace(/{الاسم}/g,p.name||'').replace(/{المبلغ}/g,fmt(s.bal)).replace(/{المتأخر}/g,fmt(s.late||s.bal)).replace(/{العيادة}/g,[...s.clinics].map(id=>clinicFull(get('clinics',id))).join(' و ')||clinicFull(get('clinics',p.clinicId))).replace(/{الأيام}/g,String(s.age));const c=get('clinics',[...s.clinics][0]||p.clinicId);return signNice(withSite(withMap(txt+'\n'+SIGN,c)).replace(/لطب الأسنان لطب الأسنان/g,'لطب الأسنان'))}
 const lastContact=p=>{const l=(p.collectLog||[]).filter(x=>x.kind==='demand');return l.length?l[l.length-1].at:''};
 function demandModal(pid,queue,qi){
   const s=debtFor(pid);const p=s.p||{};if(!s.bal){toast('لا مبالغ متبقية على '+(p.name||''),'warn');return queue?nextDemand(queue,qi):undefined}
@@ -2141,10 +2154,10 @@ ACTIONS.toggleSuspend=d=>{const s=get('staff',d.id);if(!s)return;const on=!s.sus
 
 /* ---------- Patient follow-up: check on patients after treatment, periodic recalls, WhatsApp care messages ---------- */
 const FU_TPL_DEF={
-  surgery:'مرحباً {name}، نتمنى لكم السلامة 🌿\nنطمئن على حالتكم بعد {procedure} عند {doctor}. هل تشعرون بألم أو نزف أو تورّم؟\nتذكير: تجنّبوا المضمضة القوية والأكل الحار اليوم، واستخدموا الكمادات الباردة عند الحاجة.\nلأي استفسار نحن بالخدمة.\n{clinic} · {sign}',
-  after:'مرحباً {name}، نود الاطمئنان عليكم بعد جلسة {procedure} في {clinic}.\nإذا شعرتم بأي انزعاج أو كان لديكم استفسار نحن بالخدمة دائماً.\nنتمنى لكم دوام الصحة.\n{sign}',
-  recall:'مرحباً {name}، مضت {months} أشهر على آخر زيارة لكم في {clinic}.\nننصح بفحص دوري وتنظيف للحفاظ على صحة أسنانكم. يسعدنا حجز موعد يناسبكم.\n{sign}',
-  care:'مرحباً {name}، نتمنى أن تكونوا بخير.\nنطمئن عليكم من {clinic}، وإذا احتجتم أي شيء نحن بالخدمة.\n{sign}'};
+  surgery:'مرحباً {name} 🌷\nنتمنى لكم السلامة والعافية.\nنحن من {clinic} لطب الأسنان نطمئن عليكم بعد {procedure} مع {doctor} 🦷\n\nهل تشعرون بألم أو نزف أو تورّم؟ طمّنونا بالرد على هذه الرسالة.\n\n💡 نصائح مهمة:\n• تجنّبوا المضمضة القوية والأكل الحار اليوم.\n• استخدموا الكمادات الباردة عند الحاجة.\n• التزموا بالأدوية حسب إرشادات الطبيب.\n\nنحن بخدمتكم دائماً 🤍\n{sign}',
+  after:'مرحباً {name} 🌷\nنتمنى أن تكونوا بأتم الصحة والعافية.\nنطمئن عليكم بعد جلسة {procedure} في {clinic} لطب الأسنان 🦷\n\nإذا شعرتم بأي انزعاج أو عندكم أي استفسار، راسلونا هنا ونرد عليكم بأسرع وقت.\n\nدمتم بابتسامة جميلة ✨\n{sign}',
+  recall:'مرحباً {name} 🌷\nاشتقنا لكم! مضت {months} أشهر على آخر زيارة لكم في {clinic} لطب الأسنان 🦷\n\nالفحص الدوري والتنظيف يحافظان على صحة أسنانكم ويكشفان أي مشكلة مبكراً.\n📅 احجزوا موعدكم بالرد على هذه الرسالة أو من موقعنا الإلكتروني.\n\nبانتظاركم ✨\n{sign}',
+  care:'مرحباً {name} 🌷\nنتمنى أن تكونوا بخير وعافية.\nنطمئن عليكم من {clinic} لطب الأسنان 🦷\nإذا احتجتم أي شيء نحن بخدمتكم دائماً 🤍\n{sign}'};
 const FU_KIND={surgery:['بعد قلع / جراحة','warn'],after:['بعد العلاج','info'],recall:['فحص دوري','accent'],manual:['متابعة مجدولة','']};
 const FU_OUT=[['good','بخير ومرتاح','good'],['pain','يشكو من ألم أو انزعاج','warn'],['visit','يحتاج مراجعة','bad'],['noanswer','لم يرد','muted'],['other','أخرى','']];
 const FU_SKIP_RE=/فحص|استشار|أشعة|اشعة/;const FU_SURG_RE=/قلع|جراح|زرع|زراعة|عصب|جذور|لثة/;
@@ -2171,7 +2184,7 @@ function fuItems(){return M('fu',()=>{
 })}
 const fuToday=()=>fuItems().filter(x=>x.status==='pending'&&x.kind!=='recall'&&x.due<=TODAY);
 function fuText(x,tk){const p=get('patients',x.pid)||{};const c=get('clinics',x.clinicId)||{};const k_=tk||(x.kind==='manual'?'care':x.kind);
-  return (k_==='recall'?withSite(withMap(fuTpl(k_),c)):fuTpl(k_).replace(/\n?[^\n]*\{map\}[^\n]*/g,'')).replace(/\{name\}/g,p.name||'').replace(/\{procedure\}/g,(x.t&&x.t.procedure)||'العلاج').replace(/\{doctor\}/g,docName(x.doctorId)).replace(/\{clinic\}/g,c.name||'عيادتنا').replace(/\{months\}/g,String(num(fuCfg().recallMonths)||6)).replace(/\{date\}/g,fmtDate(x.lastDate||(x.v&&x.v.date)||x.due)).replace(/\{sign\}/g,SIGN)}
+  return signNice(withSite(withMap(fuTpl(k_),c)).replace(/\{name\}/g,p.name||'').replace(/\{procedure\}/g,(x.t&&x.t.procedure)||'العلاج').replace(/\{doctor\}/g,docName(x.doctorId)).replace(/\{clinic\}/g,clinicFull(c)).replace(/\{months\}/g,String(num(fuCfg().recallMonths)||6)).replace(/\{date\}/g,fmtDate(x.lastDate||(x.v&&x.v.date)||x.due)).replace(/\{sign\}/g,SIGN).replace(/لطب الأسنان لطب الأسنان/g,'لطب الأسنان'))}
 async function fuSave(x,patch){const base=x.doc?clone(x.doc):{id:x.id,key:x.key,kind:x.kind,patientId:x.pid,clinicId:x.clinicId||'',doctorId:x.doctorId||'',treatmentId:(x.t&&x.t.id)||'',due:x.due,reason:x.reason};
   await put('followups',Object.assign(base,patch,{id:x.id}))}
 const fuFind=key=>fuItems().find(x=>x.key===key||x.id===key);
@@ -2274,7 +2287,7 @@ const remTpl=k=>(remCfg().tpl||{})[k]||REM_TPL_DEF[k];
 const remKind=a=>a.date===TODAY?'today':'before';
 function remText(a,k){const p=get('patients',a.patientId)||{};const c=get('clinics',a.clinicId)||{};const d=parse(a.date);
   const when=a.date===TODAY?'اليوم':a.date===addDays(TODAY,1)?'غداً':'يوم';
-  return withSite(withMap(remTpl(k||remKind(a)),c)).replace(/\{name\}/g,p.name||'').replace(/\{when\}/g,when).replace(/\{day\}/g,DAYS_AR[d.getDay()]).replace(/\{date\}/g,`${d.getDate()} ${MONTHS_AR[d.getMonth()]}`).replace(/\{time\}/g,t12(a.time)).replace(/\{doctor\}/g,a.doctorId?docName(a.doctorId):'الطبيب المختص').replace(/\{clinic\}/g,c.name||'عيادتنا').replace(/\{address\}/g,[clinicAddr(c),c.phone?'هاتف '+c.phone:''].filter(Boolean).join(' · ')||c.name||'').replace(/\{procedure\}/g,a.procedure||'').replace(/\{sign\}/g,SIGN).replace(/\n📍 \n/g,'\n')}
+  return signNice(withSite(withMap(remTpl(k||remKind(a)),c)).replace(/\{name\}/g,p.name||'').replace(/\{when\}/g,when).replace(/\{day\}/g,DAYS_AR[d.getDay()]).replace(/\{date\}/g,`${d.getDate()} ${MONTHS_AR[d.getMonth()]}`).replace(/\{time\}/g,t12(a.time)).replace(/\{doctor\}/g,a.doctorId?docName(a.doctorId):'الطبيب المختص').replace(/\{clinic\}/g,clinicFull(c)).replace(/\{address\}/g,[clinicAddr(c),c.phone?'هاتف '+c.phone:''].filter(Boolean).join(' · ')||c.name||'').replace(/\{procedure\}/g,a.procedure||'').replace(/\{sign\}/g,SIGN).replace(/\n📍 \n/g,'\n'))}
 /* which reminder is still owed for this appointment */
 const remField=k=>k==='booking'?'bookSent':k==='today'?'remToday':'remSent';
 const remDone=(a,k)=>!!a[remField(k||remKind(a))];
@@ -2401,10 +2414,12 @@ const noMapCard=()=>{const ids=optClinics().map(x=>x[0]).filter(id=>state.clinic
 const clinicMapUrl=c=>{if(!c)return '';const loc=parseLoc(c.mapLoc);if(loc)return `https://maps.google.com/?q=${loc.lat},${loc.lng}`;const u=String(c.mapLoc||'').trim();return /^https?:\/\//.test(u)?u:''};
 const clinicAddr=c=>c?[c.area,c.address].filter(Boolean).join('، '):'';
 const clinicLocText=c=>{if(!c)return '';const a=clinicAddr(c),u=clinicMapUrl(c);return [a?'📍 العنوان: '+a:'',u?'🗺️ موقع العيادة على الخريطة:\n'+u:'',c.phone?'📞 '+c.phone:''].filter(Boolean).join('\n')};
+const clinicFull=c=>{const n=String((c&&c.name)||'').trim();if(!n)return 'عيادات د. هدى ياسين لطب الأسنان';return /عياد/.test(n)?n:'عيادة '+n};
 const SITE_URL=(()=>{try{if(window.STANDALONE&&/^https?:/.test(location.href))return location.href.split('#')[0].split('?')[0].replace(/\/system\/.*$/,'').replace(/\/$/,'')}catch(e){}return 'https://alihabash7.github.io/dr-huda-dental'})();
 const siteLine='🌐 موقعنا الإلكتروني للحجز والاستفسار:\n'+SITE_URL;
+const signNice=t=>t.replace(new RegExp('\\n'+SIGN.replace(/\./g,'\\.')+'$'),'\n🦷 '+SIGN);
 const withSite=txt=>{if(txt.includes('{site}'))return txt.replace(/\{site\}/g,SITE_URL);if(txt.includes(SITE_URL))return txt;let i=txt.lastIndexOf('\n{sign}');if(i<0)i=txt.lastIndexOf('\n'+SIGN);return i>=0?txt.slice(0,i)+'\n'+siteLine+txt.slice(i):txt+'\n'+siteLine};
-const withMap=(txt,c)=>{const u=clinicMapUrl(c);if(txt.includes('{map}'))return txt.replace(/\n?[^\n]*\{map\}[^\n]*/g,m=>u?m.replace('{map}',u):'');if(!u)return txt;const line='🗺️ موقع العيادة على الخريطة:\n'+u;let i=txt.lastIndexOf('\n{sign}');if(i<0)i=txt.lastIndexOf('\n'+SIGN);return i>=0?txt.slice(0,i)+'\n'+line+txt.slice(i):txt+'\n'+line};
+const withMap=(txt,c)=>{const u=clinicMapUrl(c);if(txt.includes('{map}'))return txt.replace(/\n?[^\n]*\{map\}[^\n]*/g,m=>u?m.replace('{map}',u):'');const a=clinicAddr(c);const block=[a?'📍 العنوان: '+a:'',u?'🗺️ موقع العيادة على الخريطة:\n'+u:'',c&&c.phone?'📞 للتواصل: '+c.phone:''].filter(Boolean).join('\n');if(!block)return txt;let i=txt.lastIndexOf('\n{sign}');if(i<0)i=txt.lastIndexOf('\n'+SIGN);const ins='\n\n'+block;return i>=0?txt.slice(0,i)+ins+txt.slice(i):txt+ins};
 /* coordinates from "36.34, 43.13" or from a Google Maps link that carries them */
 function parseLoc(s){s=normDigits(String(s||''));const m=s.match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/);if(m)return {lat:+m[1],lng:+m[2]};return null}
 function publicClinics(){return all('clinics').filter(c=>c.active!==false&&c.onSite!==false).sort(byName).map(c=>{const loc=parseLoc(c.mapLoc);const url=!loc&&/^https?:\/\//.test(String(c.mapLoc||'').trim())?String(c.mapLoc).trim():'';
@@ -3035,6 +3050,7 @@ function visitNow(p){
     if(!legacyOnly&&!finished&&!s.todayDone)acts.push(`<button class="btn primary vn-go" data-act="addSession" data-tid="${t.id}">${ic('tooth',17)} تسجيل الجلسة ${nextN}${money_&&bal>0&&can('pay')?' والدفعة':''}</button>`);
     if(money_&&bal>0&&can('pay'))acts.push(`<button class="btn ${legacyOnly||finished||s.todayDone?'primary vn-go':''}" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} دفعة فقط</button>`);
     if(!legacyOnly&&!finished&&!nxAp)acts.push(`<button class="btn" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} حجز موعد الجلسة</button>`);
+    if(money_&&can('price')&&!legacyOnly)acts.push(`<button class="btn ghost" data-act="extendTx" data-tid="${t.id}">${ic('plus',15)} أسنان / عمل إضافي</button>`);
     if(s.todayDone&&!finished&&!legacyOnly)acts.push(`<button class="btn ghost" data-act="addSession" data-tid="${t.id}">${ic('plus',15)} جلسة أخرى</button>`);
     return `<article class="vn-card" style="--ch:${clinicHue(t.clinicId)}">
       <div class="vn-h"><div style="min-width:0"><h4>${esc(t.procedure||'علاج')}${(t.teeth||[]).length?`<span class="teeth-tag">${t.teeth.join('، ')}</span>`:''}</h4><p>${esc(docName(t.doctorId))} · <span class="pc-tag"><span class="scope-dot"></span>${esc(clinicName(t.clinicId))}</span>${s.prev&&s.prev.date?` · آخر جلسة ${fmtDate(s.prev.date)}`:''}</p></div>${nxAp?`<span class="chip ${nxAp.date===TODAY?'accent':'info'}">${ic('calendar',12)} ${nxAp.date===TODAY?'اليوم '+t12(nxAp.time):dayLabel(nxAp.date)}</span>`:''}</div>
@@ -3063,6 +3079,35 @@ function deletePatient(pid){
     const ops=[...ts.map(t=>()=>del('treatments',t.id)),...ap.map(a=>()=>del('appointments',a.id)),...labs.map(o=>()=>del('labOrders',o.id)),...fu.map(f=>()=>del('followups',f.id)),()=>del('patients',pid)];
     await bulk(ops,'جارِ الحذف');closeModal();go('patients');toast('تم حذف ملف '+p.name)},'حذف نهائي')}
 ACTIONS.delPatient=d=>deletePatient(d.id);
+/* ---------- Extra work on an open treatment: more teeth, more money, more sessions — without starting over ---------- */
+function extendForm(tid){
+  const t=get('treatments',tid);if(!t)return;if(!can('price'))return noPerm();
+  const tot=tTotal(t),pd=tPaid(t),bal=tot-pd;const have=(t.teeth||[]).map(String);const inst=t.plan==='installments';
+  const lastDue=((t.schedule||[]).slice(-1)[0]||{}).due;const firstDef=addMonths(lastDue&&lastDue>TODAY?lastDue:TODAY,1);
+  formModal({title:'عمل إضافي على العلاج',sub:`${esc(patientName(t.patientId))} · ${esc(t.procedure)}${have.length?' · الأسنان الحالية: '+have.join('، '):''}`,fields:[
+    {k:'sum',type:'html',html:txSummaryHTML(t)},
+    {k:'teeth',label:'الأسنان الإضافية (اختياري)',type:'teeth',hint:have.length?'الأسنان المسجّلة سابقاً تبقى كما هي؛ اختر الجديدة فقط':''},
+    {k:'what',label:'شنو العمل الإضافي',ph:'مثال: تاج إضافي على 26',list:'dl-procs'},
+    {k:'extra',label:'المبلغ الإضافي',type:'money',req:true,half:true,ph:'يُضاف على الكلفة الحالية'},
+    {k:'sess',label:'جلسات إضافية',type:'number',min:0,max:60,half:true,ph:'0'},
+    {k:'n',label:'يُقسَّط المبلغ الإضافي على (أشهر)',type:'number',min:1,max:48,half:true,show:()=>inst},
+    {k:'first',label:'أول قسط للإضافة',type:'date',half:true,show:()=>inst},
+    {k:'prev',type:'html',html:'<div class="plan-preview" id="ext-prev"></div>'}],
+    values:{extra:'',sess:'',n:1,first:firstDef},submit:'حفظ الإضافة',
+    onChange:(v,form)=>{const el=form.querySelector('#ext-prev');if(!el)return;const x=num(v.extra);
+      el.innerHTML=x>0?`الكلفة <b>${fmt(tot)}</b> + الإضافة <b>${fmt(x)}</b> = <b>${fmt(tot+x)}</b> د.ع<br>المدفوع ${fmt(pd)} · المتبقي يصير <b class="bad-t">${fmt(bal+x)}</b> د.ع${num(v.sess)>0&&num(t.plannedSessions)?` · الجلسات تصير ${num(t.plannedSessions)+num(v.sess)}`:''}`:'اكتب المبلغ الإضافي وشوف الحساب الجديد هنا'},
+    onSubmit:async v=>{const x=num(v.extra);if(!(x>0))fail('اكتب المبلغ الإضافي');
+      const doc=clone(t);const add=(v.teeth||[]).map(String).filter(n=>!have.includes(n));
+      doc.fee=num(t.fee)+x;if(add.length)doc.teeth=have.concat(add).map(Number).sort((a,b)=>a-b);
+      if(num(v.sess)>0)doc.plannedSessions=(num(t.plannedSessions)||sessDone(t))+num(v.sess);
+      if(inst)doc.schedule=(t.schedule||[]).concat(buildSchedule(x,Math.max(1,num(v.n)||1),v.first||firstDef));
+      if(t.plan==='cash')doc.plan='partial';
+      doc.extras=(t.extras||[]).concat([{date:TODAY,amount:x,teeth:add,what:v.what||'',sessions:num(v.sess)||0,by:Store.me||null}]);
+      await put('treatments',doc);toast(`أُضيف ${fmt(x)} د.ع · المتبقي الآن ${fmt(bal+x)} د.ع`)}});
+}
+ACTIONS.extendTx=d=>extendForm(d.tid);
+const extrasHTML=t=>(t.extras||[]).length?`<div class="tx-extras">${t.extras.map(e=>`<span class="chip accent">${ic('plus',12)} ${fmtDate(e.date)}${e.what?' · '+esc(e.what):''}${(e.teeth||[]).length?' · أسنان '+e.teeth.join('، '):''}${seeMoney()?' · '+fmt(e.amount):''}</span>`).join('')}</div>`:'';
+
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
 const byDate=(a,b)=>(a.date||'').localeCompare(b.date||'')||(a.createdAt||'').localeCompare(b.createdAt||'');
@@ -3424,6 +3469,8 @@ INPUTS.money=(v,d,el)=>{const cur=el.selectionStart==null?el.value.length:el.sel
   if(f!==el.value){el.value=f;let pos=0,seen=0;while(pos<f.length&&seen<before){if(/\d/.test(f[pos]))seen++;pos++}try{el.setSelectionRange(pos,pos)}catch(e){}}};
 INPUTS.digits=(v,d,el)=>{const n=normDigits(el.value);if(n!==el.value){const a=el.selectionStart,b=el.selectionEnd;el.value=n;try{el.setSelectionRange(a,b)}catch(e){}}};
 
+document.addEventListener('input',e=>{const w=e.target.closest&&e.target.closest('.clr-wrap,.money-in');if(w&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))w.classList.toggle('has-v',!!e.target.value)});
+ACTIONS.clrField=(d,el)=>{const w=el.closest('.clr-wrap,.money-in');const inp=w&&w.querySelector('input,textarea');if(!inp)return;inp.value='';w.classList.remove('has-v');inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));inp.focus()};
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-act]');
   if(state.qa&&!e.target.closest('.qa')){state.qa=false;renderTop()}
