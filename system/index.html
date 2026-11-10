@@ -417,6 +417,22 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 .money-in .clr-btn{inset-inline-end:40px}
 .money-in input{padding-inline-end:72px}
 .tx-extras{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 14px}
+
+/* ---- account bar / settle ---- */
+.acct-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px;border-inline-start:5px solid var(--bad)}
+.acct-bar.clear{border-inline-start-color:var(--good,#15803d)}
+.acct-main{display:flex;flex-direction:column;gap:3px;min-width:200px;flex:1}
+.acct-main>span{font-size:12.5px;color:var(--ink-3)}
+.acct-main>b{font-size:28px;line-height:1.15;color:var(--bad);font-variant-numeric:tabular-nums}.acct-main>b small{font-size:13px;color:var(--ink-3);font-weight:500}
+.acct-bar.clear .acct-main>b{color:var(--good,#15803d);font-size:22px}
+.acct-main>small{font-size:12.5px;color:var(--ink-2)}
+.acct-acts{display:flex;gap:8px;flex-wrap:wrap}
+.acct-pay{height:50px;padding:0 26px;font-size:17px;font-weight:700}
+.settle-prev:empty{display:none}.settle-prev{background:var(--surface-2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.settle-rows{display:flex;flex-direction:column;gap:6px}.settle-rows>div{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:13.5px}
+.settle-rows small{grid-column:1/-1;color:var(--ink-3);font-size:12px}.settle-rows b{font-variant-numeric:tabular-nums}
+.settle-tot{border-top:1px dashed var(--line);padding-top:8px;font-size:14px}
+@media (max-width:560px){.acct-acts{width:100%}.acct-acts .btn{flex:1 1 auto}.acct-pay{flex:1 1 100%}}
 /* ---- visit now ---- */
 .vn{border-color:color-mix(in srgb,var(--primary) 35%,var(--line))}
 .vn .card-h h3{display:flex;align-items:center;gap:8px}
@@ -1163,9 +1179,9 @@ PAGES.patient=()=>{
   <section class="card pt-head"><div class="pt-id"><div class="avatar">${esc(initials(p.name))}</div><div style="min-width:0"><h2>${esc(p.name)}${sampleTag(p)}</h2><p class="muted">${[p.phone?`<span dir="ltr">${esc(p.phone)}</span>`:'',esc(clinicName(p.clinicId)),esc(p.gender||''),p.age?esc(p.age)+' سنة':''].filter(Boolean).join(' · ')}</p>
    ${(p.alerts||[]).length?`<div class="alerts">${ic('alert',15)}<b style="font-size:13px">تنبيه طبي:</b>${p.alerts.map(a=>chip(a,'bad')).join('')}</div>`:''}${p.notes?`<p class="note">${esc(p.notes)}</p>`:''}</div></div>
    <div class="pt-actions">${openTx(p).some(t=>!t.legacy||sessDone(t))?`<button class="btn primary" data-act="visitStart" data-pid="${p.id}">${ic('tooth',16)} تسجيل جلسة</button><button class="btn" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'عمل جديد':'علاج جديد'}</button>`:`<button class="btn primary" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'تسجيل عمل':'علاج جديد'}</button>`}<button class="btn" data-act="newAppt" data-pid="${p.id}">${ic('calendar',16)} موعد</button>${locBtn(p)}<button class="btn" data-act="newLab" data-pid="${p.id}">${ic('tooth',16)} طلب مختبر</button>${seeMoney()&&can('price')?`<button class="btn" data-act="addDebt" data-pid="${p.id}">${ic('wallet',16)} إضافة دين / متبقي</button>`:''}${seeMoney()&&can('print')&&ts.length?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف حساب للطباعة</button>`:''}${seeMoney()&&can('demand')&&total-paid>0?`<button class="btn wa" data-act="demand" data-id="${p.id}">${ic('chat',16)} مطالبة بالدفع</button>`:waBtn(p.phone,`مرحباً ${p.name}،\n${SIGN}`,'واتساب')}<button class="icon-btn" data-act="editPatient" data-id="${p.id}" aria-label="تعديل بيانات المريض">${ic('edit')}</button>${isAdmin()&&!Store.preview?`<button class="icon-btn danger" data-act="delPatient" data-id="${p.id}" aria-label="حذف المريض" title="حذف المريض">${ic('trash')}</button>`:''}</div></section>
+  ${accountBar(p)}
   ${visitNow(p)}
   ${pcTop?patientClinicsCard(p):''}
-  ${seeMoney()?`<div class="kpis">${kpi('إجمالي العلاج',money(total),ts.length+' خطة علاج')}${kpi('المدفوع',money(paid),total?pctOf(paid,total)+'% من الإجمالي':'')}${kpi('المتبقي',money(total-paid),'',total-paid>0?'':'')}${kpi('أقساط متأخرة',late.length?`<span class="bad-t">${late.length}</span>`:'0',late.length?'بقيمة '+fmt(sum(late,x=>x.left))+' د.ع':'المريض منتظم')}</div>`:''}
   ${seeMoney()&&can('price')&&!ts.length&&!all('treatments').some(t=>t.patientId===p.id)?`<section class="card pad" style="display:flex;flex-direction:column;gap:10px;border-color:color-mix(in srgb,var(--warn) 45%,var(--line))"><h3 style="font-size:16px">لا يوجد علاج أو دين مسجّل لهذا المريض</h3><p style="margin:0;font-size:13.5px;color:var(--ink-2)">اضغط الزر وسجّل كلفة العلاج، وما دفعه المريض إن وُجد. المتبقي يظهر ديناً بذمم المرضى، وتكدر تعدّله أو تضيف عليه لاحقاً.</p><div><button class="btn primary" data-act="addDebt" data-pid="${p.id}">${ic('wallet',16)} إضافة دين / متبقي</button></div></section>`:''}
   ${pcTop?'':patientClinicsCard(p)}
   ${patientLedger(p,ts)}
@@ -1724,7 +1740,7 @@ PAGES.myday=()=>{
   ${sent.length||recv.length?`<section class="card"><div class="card-h"><h3>المختبر</h3></div><div class="list">${sent.map(o=>`<div class="li"><div class="grow"><div class="t">${esc(o.work)} · ${esc(patientName(o.patientId))}</div><div class="s">أُرسل إلى ${esc(get('labs',o.labId)?.name||'')} · التسليم ${fmtDate(o.dueDate)}</div></div>${chip('أُرسل','info')}</div>`).join('')}${recv.map(o=>`<div class="li"><div class="grow"><div class="t">${esc(o.work)} · ${esc(patientName(o.patientId))}</div><div class="s">${esc(get('labs',o.labId)?.name||'')}</div></div>${chip(LAB_ST[o.status]?.[0]||'',LAB_ST[o.status]?.[1])}</div>`).join('')}</div></section>`:''}`;
 };
 Object.assign(ACTIONS,{
-  statement:d=>statementModal(d.id),followUp:d=>followUpForm(d.id),payPatient:d=>payPatient(d.id),
+  statement:d=>statementModal(d.id),followUp:d=>followUpForm(d.id),payPatient:d=>settleForm(d.id),
   dbucket:d=>{state.dbucket=d.v;render()},dstat:d=>{state.dstat=d.v;render()},dsort:d=>{state.dsort=d.v;render()},
   pickClinicDebts:d=>{state.clinic=d.id;saveUi();render()},debtClinic:d=>{state.clinic=d.v;saveUi();render()},
   cday:d=>{state.cdate=Number(d.d)===0?TODAY:addDays(state.cdate||TODAY,Number(d.d));render()},setCdate:d=>{state.cdate=d.v;render();window.scrollTo({top:0})},
@@ -3177,6 +3193,48 @@ const catSeg=(act,cur,count)=>`<div class="seg cat-seg" role="tablist" aria-labe
 ACTIONS.pcat=d=>{state.pcat=d.v;render()};
 ACTIONS.dcat=d=>{state.dcat=d.v;render()};
 const patientCats=pid=>M('pcats:'+pid,()=>new Set(all('treatments').filter(t=>t.patientId===pid&&(isAdmin()||cf(t))).map(txCat)));
+
+/* ---------- Settle: one clear "pay" for the whole patient file — the amount is spread over the open treatments ---------- */
+const openDebtTx=pid=>all('treatments').filter(t=>t.patientId===pid&&tBal(t)>0&&(isAdmin()||cf(t))).sort((a,b)=>{const la=schedStatus(a).some(x=>x.state==='late'),lb=schedStatus(b).some(x=>x.state==='late');return (lb-la)||(a.date||'').localeCompare(b.date||'')});
+function allocate(list,amount,only){let left=amount;const out=[];for(const t of list){if(only&&t.id!==only)continue;if(left<=0)break;const a=Math.min(left,tBal(t));if(a>0){out.push([t,a]);left-=a}}return {out,left}}
+function settleForm(pid){
+  if(!can('pay'))return noPerm();const p=get('patients',pid);if(!p)return;const list=openDebtTx(pid);
+  if(!list.length)return toast('حساب المريض مسدّد بالكامل، ما عليه شي','good');
+  const bal=sum(list,tBal);const due=sum(list,t=>{if(t.plan!=='installments')return 0;return sum(schedStatus(t).filter(x=>x.state==='late'||x.state==='soon'),x=>num(x.amount)-x.paid)});
+  const opts=[['auto','توزيع تلقائي: المتأخر أولاً ثم الأقدم']].concat(list.map(t=>[t.id,`${t.procedure} · ${catLbl(txCat(t))} · متبقٍ ${fmt(tBal(t))}`]));
+  formModal({title:'تسديد · '+p.name,sub:`المتبقي الكلي عليه <b class="bad-t">${fmt(bal)}</b> د.ع على ${list.length} ${list.length===1?'علاج':'علاجات'}`,fields:[
+    {k:'amount',label:'المبلغ المستلم',type:'money',req:true,ph:'اكتب المبلغ اللي دفعه المريض'},
+    fillField('amount',[[`تسديد الكل (${fmt(bal)})`,bal]].concat(due>0&&due<bal?[[`المستحق الآن (${fmt(due)})`,due]]:[])),
+    {k:'to',label:'على أي علاج',type:'select',opts,show:()=>list.length>1},
+    {k:'prev',type:'html',html:'<div class="settle-prev" id="settle-prev"></div>'},
+    {k:'method',label:'طريقة الدفع',type:'select',opts:PAY_METHODS,half:true},{k:'date',label:'التاريخ',type:'date',req:true,half:true},
+    {k:'note',label:'ملاحظة (اختياري)'}],
+    values:{method:'cash',date:TODAY,to:'auto'},submit:'تسديد',
+    onChange:(v,form)=>{const el=form.querySelector('#settle-prev');if(!el)return;const a=num(v.amount);const only=v.to&&v.to!=='auto'?v.to:null;
+      if(!(a>0)){el.innerHTML='';return}const maxA=only?tBal(get('treatments',only)):bal;
+      if(a>maxA+1){el.innerHTML=`<b class="bad-t">المبلغ أكبر من المتبقي (${fmt(maxA)} د.ع)</b>`;return}
+      const {out}=allocate(list,a,only);
+      el.innerHTML=`<div class="settle-rows">${out.map(([t,x])=>`<div><span>${catChip(txCat(t))} ${esc(t.procedure)}</span><b>${fmt(x)}</b><small>يبقى ${fmt(tBal(t)-x)}</small></div>`).join('')}</div><div class="settle-tot">المتبقي الكلي بعد التسديد: <b class="${bal-a<=0?'good-t':'bad-t'}">${bal-a<=0?'مسدّد بالكامل ✓':fmt(bal-a)+' د.ع'}</b></div>`},
+    onSubmit:async v=>{const a=num(v.amount);if(!(a>0))fail('اكتب المبلغ');const only=v.to&&v.to!=='auto'?v.to:null;const maxA=only?tBal(get('treatments',only)):bal;
+      if(a>maxA+1)fail(`المبلغ أكبر من المتبقي (${fmt(maxA)} د.ع)`);
+      const {out}=allocate(list,a,only);const made=[];
+      for(const [t,x] of out){const pay={id:uid(),amount:x,date:v.date||TODAY,method:v.method||'cash',note:v.note||'',by:Store.me||null};const doc=clone(t);doc.payments=(doc.payments||[]).concat([pay]);await put('treatments',doc);made.push([t.id,pay.id,x])}
+      toast(`تم تسديد ${fmt(a)} د.ع · المتبقي ${fmt(Math.max(0,bal-a))}`,'good');
+      setTimeout(()=>made.length===1?receiptModal(made[0][0],made[0][1]):settledModal(pid,a,made),60)}});
+}
+function settledModal(pid,a,made){const p=get('patients',pid)||{};const rest=sum(openDebtTx(pid),tBal);
+  const text=signNice(withSite(`وصل تسديد 🌷\nالمريض: ${p.name||''}\nالمبلغ المستلم: ${fmt(a)} دينار بتاريخ ${fmtFull(TODAY)}\n${made.map(([tid,,x])=>{const t=get('treatments',tid)||{};return `• ${t.procedure||'علاج'}: ${fmt(x)}`}).join('\n')}\nالمتبقي الكلي: ${rest>0?fmt(rest)+' دينار':'مسدّد بالكامل ✓'}\nشكراً لثقتكم 🤍\n${SIGN}`));
+  openModal(`<div class="m-head"><div><h3>${ic('check',18)} تم استلام ${fmt(a)} د.ع</h3><p>${esc(p.name||'')} · المتبقي ${rest>0?`<b class="bad-t">${fmt(rest)}</b> د.ع`:'<b class="good-t">مسدّد بالكامل</b>'}</p></div><button class="icon-btn" data-act="closeModal" aria-label="إغلاق">${ic('x')}</button></div>
+  <div class="m-body"><pre class="receipt">${esc(text)}</pre></div>
+  <div class="m-foot">${waBtn(p.phone,text,'إرسال الوصل')}<button class="btn" data-act="printRc" data-pid="${pid}">${ic('receipt',15)} كشف الحساب</button><span class="sp"></span><button class="btn primary" data-act="closeModal">تم</button></div>`)}
+ACTIONS.settle=d=>settleForm(d.pid||d.id);
+function accountBar(p){
+  if(!seeMoney())return '';const ts=all('treatments').filter(t=>t.patientId===p.id&&(isAdmin()||cf(t)));if(!ts.length)return '';
+  const tot=sum(ts,tTotal),pd=sum(ts,tPaid),bal=tot-pd;const last=ts.flatMap(t=>(t.payments||[]).map(x=>x.date)).sort().pop();
+  const late=instItems().filter(x=>x.patientId===p.id&&x.state==='late');
+  return `<section class="card acct-bar ${bal>0?'owes':'clear'}"><div class="acct-main"><span>${bal>0?'المتبقي عليه':'الحساب'}</span><b>${bal>0?fmt(bal)+' <small>د.ع</small>':'مسدّد بالكامل ✓'}</b>
+    <small>دفع ${fmt(pd)} من ${fmt(tot)}${last?' · آخر تسديد '+fmtDate(last):''}${late.length?` · <span class="bad-t">${late.length} قسط متأخر</span>`:''}</small>${tot>0?`<div class="vn-pbar"><i style="width:${pctOf(pd,tot)}%"></i></div>`:''}</div>
+    <div class="acct-acts">${bal>0&&can('pay')?`<button class="btn primary acct-pay" data-act="settle" data-pid="${p.id}">${ic('cash',18)} تسديد</button>`:''}${can('print')?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف الحساب</button>`:''}</div></section>`}
 
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
