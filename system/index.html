@@ -389,6 +389,7 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 
 
 
+.proc-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.proc-chips small{color:var(--ink-3);font-size:12px}.pc-btn{cursor:pointer;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:12.5px;padding:5px 10px;height:auto}.pc-btn:hover{border-color:var(--accent)}
 /* ---- treatment departments ---- */
 .cat-pick{display:flex;flex-wrap:wrap;gap:6px}
 .cat-opt{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:13.5px;color:var(--ink-2);user-select:none}
@@ -665,7 +666,8 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 <script>
 "use strict";
 /* ---------- Constants ---------- */
-const PROCS=['فحص واستشارة','أشعة','تنظيف وتلميع','حشوة تجميلية','حشوة عصب (علاج جذور)','قلع بسيط','قلع جراحي','تاج زيركون','تاج بورسلين','جسر','فينير (قشور)','زراعة','طقم كامل','طقم جزئي','تبييض','تقويم','علاج لثة','أسنان أطفال'];
+const FILL_TYPES=["حشوة كومبوزيت (ضوئية)", "حشوة كومبوزيت تجميلية (أمامية)", "حشوة أملغم (فضية)", "حشوة زجاجية GIC", "حشوة مؤقتة", "حشوة عصب (علاج جذور)", "علاج جذور · قناة واحدة", "علاج جذور · قناتان", "علاج جذور · ثلاث قنوات فأكثر", "إعادة علاج جذور", "حشوة لبية (بالبوتي)", "دعامة ليفية (Post)", "حشوة أسنان لبنية", "حشوة كومبوزيت ضرس خلفي", "قلع بسيط", "قلع جراحي", "قلع ضرس عقل", "تنظيف وتلميع", "علاج لثة"];
+const PROCS=['فحص واستشارة','أشعة','تنظيف وتلميع','حشوة تجميلية','حشوة عصب (علاج جذور)','قلع بسيط','قلع جراحي','تاج زيركون','تاج بورسلين','جسر','فينير (قشور)','زراعة','طقم كامل','طقم جزئي','تبييض','تقويم','علاج لثة','أسنان أطفال'].concat(FILL_TYPES.filter(x=>!['قلع بسيط','قلع جراحي','تنظيف وتلميع','علاج لثة'].includes(x)));
 const LAB_WORKS=['تاج زيركون','تاج PFM بورسلين على معدن','تاج E-max','فينير E-max','جسر زيركون','تاج على زرعة','طقم كامل أكريل','طقم جزئي معدني','طقم مرن','واقي ليلي','ريتينر تقويم'];
 const SHADES=['A1','A2','A3','A3.5','A4','B1','B2','B3','C1','C2','C3','D2','D3','BL1','BL2','BL3'];
 const PAY_METHODS=[['cash','نقد'],['zaincash','زين كاش'],['fib','FIB'],['qi','كي كارد'],['bank','تحويل مصرفي']];
@@ -847,7 +849,7 @@ const myStaff=()=>{const r=role();return r.kind==='staff'?get('staff',r.id):null
 const myDoctor=()=>{const r=role();return r.kind==='doctor'?get('doctors',r.id):null};
 const clinicSel=x=>state.clinic==='all'||x.clinicId===state.clinic;
 const cf=x=>{const r=role();if(r.kind==='doctor')return x.doctorId===r.id&&clinicSel(x);if(r.kind==='staff'){const st=myStaff()||{};return (staffClinicIds(st).includes(x.clinicId)||(!!x.doctorId&&(st.doctorIds||[]).includes(x.doctorId)))&&clinicSel(x)}return clinicSel(x)};
-const scopePatients=()=>M('scopeP',()=>{if(isAdmin())return null;const set=new Set();for(const c of ['treatments','appointments','labOrders'])for(const x of all(c))if(cf(x))set.add(x.patientId);const st=myStaff();for(const p of all('patients')){if(!Store.preview&&p.createdBy&&p.createdBy===Store.me)set.add(p.id);if(st&&staffClinicIds(st).includes(p.clinicId))set.add(p.id)}return set});
+const scopePatients=()=>M('scopeP',()=>{if(isAdmin())return null;const set=new Set();for(const c of ['treatments','appointments','labOrders'])for(const x of all(c))if(cf(x))set.add(x.patientId);const st=myStaff();for(const p of all('patients')){if(!Store.preview&&p.createdBy&&p.createdBy===Store.me)set.add(p.id);if(st&&staffClinicIds(st).includes(p.clinicId))set.add(p.id);if(!Store.preview?role().kind==='doctor'&&p.doctorId===role().id:role().kind==='doctor'&&p.doctorId===role().id)set.add(p.id)}return set});
 const pf=p=>{const set=scopePatients();return set?set.has(p.id):state.clinic==='all'||clinicPatientIds(state.clinic).has(p.id)};
 const roleClinicIds=()=>{const r=role();if(r.kind==='doctor')return myDoctor()?.clinicIds||[];if(r.kind==='staff'){const st=myStaff()||{};const ids=new Set(staffClinicIds(st));(st.doctorIds||[]).forEach(id=>(get('doctors',id)?.clinicIds||[]).forEach(c=>ids.add(c)));return [...ids].filter(Boolean)}return null};
 const optClinics=()=>{const ids=roleClinicIds();return all('clinics').filter(c=>c.active!==false&&(!ids||ids.includes(c.id))).sort(byName).map(c=>[c.id,c.name])};
@@ -1217,9 +1219,9 @@ PAGES.patient=()=>{
   const pcR=patientClinics(p.id),pcTop=pcR.length>1||pcR.some(r=>!myClinic(r.cid));
   const ap=all('appointments').filter(a=>a.patientId===p.id&&(isAdmin()||cf(a))).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time)).slice(0,8);
   return `<div class="crumbs"><a href="#patients" data-act="go" data-page="patients">${isDoctor()?'مرضاي':'المرضى'}</a><span>‹</span><span>${esc(p.name)}</span></div>
-  <section class="card pt-head"><div class="pt-id"><div class="avatar">${esc(initials(p.name))}</div><div style="min-width:0"><h2>${esc(p.name)}${sampleTag(p)}</h2><p class="muted">${[p.phone?`<span dir="ltr">${esc(p.phone)}</span>`:'',esc(clinicName(p.clinicId)),esc(p.gender||''),p.age?esc(p.age)+' سنة':''].filter(Boolean).join(' · ')}</p>
+  <section class="card pt-head"><div class="pt-id"><div class="avatar">${esc(initials(p.name))}</div><div style="min-width:0"><h2>${esc(p.name)}${sampleTag(p)}</h2><p class="muted">${[p.phone?`<span dir="ltr">${esc(p.phone)}</span>`:'',esc(clinicName(p.clinicId)),p.doctorId?'<b>'+esc(docName(p.doctorId))+'</b>':'',esc(p.gender||''),p.age?esc(p.age)+' سنة':''].filter(Boolean).join(' · ')}</p>
    ${(p.alerts||[]).length?`<div class="alerts">${ic('alert',15)}<b style="font-size:13px">تنبيه طبي:</b>${p.alerts.map(a=>chip(a,'bad')).join('')}</div>`:''}${p.notes?`<p class="note">${esc(p.notes)}</p>`:''}</div></div>
-   <div class="pt-actions">${openTx(p).some(t=>!t.legacy||sessDone(t))?`<button class="btn primary" data-act="visitStart" data-pid="${p.id}">${ic('tooth',16)} تسجيل جلسة</button><button class="btn" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'عمل جديد':'علاج جديد'}</button>`:`<button class="btn primary" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'تسجيل عمل':'علاج جديد'}</button>`}<button class="btn" data-act="newAppt" data-pid="${p.id}">${ic('calendar',16)} موعد</button>${locBtn(p)}<button class="btn" data-act="newLab" data-pid="${p.id}">${ic('tooth',16)} طلب مختبر</button>${seeMoney()&&can('price')?`<button class="btn" data-act="addDebt" data-pid="${p.id}">${ic('wallet',16)} إضافة دين / متبقي</button>`:''}${seeMoney()&&can('print')&&ts.length?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف حساب للطباعة</button>`:''}${seeMoney()&&can('demand')&&total-paid>0?`<button class="btn wa" data-act="demand" data-id="${p.id}">${ic('chat',16)} مطالبة بالدفع</button>`:waBtn(p.phone,`مرحباً ${p.name}،\n${SIGN}`,'واتساب')}<button class="icon-btn" data-act="editPatient" data-id="${p.id}" aria-label="تعديل بيانات المريض">${ic('edit')}</button>${isAdmin()&&!Store.preview?`<button class="icon-btn danger" data-act="delPatient" data-id="${p.id}" aria-label="حذف المريض" title="حذف المريض">${ic('trash')}</button>`:''}</div></section>
+   <div class="pt-actions">${openTx(p).some(t=>!t.legacy||sessDone(t))?`<button class="btn primary" data-act="visitStart" data-pid="${p.id}">${ic('tooth',16)} تسجيل جلسة</button><button class="btn" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'عمل جديد':'علاج جديد'}</button>`:`<button class="btn primary" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'تسجيل عمل':'علاج جديد'}</button>`}<button class="btn" data-act="newAppt" data-pid="${p.id}">${ic('calendar',16)} موعد</button>${locBtn(p)}<button class="btn" data-act="newLab" data-pid="${p.id}">${ic('tooth',16)} طلب مختبر</button>${seeMoney()&&can('price')?`<button class="btn" data-act="addDebt" data-pid="${p.id}">${ic('wallet',16)} إضافة دين / متبقي</button>`:''}${seeMoney()&&can('print')&&ts.length?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف حساب للطباعة</button>`:''}${seeMoney()&&can('demand')&&total-paid>0?`<button class="btn wa" data-act="demand" data-id="${p.id}">${ic('chat',16)} مطالبة بالدفع</button>`:waBtn(p.phone,`مرحباً ${p.name}،\n${SIGN}`,'واتساب')}<button class="icon-btn" data-act="editPatient" data-id="${p.id}" aria-label="تعديل بيانات المريض">${ic('edit')}</button>${can('editPatient')||isAdmin()?`<button class="btn sm" data-act="changeDoc" data-pid="${p.id}">${ic('steth',15)} تغيير الطبيب</button>`:''}${isAdmin()&&!Store.preview?`<button class="icon-btn danger" data-act="delPatient" data-id="${p.id}" aria-label="حذف المريض" title="حذف المريض">${ic('trash')}</button>`:''}</div></section>
   ${p.noPhone&&!p.phone?`<div class="mode-banner" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${ic('phone',16)}<span style="flex:1;min-width:200px">بدون رقم موبايل${p.noPhoneWhy?' · '+esc(p.noPhoneWhy):''}. ما توصله رسائل التذكير والمتابعة. أضف رقمه أول ما يتوفر.</span><button class="btn sm" data-act="editPatient" data-id="${p.id}">${ic('edit',14)} إضافة رقم</button></div>`:''}
   ${accountBar(p)}
   ${visitNow(p)}
@@ -3224,7 +3226,9 @@ function catReportCard(month,cid){const rows=catStats(month,cid);const mx=Math.m
     <div class="cat-n"><span>المحصّل</span><b>${fmt(r.collected)}</b></div><div class="bar"><i style="width:${pctOf(r.collected,mx)}%;background:var(--cc)"></i></div>
     <div class="cat-s"><span>${r.tx} علاج جديد · ${r.patients.size} مريض</span><span>قيمة الأعمال ${fmt(r.value)}</span><span class="${r.remaining?'bad-t':''}">ديون متبقية ${fmt(r.remaining)}${r.open?' ('+r.open+')':''}</span></div></div>`).join('')}</div></section>`}
 /* department picker used in every treatment entry form */
-const CAT_EXTRA={fill:['حشوة ضوئية','حشوة أملغم','حشوة مؤقتة','قلع ضرس العقل'],crown:['تلبيس زيركون','تلبيس بورسلين','تاج إيماكس','جسر 3 وحدات'],ortho:['تقويم معدني','تقويم شفاف','تقويم خزفي','مراجعة تقويم','مثبّت (ريتينر)'],filler:['فيلر شفاه','فيلر خدود','فيلر تحت العين','فيلر ذقن','بوتوكس','ميزوثيرابي','بلازما وجه'],other:[]};
+const CAT_EXTRA={fill:FILL_TYPES,crown:['تلبيس زيركون','تلبيس بورسلين','تاج إيماكس','جسر 3 وحدات'],ortho:['تقويم معدني','تقويم شفاف','تقويم خزفي','مراجعة تقويم','مثبّت (ريتينر)'],filler:['فيلر شفاه','فيلر خدود','فيلر تحت العين','فيلر ذقن','بوتوكس','ميزوثيرابي','بلازما وجه'],other:[]};
+const procChips=k=>`<div class="proc-chips"><small>اختيار سريع:</small>${(CAT_EXTRA[k]||[]).map(x=>`<button type="button" class="chip pc-btn" data-act="fillProc" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`;
+ACTIONS.fillProc=(d,el)=>{const f=el.closest('form');const inp=f&&(f.querySelector('#f_procedure')||f.querySelector('#f_fProc'));if(inp){inp.value=d.v;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}))}};
 const catDatalists=()=>TX_CATS.map(([k])=>`<datalist id="dl-procs-${k}">${[...new Set(PROCS.filter(p=>guessCat(p)===k).concat(CAT_EXTRA[k]||[]))].map(p=>`<option value="${esc(p)}">`).join('')}</datalist>`).join('');
 function catPickHTML(name,v,forName,id,attrs,manual){return `<div class="cat-pick ${manual||v&&id&&false?'manual':''}" ${id?`id="${id}"`:''} data-catfor="${esc(forName||'')}">${TX_CATS.map(([k,l,,c])=>`<label class="cat-opt" style="--cc:${c}"><input type="radio" name="${esc(name)}" value="${k}" ${v===k?'checked':''} ${attrs||''}><span class="cat-dot"></span>${esc(l)}</label>`).join('')}</div>`}
 /* typing the procedure picks the department (until the user picks one by hand); picking a department narrows the suggestions */
@@ -3444,6 +3448,26 @@ ACTIONS.perfRate=d=>{const doc=get('doctors',d.id);if(!doc)return;
   formModal({title:'تقييم د. '+doc.name,sub:'تقييم الإدارة يدخل بنسبة 20% من التقييم العام',fields:[{k:'stars',label:'التقييم',type:'select',opts:[['5','⭐⭐⭐⭐⭐ ممتاز'],['4','⭐⭐⭐⭐ جيد جداً'],['3','⭐⭐⭐ جيد'],['2','⭐⭐ ضعيف'],['1','⭐ سيئ']],req:true},{k:'note',label:'ملاحظة (اختياري)',type:'textarea',rows:2,ph:'مثال: التزام ممتاز ورضا المرضى عالٍ'}],values:{stars:'5'},submit:'حفظ التقييم',
     onSubmit:async v=>{const n=clone(doc);n.reviews=(n.reviews||[]).concat([{date:TODAY,stars:Number(v.stars),note:v.note||'',by:Store.me||null}]).slice(-24);await put('doctors',n);toast('تم حفظ التقييم')}})};
 
+/* ---------- Change a patient's doctor: the patient's own doctor, and optionally his treatments and upcoming appointments ---------- */
+const ptOpenTx=pid=>all('treatments').filter(t=>t.patientId===pid&&(tBal(t)>0||(num(t.plannedSessions)>sessDone(t))));
+function changeDoctorForm(pid){
+  if(!can('editPatient')&&!isAdmin())return noPerm();const p=get('patients',pid);if(!p)return;
+  const ts=all('treatments').filter(t=>t.patientId===pid);const open=ptOpenTx(pid);const fut=all('appointments').filter(a=>a.patientId===pid&&a.date>=TODAY&&!['cancelled','done','noshow'].includes(a.status));
+  const logs=(p.doctorLog||[]).slice(-3).reverse();
+  formModal({title:'تغيير الطبيب · '+p.name,sub:`الطبيب الحالي: <b>${esc(p.doctorId?docName(p.doctorId):'غير محدد')}</b>${logs.length?' · آخر تغيير '+fmtDate(logs[0].date):''}`,fields:[
+    {k:'doctorId',label:'الطبيب الجديد',type:'select',opts:all('doctors').filter(d=>d.active!==false).sort(byName).map(d=>[d.id,'د. '+d.name+(d.specialty?' · '+d.specialty:'')]),req:true},
+    {k:'scope',label:'شنو ينتقل مع المريض؟',type:'select',opts:[['patient','ملف المريض فقط (الطبيب المسؤول)'],['open',`+ علاجاته المفتوحة (${open.length}) ومواعيده القادمة (${fut.length})`],['all',`+ كل علاجاته السابقة (${ts.length}) ومواعيده القادمة`]]},
+    {k:'note',label:'السبب (اختياري)',ph:'مثال: انتقل الطبيب لعيادة ثانية'},
+    {k:'warn',type:'html',html:'<div class="mode-banner" id="cd-warn" hidden>تنبيه: نقل العلاجات السابقة يغيّر مستحقات الأطباء بالأشهر اللي دفع بيها المريض، لأن مستحق الطبيب يُحسب على علاجاته.</div>'}],
+    values:{doctorId:p.doctorId||(ts[0]||{}).doctorId||'',scope:'open'},submit:'تغيير الطبيب',
+    onChange:(v,form)=>{const w=form.querySelector('#cd-warn');if(w)w.hidden=v.scope!=='all'},
+    onSubmit:async v=>{if(!v.doctorId)fail('اختر الطبيب');const to=v.doctorId;const from=p.doctorId||'';
+      const n=clone(p);n.doctorId=to;n.doctorLog=(p.doctorLog||[]).concat([{date:TODAY,from,to,scope:v.scope,note:v.note||'',by:Store.me||null}]).slice(-20);await put('patients',n);let moved=0,mvA=0;
+      if(v.scope==='open'||v.scope==='all'){for(const t of (v.scope==='all'?ts:open)){if(t.doctorId===to)continue;const d=clone(t);d.doctorId=to;await put('treatments',d);moved++}
+        for(const a of fut){if(a.doctorId===to)continue;const d=clone(a);d.doctorId=to;await put('appointments',d);mvA++}}
+      toast(`صار طبيبه د. ${(get('doctors',to)||{}).name||''}${moved||mvA?` · نُقل ${moved} علاج و${mvA} موعد`:''}`,'good')}})}
+ACTIONS.changeDoc=d=>changeDoctorForm(d.pid||d.id);
+
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
 const byDate=(a,b)=>(a.date||'').localeCompare(b.date||'')||(a.createdAt||'').localeCompare(b.createdAt||'');
@@ -3570,26 +3594,26 @@ function payLabForm(id){const l=get('labs',id);const bal=labBilled(l)-labPaid(l)
 function patientForm(p,after){
   p=p||{};
   formModal({title:p.id?'تعديل بيانات المريض':'مريض جديد',fields:[
-    {k:'phone',label:'رقم موبايل المريض (مطلوب)',type:'tel',ph:'07xxxxxxxxx',half:true,hint:'اكتبه أولاً: النظام يتأكد فوراً إن المريض مو مسجّل من قبل',show:v=>!v.noPhone},{k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},...noPhoneFields('p',null).map(f=>f.k==='pNo'?Object.assign(f,{k:'noPhone'}):Object.assign(f,{k:'noPhoneWhy',show:v=>!!v.noPhone})),{k:'name',label:'الاسم الكامل',req:true,hint:'إذا ما عنده رقم اكتب الاسم الثلاثي والعمر حتى ما ينلخبط مع غيره'},
+    {k:'phone',label:'رقم موبايل المريض (مطلوب)',type:'tel',ph:'07xxxxxxxxx',half:true,hint:'اكتبه أولاً: النظام يتأكد فوراً إن المريض مو مسجّل من قبل',show:v=>!v.noPhone},{k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},{k:'pDoctor',label:'الطبيب المسؤول عن المريض',type:'select',opts:optDoctors(),empty:'— غير محدد —',hint:p.id?'لنقل علاجاته ومواعيده لطبيب آخر استخدم زر «تغيير الطبيب» بملف المريض':''},...noPhoneFields('p',null).map(f=>f.k==='pNo'?Object.assign(f,{k:'noPhone'}):Object.assign(f,{k:'noPhoneWhy',show:v=>!!v.noPhone})),{k:'name',label:'الاسم الكامل',req:true,hint:'إذا ما عنده رقم اكتب الاسم الثلاثي والعمر حتى ما ينلخبط مع غيره'},
     {k:'dupbox',type:'html',html:'<div id="dup-box" data-mode="open"></div>',show:v=>findDupes(v.name,v.noPhone?'':v.phone,p.id).length>0},
     {k:'notDup',label:'تأكدت أنه مريض مختلف عن الموجودين',type:'checkbox',show:v=>findDupes(v.name,v.noPhone?'':v.phone,p.id).length>0},
     {k:'gender',label:'الجنس',type:'select',opts:[['أنثى','أنثى'],['ذكر','ذكر']],empty:'—',half:true},{k:'age',label:'العمر',type:'number',min:0,max:120,half:true},
     {k:'alerts',label:'تنبيهات طبية',type:'checks',opts:ALERTS.map(a=>[a,a])},{k:'notes',label:'ملاحظات',type:'textarea',rows:2},
     {k:'sFin',type:'section',label:seeMoney()?'العلاج والحساب':'العلاج',hint:seeMoney()?'اختياري. حدد العلاج والأسنان، واكتب الكلفة الكلية والمبلغ الواصل. المتبقي يُسجَّل تلقائياً في ذمم المرضى.':'اختياري. حدد العلاج والأسنان التي ستعمل عليها.',show:()=>!p.id},
-    {k:'fCat',label:'القسم',type:'catpick',for:'fProc',show:()=>!p.id},{k:'fProc',label:'العلاج',list:'dl-procs',ph:'مثال: تاج زيركون',half:true,show:()=>!p.id},{k:'fDoc',label:'الطبيب',type:'select',opts:optDoctors(),empty:'— غير محدد —',half:true,show:()=>!p.id},
+    {k:'fCat',label:'القسم',type:'catpick',for:'fProc',show:()=>!p.id},{k:'fProc',label:'العلاج',list:'dl-procs',ph:'مثال: تاج زيركون',half:true,show:()=>!p.id},{k:'fchips_fill',type:'html',html:procChips('fill'),show:v=>(v.cat||guessCat(v.fProc))==='fill'},{k:'fchips_crown',type:'html',html:procChips('crown'),show:v=>(v.cat||guessCat(v.fProc))==='crown'},{k:'fchips_ortho',type:'html',html:procChips('ortho'),show:v=>(v.cat||guessCat(v.fProc))==='ortho'},{k:'fchips_filler',type:'html',html:procChips('filler'),show:v=>(v.cat||guessCat(v.fProc))==='filler'},{k:'fDoc',label:'الطبيب',type:'select',opts:optDoctors(),empty:'— غير محدد —',half:true,show:()=>!p.id},
     {k:'fTeeth',label:'الأسنان التي سيُعمل عليها',type:'teeth',show:()=>!p.id},
     {k:'fSess',label:'عدد الجلسات المتوقعة',type:'number',min:1,max:60,half:true,ph:'مثال: 3',show:()=>!p.id},
     {k:'fFee',label:'تكلفة العلاج الكلية',type:'money',half:true,show:()=>!p.id&&seeMoney()&&can('price')},{k:'fPaid',label:'المبلغ الواصل',type:'money',half:true,show:()=>!p.id&&seeMoney()&&can('price')&&can('pay')},
     {k:'fMethod',label:'طريقة الاستلام',type:'select',opts:PAY_METHODS,half:true,show:v=>!p.id&&seeMoney()&&num(v.fPaid)>0},{k:'fDate',label:'تاريخ العلاج',type:'date',half:true,show:v=>!p.id&&(num(v.fFee)>0||!!v.fProc||(v.fTeeth||[]).length>0)},
     {k:'fPrev',type:'html',html:'<div class="plan-preview" id="fin-prev" style="grid-column:auto"></div>',show:v=>!p.id&&seeMoney()&&num(v.fFee)>0}],
-    values:Object.assign({clinicId:defaultClinic(),fDate:TODAY,fMethod:'cash',fDoc:defaultDoctor(),noPhoneWhy:NP_REASONS[0][0]},p,{noPhone:!!p.noPhone}),
+    values:Object.assign({clinicId:defaultClinic(),fDate:TODAY,fMethod:'cash',fDoc:defaultDoctor(),noPhoneWhy:NP_REASONS[0][0]},p,{noPhone:!!p.noPhone,pDoctor:p.doctorId||''}),
     onChange:(v,form)=>{const box=form.querySelector('#dup-box');if(box)setBox(box,dupBoxHTML(findDupes(v.name,v.noPhone?'':v.phone,p.id),'open'));
       const fp=form.querySelector('#fin-prev');if(fp){const fee=num(v.fFee),pd=num(v.fPaid),rem=fee-pd;fp.textContent=!fee?'':pd>fee?'المبلغ الواصل أكبر من الكلفة':rem>0?`المتبقي ${fmt(rem)} د.ع، يُسجَّل ديناً على المريض في ذمم المرضى`:'مسدّد بالكامل، لا يوجد دين'}},
     danger:p.id&&isAdmin()?{label:'حذف المريض',onClick:()=>deletePatient(p.id)}:null,
     onSubmit:async(v,form)=>{if(v.noPhone){v.phone='';if(!String(v.name||'').trim().includes(' ')&&!num(v.age)){toast('بدون رقم: اكتب الاسم الثلاثي أو العمر حتى نفرّقه عن غيره','warn');const el=form.querySelector('.fld[data-k="name"] input');el&&el.focus();return false}}else{const pe=phoneErr(v.phone);if(pe)return fieldErr(form,'phone',pe);v.phone=phoneNorm(v.phone)}if(!dupGate(findDupes(v.name,v.phone,p.id),v,form))return false;
       const fee=!p.id&&seeMoney()&&can('price')?num(v.fFee):0,paid=!p.id&&seeMoney()&&can('price')&&can('pay')?num(v.fPaid):0;
       if(paid>0&&!fee)fail('اكتب تكلفة العلاج الكلية أولاً');if(paid>fee)fail('المبلغ الواصل أكبر من تكلفة العلاج');
-      const id=await put('patients',Object.assign(clone(p),{name:v.name,phone:v.phone,noPhone:!!v.noPhone,noPhoneWhy:v.noPhone?(v.noPhoneWhy||NP_REASONS[0][0]):'',clinicId:v.clinicId,gender:v.gender,age:v.age,alerts:v.alerts,notes:v.notes}));
+      const id=await put('patients',Object.assign(clone(p),{name:v.name,doctorId:v.pDoctor||'',phone:v.phone,noPhone:!!v.noPhone,noPhoneWhy:v.noPhone?(v.noPhoneWhy||NP_REASONS[0][0]):'',clinicId:v.clinicId,gender:v.gender,age:v.age,alerts:v.alerts,notes:v.notes}));
       const teeth=!p.id?(v.fTeeth||[]):[];
       if(!p.id&&(fee>0||v.fProc||teeth.length)){const d=v.fDate||TODAY;await put('treatments',{patientId:id,procedure:v.fProc||'علاج',cat:v.fCat||guessCat(v.fProc),clinicId:v.clinicId,doctorId:v.fDoc||'',date:d,teeth,fee,discount:0,plan:fee&&paid>=fee?'cash':'partial',down:0,schedule:[],payments:paid>0?[{id:uid(),amount:paid,date:d,method:v.fMethod||'cash',by:Store.me||null}]:[],notes:'',plannedSessions:num(v.fSess)||'',byDoctor:isDoctor()||undefined});
         toast(fee-paid>0?`تم الحفظ · المتبقي ${fmt(fee-paid)} د.ع سُجّل في ذمم المرضى`:fee>0?'تم الحفظ · العلاج مسدّد بالكامل':'تم حفظ المريض والعلاج')}else toast('تم الحفظ');if(!p.id)(after||(id=>go('patient',{patientId:id})))(id)}});
@@ -3597,7 +3621,7 @@ function patientForm(p,after){
 function treatmentForm(t,pid,pre){
   const isNew=!t;t=t||{};pid=t.patientId||pid;pre=pre||{};const mC=maxChairs();const pt=get('patients',pid);const money_=seeMoney()&&can('price');const payOk=can('pay');
   const fields=[
-    {k:'cat',label:'القسم',type:'catpick',for:'procedure',hint:'يتحدد وحده من اسم العلاج، وتكدر تغيّره'},{k:'procedure',label:'العلاج',req:true,list:'dl-procs',ph:'مثال: تاج زيركون'},
+    {k:'cat',label:'القسم',type:'catpick',for:'procedure',hint:'يتحدد وحده من اسم العلاج، وتكدر تغيّره'},{k:'procedure',label:'العلاج',req:true,list:'dl-procs',ph:'مثال: تاج زيركون'},{k:'chips_fill',type:'html',html:procChips('fill'),show:v=>(v.cat||guessCat(v.procedure))==='fill'},{k:'chips_crown',type:'html',html:procChips('crown'),show:v=>(v.cat||guessCat(v.procedure))==='crown'},{k:'chips_ortho',type:'html',html:procChips('ortho'),show:v=>(v.cat||guessCat(v.procedure))==='ortho'},{k:'chips_filler',type:'html',html:procChips('filler'),show:v=>(v.cat||guessCat(v.procedure))==='filler'},
     {k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},{k:'doctorId',label:'الطبيب المعالج',type:'select',opts:optDoctors(),empty:'— اختر —',req:true,half:true},
     {k:'chair',label:'الكرسي',type:'select',opts:chairOpts(mC),empty:'—',half:true,show:v=>chairCount(v.clinicId)>1,hint:'الكرسي الذي يُعالَج عليه المريض'},
     {k:'teeth',label:'الأسنان المعالجة (اختياري)',type:'teeth'},
