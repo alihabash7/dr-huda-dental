@@ -418,6 +418,17 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 .money-in input{padding-inline-end:72px}
 .tx-extras{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 14px}
 
+
+/* ---- edit account modal ---- */
+.ea-body{display:flex;flex-direction:column;gap:12px}
+.ea-card{border:1px solid var(--line);border-inline-start:4px solid var(--cc);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.ea-card.bad{border-color:var(--bad)}
+.ea-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.ea-h b{font-size:15px;display:block}.ea-h small{display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:var(--ink-3);font-size:12px;margin-top:3px}
+.ea-bal{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ea-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.ea-grid label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-3);min-width:0}.ea-grid .money-in{min-width:0}.ea-grid input{width:100%;min-width:0;box-sizing:border-box;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding-inline-start:12px}.ea-grid input:disabled{opacity:.55}.ea-grid input:focus{outline:2px solid var(--accent);outline-offset:0}
+.ea-pt{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.ea-pay{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;padding:6px 0;border-top:1px dashed var(--line-2);font-size:13px}.ea-pay b{font-variant-numeric:tabular-nums}
+.ea-warn{color:var(--bad);font-size:12.5px;background:color-mix(in srgb,var(--bad) 10%,var(--surface));border-radius:8px;padding:8px 10px}
 /* ---- account bar / settle ---- */
 .acct-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px;border-inline-start:5px solid var(--bad)}
 .acct-bar.clear{border-inline-start-color:var(--good,#15803d)}
@@ -1162,8 +1173,8 @@ function patientTableIn(){
   let ps=all('patients').filter(pf);if(state.pcat&&state.pcat!=='all')ps=ps.filter(p=>patientCats(p.id).has(state.pcat));if(q)ps=ps.filter(p=>(p.name||'').includes(q)||(p.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,'')));
   ps.sort((a,b)=>((st.get(b.id)?.last||b.createdAt||'')).localeCompare(st.get(a.id)?.last||a.createdAt||''));
   if(!ps.length)return empty(q?'لا نتائج مطابقة':'لا يوجد مرضى بعد',q?'جرّب جزءاً من الاسم أو آخر أرقام الهاتف':'أضف أول مريض أو احجز موعداً لمريض جديد',q?'':`<button class="btn primary sm" data-act="newPatient">${ic('plus',16)} مريض جديد</button>`);
-  if(!seeMoney())return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">عدد الأعمال</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{count:0,last:''};return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${s.count}</td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>`;
-  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{total:0,paid:0,last:''};const b=s.total-s.paid;return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n ${b>0?'bad-t':''}"><b>${fmt(b)}</b></td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>${ps.length>300?`<p class="pad muted">يظهر أول 300 مريض، استخدم البحث للوصول إلى البقية.</p>`:''}`;
+  if(!seeMoney())return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">عدد الأعمال</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{count:0,last:''};return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${s.count}</td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>`;
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{total:0,paid:0,last:''};const b=s.total-s.paid;return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n ${b>0?'bad-t':''}"><b>${fmt(b)}</b></td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>${ps.length>300?`<p class="pad muted">يظهر أول 300 مريض، استخدم البحث للوصول إلى البقية.</p>`:''}`;
 }
 INPUTS.q=v=>{state.q=normDigits(v);const el=$('#pat-list');if(el)el.innerHTML=patientTable()};
 
@@ -1179,6 +1190,7 @@ PAGES.patient=()=>{
   <section class="card pt-head"><div class="pt-id"><div class="avatar">${esc(initials(p.name))}</div><div style="min-width:0"><h2>${esc(p.name)}${sampleTag(p)}</h2><p class="muted">${[p.phone?`<span dir="ltr">${esc(p.phone)}</span>`:'',esc(clinicName(p.clinicId)),esc(p.gender||''),p.age?esc(p.age)+' سنة':''].filter(Boolean).join(' · ')}</p>
    ${(p.alerts||[]).length?`<div class="alerts">${ic('alert',15)}<b style="font-size:13px">تنبيه طبي:</b>${p.alerts.map(a=>chip(a,'bad')).join('')}</div>`:''}${p.notes?`<p class="note">${esc(p.notes)}</p>`:''}</div></div>
    <div class="pt-actions">${openTx(p).some(t=>!t.legacy||sessDone(t))?`<button class="btn primary" data-act="visitStart" data-pid="${p.id}">${ic('tooth',16)} تسجيل جلسة</button><button class="btn" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'عمل جديد':'علاج جديد'}</button>`:`<button class="btn primary" data-act="newTreatment" data-pid="${p.id}">${ic('plus',16)} ${isDoctor()?'تسجيل عمل':'علاج جديد'}</button>`}<button class="btn" data-act="newAppt" data-pid="${p.id}">${ic('calendar',16)} موعد</button>${locBtn(p)}<button class="btn" data-act="newLab" data-pid="${p.id}">${ic('tooth',16)} طلب مختبر</button>${seeMoney()&&can('price')?`<button class="btn" data-act="addDebt" data-pid="${p.id}">${ic('wallet',16)} إضافة دين / متبقي</button>`:''}${seeMoney()&&can('print')&&ts.length?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف حساب للطباعة</button>`:''}${seeMoney()&&can('demand')&&total-paid>0?`<button class="btn wa" data-act="demand" data-id="${p.id}">${ic('chat',16)} مطالبة بالدفع</button>`:waBtn(p.phone,`مرحباً ${p.name}،\n${SIGN}`,'واتساب')}<button class="icon-btn" data-act="editPatient" data-id="${p.id}" aria-label="تعديل بيانات المريض">${ic('edit')}</button>${isAdmin()&&!Store.preview?`<button class="icon-btn danger" data-act="delPatient" data-id="${p.id}" aria-label="حذف المريض" title="حذف المريض">${ic('trash')}</button>`:''}</div></section>
+  ${p.noPhone&&!p.phone?`<div class="mode-banner" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${ic('phone',16)}<span style="flex:1;min-width:200px">بدون رقم موبايل${p.noPhoneWhy?' · '+esc(p.noPhoneWhy):''}. ما توصله رسائل التذكير والمتابعة. أضف رقمه أول ما يتوفر.</span><button class="btn sm" data-act="editPatient" data-id="${p.id}">${ic('edit',14)} إضافة رقم</button></div>`:''}
   ${accountBar(p)}
   ${visitNow(p)}
   ${pcTop?patientClinicsCard(p):''}
@@ -1215,7 +1227,7 @@ PAGES.accounts=()=>{
   let body='';
   const instRow=x=>{const p=get('patients',x.patientId)||{};const dl=daysBetween(x.due,TODAY);return `<tr><td><div class="who"><a href="#patient" data-act="openPatient" data-id="${p.id||''}" style="text-decoration:none;font-weight:500">${esc(p.name||'—')}</a><small dir="ltr" style="text-align:end">${esc(p.phone||'')}</small></div></td><td>${esc(clinicName(x.clinicId))}</td><td>${esc(x.t.procedure)}</td><td>${x.n} / ${x.of}</td><td>${fmtDate(x.due)}</td><td>${x.state==='late'?chip(`متأخر ${dl} يوم`,'bad'):chip(dl===0?'اليوم':`بعد ${-dl} يوم`,'warn')}</td><td class="n"><b>${fmt(x.left)}</b></td><td><div class="acts">${waBtn(p.phone,remindText(p,x))}<button class="btn sm" data-act="addPayment" data-tid="${x.t.id}">تسديد</button></div></td></tr>`};
   if(tab==='late'||tab==='soon'){const rows=tab==='late'?late:soon;body=rows.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>العيادة</th><th>العلاج</th><th>القسط</th><th>تاريخ الاستحقاق</th><th>الحالة</th><th class="n">المبلغ</th><th></th></tr></thead><tbody>${rows.map(instRow).join('')}</tbody><tfoot><tr><td colspan="6">المجموع</td><td class="n">${fmt(sum(rows,x=>x.left))}</td><td></td></tr></tfoot></table></div>`:empty(tab==='late'?'لا أقساط متأخرة':'لا أقساط خلال الأيام السبعة القادمة','')}
-  else if(tab==='debts'){body=debtors.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${debtors.map(([p,s])=>`<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}</td><td>${esc(clinicName(p.clinicId))}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n bad-t"><b>${fmt(s.total-s.paid)}</b></td><td class="muted">${fmtDate(s.last)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="4">إجمالي الذمم</td><td class="n">${fmt(sum(debtors,([,s])=>s.total-s.paid))}</td><td></td></tr></tfoot></table></div>`:empty('لا ذمم على المرضى','')}
+  else if(tab==='debts'){body=debtors.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${debtors.map(([p,s])=>`<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}</td><td>${esc(clinicName(p.clinicId))}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n bad-t"><b>${fmt(s.total-s.paid)}</b></td><td class="muted">${fmtDate(s.last)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="4">إجمالي الذمم</td><td class="n">${fmt(sum(debtors,([,s])=>s.total-s.paid))}</td><td></td></tr></tfoot></table></div>`:empty('لا ذمم على المرضى','')}
   else{const byM={};pays.forEach(p=>byM[p.method||'cash']=(byM[p.method||'cash']||0)+num(p.amount));
     body=`<div class="pad cat-row" style="border-bottom:1px solid var(--line-2)">${PAY_METHODS.filter(([k])=>byM[k]).map(([k,l])=>`<span class="chip accent">${l}: ${fmt(byM[k])}</span>`).join('')||'<span class="muted">لا دفعات في هذا الشهر</span>'}</div>${pays.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>التاريخ</th><th>المريض</th><th>العيادة</th><th>الطبيب</th><th>العلاج</th><th>الطريقة</th><th class="n">المبلغ</th><th>سجّلها</th></tr></thead><tbody>${pays.map(x=>`<tr><td>${fmtDate(x.date)}</td><td><a href="#patient" data-act="openPatient" data-id="${x.patientId}" style="text-decoration:none;font-weight:500">${esc(patientName(x.patientId))}</a></td><td>${esc(clinicName(x.clinicId))}</td><td>${esc(docName(x.doctorId))}</td><td>${esc(x.t.procedure)}</td><td>${esc((PAY_METHODS.find(m=>m[0]===x.method)||[,'نقد'])[1])}</td><td class="n"><b>${fmt(x.amount)}</b></td><td>${who(x.by)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="6">مجموع ${monthLabel(m)}</td><td class="n">${fmt(sum(pays,p=>p.amount))}</td><td></td></tr></tfoot></table></div>`:''}`}
   return `<div class="kpis">${kpi('المحصّل هذا الشهر',money(sum(pays,p=>p.amount)),pays.length+' دفعة')}${kpi('أقساط متأخرة',money(sum(late,x=>x.left)),late.length+' قسط')}${kpi('مستحق خلال 7 أيام',money(sum(soon,x=>x.left)),soon.length+' قسط')}${kpi('إجمالي ذمم المرضى',money(sum(debtors,([,s])=>s.total-s.paid)),debtors.length+' مريض')}</div>
@@ -1379,9 +1391,9 @@ async function claimCode(raw){
 }
 INPUTS.joinCode=v=>{state.joinCode=v};
 function quickWork(){
-  formModal({title:isDoctor()?'تسجيل عمل':'تسجيل علاج',sub:'اختر المريض، أو اكتب اسماً جديداً لإضافته',fields:[{k:'patient',label:'المريض',type:'patient'},{k:'newPhone',label:'موبايل المريض الجديد (مطلوب)',type:'tel',ph:'07xxxxxxxxx',show:v=>!v.patient&&!!v.patient_new},{k:'dupbox',type:'html',html:'<div id="dup-box" data-mode="pick"></div>',show:v=>!v.patient&&!!v.patient_new&&findDupes(v.patient_new,v.newPhone).length>0},{k:'notDup',label:'تأكدت أنه مريض جديد مختلف',type:'checkbox',show:v=>!v.patient&&!!v.patient_new&&findDupes(v.patient_new,v.newPhone).length>0}],submit:'متابعة',
+  formModal({title:isDoctor()?'تسجيل عمل':'تسجيل علاج',sub:'اختر المريض، أو اكتب اسماً جديداً لإضافته',fields:[{k:'patient',label:'المريض',type:'patient'},{k:'newPhone',label:'موبايل المريض الجديد (مطلوب)',type:'tel',ph:'07xxxxxxxxx',show:v=>!v.patient&&!!v.patient_new&&!v.newNo},{k:'newNo',label:'ما عنده رقم / رفض إعطاء الرقم',type:'checkbox',show:v=>!v.patient&&!!v.patient_new},{k:'newWhy',label:'السبب',type:'select',opts:NP_REASONS,show:v=>!v.patient&&!!v.patient_new&&!!v.newNo},{k:'dupbox',type:'html',html:'<div id="dup-box" data-mode="pick"></div>',show:v=>!v.patient&&!!v.patient_new&&findDupes(v.patient_new,v.newPhone).length>0},{k:'notDup',label:'تأكدت أنه مريض جديد مختلف',type:'checkbox',show:v=>!v.patient&&!!v.patient_new&&findDupes(v.patient_new,v.newPhone).length>0}],submit:'متابعة',
     onChange:(v,form)=>{const box=form.querySelector('#dup-box');if(box)setBox(box,!v.patient&&v.patient_new?dupBoxHTML(findDupes(v.patient_new,v.newPhone),'pick'):'')},
-    onSubmit:async(v,form)=>{let pid=v.patient;if(!pid){if(!v.patient_new)fail('اكتب اسم المريض');{const pe=phoneErr(v.newPhone);if(pe)return fieldErr(form,'newPhone',pe)}if(!dupGate(findDupes(v.patient_new,v.newPhone),v,form))return false;pid=await put('patients',{name:v.patient_new,phone:phoneNorm(v.newPhone),clinicId:defaultClinic()})}setTimeout(()=>treatmentForm(null,pid),30)}});
+    onSubmit:async(v,form)=>{let pid=v.patient;if(!pid){if(!v.patient_new)fail('اكتب اسم المريض');if(!v.newNo){const pe=phoneErr(v.newPhone);if(pe)return fieldErr(form,'newPhone',pe)}if(!dupGate(findDupes(v.patient_new,v.newNo?'':v.newPhone),v,form))return false;pid=await put('patients',{name:v.patient_new,phone:v.newNo?'':phoneNorm(v.newPhone),noPhone:!!v.newNo,noPhoneWhy:v.newNo?(v.newWhy||NP_REASONS[0][0]):'',clinicId:defaultClinic()})}setTimeout(()=>treatmentForm(null,pid),30)}});
 }
 const unpriced=()=>all('treatments').filter(t=>cf(t)&&tTotal(t)===0).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
 const unpricedCard=()=>{if(!can('price'))return '';const l=unpriced();if(!l.length)return '';return `<section class="card"><div class="card-h"><h3>أعمال سجّلها الأطباء بانتظار التسعير</h3><span class="chip warn">${l.length}</span></div><div class="list">${l.slice(0,8).map(t=>`<div class="li"><div class="grow"><div class="t">${esc(t.procedure)} · ${esc(patientName(t.patientId))}</div><div class="s">${esc(docName(t.doctorId))} · ${fmtDate(t.date)} · ${esc(clinicName(t.clinicId))}</div></div><button class="btn sm" data-act="editTreatment" data-id="${t.id}">إضافة الكلفة</button></div>`).join('')}</div></section>`};
@@ -1797,6 +1809,9 @@ const impLoad=()=>{try{const o=JSON.parse(localStorage.getItem(IMP_KEY)||'null')
 const imp=(()=>{const o=impLoad();return o||{rows:[],clinicId:'',doctorId:'',date:'',thousands:false,share:false}})();
 const impSave=()=>{try{localStorage.setItem(IMP_KEY,JSON.stringify(imp))}catch(e){}};
 const impRow=r=>Object.assign({k:uid(),name:'',phone:'',amount:'',date:'',note:'',src:'يدوي'},r);
+const NP_REASONS=[['لا يملك رقماً','لا يملك رقماً'],['رفض إعطاء الرقم','رفض إعطاء الرقم'],['سيُحضره لاحقاً','سيُحضره لاحقاً'],['طفل · رقم الأهل غير متوفر','طفل · رقم الأهل غير متوفر'],['سبب آخر','سبب آخر']];
+/* patient without a phone number: allowed, but with a reason, and matched by name + age for duplicates */
+const noPhoneFields=(pre,showFn)=>[{k:pre+'No',label:'ما عنده رقم / رفض إعطاء الرقم',type:'checkbox',show:showFn},{k:pre+'Why',label:'السبب',type:'select',opts:NP_REASONS,show:v=>(showFn?showFn(v):true)&&!!v[pre+'No']}];
 const phoneNorm=ph=>{let d=normDigits(ph||'').replace(/\D/g,'');if(d.startsWith('00'))d=d.slice(2);if(d.startsWith('964'))d='0'+d.slice(3);if(/^7\d{9}$/.test(d))d='0'+d;return /^07\d{9}$/.test(d)?d:''};
 const phoneErr=ph=>{const d=normDigits(ph||'').replace(/\D/g,'');if(!d)return 'رقم موبايل المريض مطلوب';return phoneNorm(ph)?'':'رقم الموبايل غير صحيح: 11 رقماً يبدأ بـ 07 (مثال 07701234567)'};
 const fieldErr=(form,k,msg)=>{const el=form&&form.querySelector(`.fld[data-k="${k}"]`);if(el){el.classList.add('err');el.querySelector('.emsg')?.remove();el.insertAdjacentHTML('beforeend',`<small class="emsg">${esc(msg)}</small>`);el.querySelector('input')?.focus();el.scrollIntoView({block:'center',behavior:'smooth'})}toast(msg,'warn');return false};
@@ -1909,7 +1924,7 @@ function findDupes(name,phone,exceptId){
   return out.sort((a,b)=>b.strong-a.strong).slice(0,6);
 }
 function dupBoxHTML(list,mode){if(!list.length)return '';
-  return `<div class="dup-box" role="alert"><b>${ic('alert',16)} هذا المريض قد يكون مسجّلاً مسبقاً</b>${list.map(d=>{const s=patientStats().get(d.p.id);return `<div class="dup-row"><div class="grow"><div class="t">${esc(d.p.name)}${sampleTag(d.p)}</div><div class="s">${esc(d.reason)} · <span dir="ltr">${esc(d.p.phone||'بدون رقم')}</span> · ${esc(clinicName(d.p.clinicId))}${s?` · ${s.count} عمل`:''}</div></div><button type="button" class="btn sm ${mode==='pick'?'primary':''}" data-act="${mode==='pick'?'dupPick':'dupOpen'}" data-id="${d.p.id}">${mode==='pick'?'اختيار هذا المريض':'فتح ملفه'}</button></div>`}).join('')}<small>إذا كان شخصاً آخر (مثلاً أحد أفراد العائلة بنفس الرقم)، أشّر «تأكدت أنه مريض مختلف» ثم احفظ.</small></div>`}
+  return `<div class="dup-box" role="alert"><b>${ic('alert',16)} هذا المريض قد يكون مسجّلاً مسبقاً</b>${list.map(d=>{const s=patientStats().get(d.p.id);return `<div class="dup-row"><div class="grow"><div class="t">${esc(d.p.name)}${sampleTag(d.p)}</div><div class="s">${esc(d.reason)}${d.p.age?' · '+esc(d.p.age)+' سنة':''} · <span dir="ltr">${esc(d.p.phone||'بدون رقم')}</span> · ${esc(clinicName(d.p.clinicId))}${s?` · ${s.count} عمل`:''}</div></div><button type="button" class="btn sm ${mode==='pick'?'primary':''}" data-act="${mode==='pick'?'dupPick':'dupOpen'}" data-id="${d.p.id}">${mode==='pick'?'اختيار هذا المريض':'فتح ملفه'}</button></div>`}).join('')}<small>إذا كان شخصاً آخر (مثلاً أحد أفراد العائلة بنفس الرقم)، أشّر «تأكدت أنه مريض مختلف» ثم احفظ.</small></div>`}
 const setBox=(box,html)=>{if(box.__h!==html){box.innerHTML=html;box.__h=html}};
 const dupGate=(list,v,form)=>{if(list.length&&!v.notDup){const box=form.querySelector('#dup-box');if(box)setBox(box,dupBoxHTML(list,box.dataset.mode));toast('تحقق من التكرار قبل الإضافة','warn');return false}return true};
 ACTIONS.dupOpen=d=>{closeModal();reach(d.id);go('patient',{patientId:d.id})};
@@ -2399,7 +2414,7 @@ ACTIONS.fillTime=(d,el)=>{const inp=el.closest('form')?.querySelector('#f_time')
 function apptForm(a,pid){
   a=a||{};
   return formModal({title:a.id?'تعديل الموعد':(a.bookingId?'حجز موعد لطلب من الموقع':'موعد جديد'),fields:[
-    {k:'patient',label:'المريض',type:'patient'},{k:'newPhone',label:'موبايل المريض الجديد (مطلوب)',type:'tel',ph:'07xxxxxxxxx',show:v=>!v.patient&&!!v.patient_new,hint:'سيُنشأ ملف جديد لهذا المريض'},
+    {k:'patient',label:'المريض',type:'patient'},{k:'newPhone',label:'موبايل المريض الجديد (مطلوب)',type:'tel',ph:'07xxxxxxxxx',show:v=>!v.patient&&!!v.patient_new&&!v.newNo,hint:'سيُنشأ ملف جديد لهذا المريض'},{k:'newNo',label:'ما عنده رقم / رفض إعطاء الرقم',type:'checkbox',show:v=>!v.patient&&!!v.patient_new},{k:'newWhy',label:'السبب',type:'select',opts:NP_REASONS,show:v=>!v.patient&&!!v.patient_new&&!!v.newNo},
     {k:'dupbox',type:'html',html:'<div id="dup-box" data-mode="pick"></div>',show:v=>!v.patient&&!!v.patient_new&&findDupes(v.patient_new,v.newPhone).length>0},
     {k:'notDup',label:'تأكدت أنه مريض جديد مختلف',type:'checkbox',show:v=>!v.patient&&!!v.patient_new&&findDupes(v.patient_new,v.newPhone).length>0},
     {k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},{k:'doctorId',label:'الطبيب',type:'select',opts:optDoctors(),empty:'— غير محدد —',half:true},
@@ -2413,7 +2428,7 @@ function apptForm(a,pid){
     onChange:(v,form)=>{const box=form.querySelector('#dup-box');if(box)setBox(box,!v.patient&&v.patient_new?dupBoxHTML(findDupes(v.patient_new,v.newPhone),'pick'):'');const sb=form.querySelector('#slot-box');if(sb)setBox(sb,slotBoxHTML(Object.assign({},v,{chair:chairCount(v.clinicId)>1?v.chair:''}),a.id))},
     onSubmit:async(v,form)=>{const vv=Object.assign({},v,{chair:chairCount(v.clinicId)>1?(v.chair||''):''});const cl=apptConflicts(vv,a.id);
       if(cl.length&&!v.clashOk){const nf=nextFree(vv,a.id);fail(`الوقت محجوز: ${patientName(cl[0].patientId)} الساعة ${t12(cl[0].time)}${nf?` · أقرب وقت فارغ ${t12(nf)}`:''}`)}
-      let p=v.patient;if(!p){if(!v.patient_new)fail('اكتب اسم المريض أو اختره من القائمة');{const pe=phoneErr(v.newPhone);if(pe)return fieldErr(form,'newPhone',pe)}if(!dupGate(findDupes(v.patient_new,v.newPhone),v,form))return false;p=await put('patients',{name:v.patient_new,phone:phoneNorm(v.newPhone),clinicId:v.clinicId})}
+      let p=v.patient;if(!p){if(!v.patient_new)fail('اكتب اسم المريض أو اختره من القائمة');if(!v.newNo){const pe=phoneErr(v.newPhone);if(pe)return fieldErr(form,'newPhone',pe)}if(!dupGate(findDupes(v.patient_new,v.newNo?'':v.newPhone),v,form))return false;p=await put('patients',{name:v.patient_new,phone:v.newNo?'':phoneNorm(v.newPhone),noPhone:!!v.newNo,noPhoneWhy:v.newNo?(v.newWhy||NP_REASONS[0][0]):'',clinicId:v.clinicId})}
       const moved=!a.id||a.date!==v.date||a.time!==v.time;
       const doc=Object.assign(clone(a),{patientId:p,clinicId:v.clinicId,doctorId:v.doctorId,chair:vv.chair,date:v.date,time:v.time,dur:num(v.dur),procedure:v.procedure,status:v.status,notes:v.notes});
       if(moved&&a.id){delete doc.remSent;delete doc.remToday;delete doc.bookSent;doc.wantsChange=false;if(doc.status==='confirmed')doc.status='scheduled'}
@@ -2614,7 +2629,7 @@ async function saveRecs(recs){
   const st={patients:0,tx:0,balances:0,skipped:0,fee:0,paid:0};const ops=[];
   for(const r of recs)ops.push(async()=>{
     let pid=r.existingId;
-    if(!pid){pid=await put('patients',{name:r.name.trim(),phone:cleanPhone(r.phone),clinicId:r.clinicId,gender:r.gender||'',age:r.age||'',alerts:r.alerts||[],notes:r.notes||'من السجلات القديمة',imported:true});st.patients++}
+    if(!pid){pid=await put('patients',{name:r.name.trim(),phone:cleanPhone(r.phone),noPhone:!!r.noPhone,noPhoneWhy:r.noPhoneWhy||'',clinicId:r.clinicId,gender:r.gender||'',age:r.age||'',alerts:r.alerts||[],notes:r.notes||'من السجلات القديمة',imported:true});st.patients++}
     r.pid=pid;const have=new Set(all('treatments').filter(t=>t.patientId===pid).map(txKey));
     for(const t of r.tx||[]){
       if(have.has(txKey(t))){st.skipped++;continue}
@@ -2635,7 +2650,7 @@ const opSumLine=st=>[st.patients?`${st.patients} مريض جديد`:'',st.tx?`${
 /* ================= Wizard ================= */
 let op=null;
 const OP_MODES=[['detail','علاجات سابقة بالتفصيل'],['balance','الرصيد المتبقي فقط'],['none','تسجيل المريض فقط']];
-const opFresh=keep=>({step:1,name:'',phone:'',clinicId:(keep&&keep.clinicId)||defaultClinic(),gender:'',age:'',alerts:[],notes:'',existingId:'',dupes:null,mode:'detail',tx:[],balAmount:'',balDate:'',balNote:'',balDoctor:'',defDoc:(keep&&keep.defDoc)||'',lastDate:(keep&&keep.lastDate)||'',saved:0});
+const opFresh=keep=>({step:1,name:'',phone:'',noPhone:false,noPhoneWhy:'',clinicId:(keep&&keep.clinicId)||defaultClinic(),gender:'',age:'',alerts:[],notes:'',existingId:'',dupes:null,mode:'detail',tx:[],balAmount:'',balDate:'',balNote:'',balDoctor:'',defDoc:(keep&&keep.defDoc)||'',lastDate:(keep&&keep.lastDate)||'',saved:0});
 const opTx=prev=>({procedure:'',teeth:'',doctorId:prev?prev.doctorId:op.defDoc,date:prev?prev.date:op.lastDate,fee:'',paid:'',sessions:'',planned:'',note:''});
 const opDocs=()=>{const cid=op.clinicId;return all('doctors').filter(d=>d.active!==false).sort((a,b)=>(((b.clinicIds||[]).includes(cid))-((a.clinicIds||[]).includes(cid)))||byName(a,b)).map(d=>[d.id,'د. '+d.name+((d.clinicIds||[]).includes(cid)?'':' · عيادة أخرى')])};
 function oldPatient(){if(!can('addPatient')||!seeMoney())return noPerm();op=opFresh();op.tx=[opTx()];openModal('',true);opRender()}
@@ -2652,7 +2667,8 @@ function opStep1(){
   const dup=op.dupes&&op.dupes.length?`<div class="dup-box" role="alert"><b>${ic('alert',16)} هذا المريض قد يكون مسجّلاً مسبقاً</b>${op.dupes.map(d=>{const s=patientStats().get(d.p.id);return `<div class="dup-row"><div class="grow"><div class="t">${esc(d.p.name)}</div><div class="s">${esc(d.reason)} · ${esc(clinicName(d.p.clinicId))}${d.p.phone?' · <span dir="ltr">'+esc(d.p.phone)+'</span>':''}${s?' · '+s.count+' علاج':''}</div></div><button type="button" class="btn sm" data-act="opUseDup" data-id="${d.p.id}">نفس المريض: أضف له السجل</button></div>`}).join('')}<button type="button" class="btn sm primary" data-act="opNotDup">مريض مختلف، تابع</button></div>`:'';
   return `<div class="grid-form">
    <div class="fld"><label for="op-name">اسم المريض <b class="req">*</b></label><input id="op-name" value="${esc(op.name)}" data-inp="opF" data-f="name" autocomplete="off" placeholder="الاسم الثلاثي" ${op.existingId?'readonly':''}></div>
-   <div class="fld half"><label for="op-phone">رقم الموبايل <b class="req">*</b></label><input id="op-phone" value="${esc(op.phone)}" data-inp="opF" data-f="phone" inputmode="tel" dir="ltr" style="text-align:right" placeholder="07xxxxxxxxx" autocomplete="off"></div>
+   <div class="fld half"><label for="op-phone">رقم الموبايل ${op.noPhone?'':'<b class="req">*</b>'}</label><input id="op-phone" value="${esc(op.phone)}" data-inp="opF" data-f="phone" inputmode="tel" dir="ltr" style="text-align:right" placeholder="07xxxxxxxxx" autocomplete="off" ${op.noPhone?'disabled':''}></div>
+   <div class="fld"><label class="chk"><input type="checkbox" ${op.noPhone?'checked':''} data-chg="opNoPhone"><span>ما عنده رقم / رفض إعطاء الرقم</span></label>${op.noPhone?`<select data-chg="opNoPhoneWhy" style="margin-top:8px">${NP_REASONS.map(([a,b])=>`<option value="${esc(a)}" ${op.noPhoneWhy===a?'selected':''}>${esc(b)}</option>`).join('')}</select>`:''}</div>
    <div class="fld half"><label for="op-clinic">العيادة <b class="req">*</b></label><select id="op-clinic" data-chg="opSel" data-f="clinicId">${optClinics().map(([v,l])=>`<option value="${v}" ${op.clinicId===v?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
    <div class="fld third"><label>الجنس</label><div class="seg">${[['ذكر','ذكر'],['أنثى','أنثى']].map(([v,l])=>`<button type="button" class="${op.gender===v?'on':''}" data-act="opGender" data-v="${v}">${l}</button>`).join('')}</div></div>
    <div class="fld third"><label for="op-age">العمر</label><input id="op-age" value="${esc(op.age)}" data-inp="opF" data-f="age" inputmode="numeric" placeholder="سنة" autocomplete="off"></div>
@@ -2692,14 +2708,14 @@ function opStep2(){
 }
 const opTotText=()=>{const f=sum(op.tx,t=>num(t.fee)),p=sum(op.tx,t=>Math.min(num(t.paid),num(t.fee)));return f?`المجموع: الكلفة ${fmt(f)} · المدفوع ${fmt(p)} · المتبقي <b>${fmt(f-p)}</b> د.ع`:''};
 function opValid(){
-  if(op.step===1){const n=op.name.trim();if(n.length<2)return 'اكتب اسم المريض';{const pe=phoneErr(op.phone);if(pe)return pe;op.phone=phoneNorm(op.phone)}if(!op.clinicId)return 'اختر العيادة';return ''}
+  if(op.step===1){const n=op.name.trim();if(n.length<2)return 'اكتب اسم المريض';if(op.noPhone){op.phone='';if(!n.includes(' ')&&!num(op.age))return 'بدون رقم: اكتب الاسم الثلاثي أو العمر حتى نفرّقه عن غيره'}else{const pe=phoneErr(op.phone);if(pe)return pe;op.phone=phoneNorm(op.phone)}if(!op.clinicId)return 'اختر العيادة';return ''}
   if(op.mode==='balance'){if(!(num(op.balAmount)>0))return 'اكتب المبلغ المتبقي على المريض';if(op.balDate&&!isoOk(op.balDate))return 'تاريخ الدين غير صحيح';return ''}
   if(op.mode==='detail'){const used=op.tx.filter(t=>t.procedure.trim()||t.fee!==''||t.paid!=='');if(!used.length)return 'أضف علاجاً واحداً على الأقل، أو اختر «الرصيد المتبقي فقط» أو «تسجيل المريض فقط»';
     for(const [i,t] of used.entries()){const k=`علاج ${op.tx.indexOf(t)+1}: `;if(!t.procedure.trim())return k+'اكتب اسم العلاج';if(!isoOk(t.date))return k+'اكتب تاريخ العلاج';if(t.date>TODAY)return k+'التاريخ في المستقبل';if(!(num(t.fee)>0))return k+'اكتب الكلفة الكلية';if(num(t.paid)>num(t.fee))return k+'المدفوع أكبر من الكلفة';if(t.sessions!==''&&!(num(t.sessions)>=0&&num(t.sessions)<=60))return k+'عدد الجلسات غير صحيح';if(t.planned!==''&&!(num(t.planned)>=1&&num(t.planned)<=60))return k+'عدد الجلسات الكلية غير صحيح';if(t.planned!==''&&t.sessions!==''&&num(t.sessions)>num(t.planned))return k+'الجلسات المنجزة أكبر من المتوقعة'}}
   return '';
 }
 function opRec(){
-  const r={existingId:op.existingId,name:op.name,phone:op.phone,clinicId:op.clinicId,gender:op.gender,age:op.age,alerts:op.alerts,notes:op.notes,tx:[],balance:null};
+  const r={existingId:op.existingId,name:op.name,phone:op.phone,noPhone:!!op.noPhone,noPhoneWhy:op.noPhone?op.noPhoneWhy||NP_REASONS[0][0]:'',clinicId:op.clinicId,gender:op.gender,age:op.age,alerts:op.alerts,notes:op.notes,tx:[],balance:null};
   if(op.mode==='detail')r.tx=op.tx.filter(t=>t.procedure.trim()||t.fee!==''||t.paid!=='').map(t=>({procedure:t.procedure,cat:t.cat||guessCat(t.procedure),teeth:teethOf(t.teeth),doctorId:t.doctorId,date:t.date,fee:num(t.fee),paid:num(t.paid),sessions:t.sessions===''?0:num(t.sessions),planned:t.planned===''?'':num(t.planned),note:t.note,clinicId:op.clinicId}));
   else if(op.mode==='balance')r.balance={amount:num(op.balAmount),date:op.balDate,note:op.balNote,doctorId:op.balDoctor};
   return r;
@@ -3187,6 +3203,8 @@ document.addEventListener('input',e=>{const t=e.target;if(!t||t.tagName!=='INPUT
   const k=t.value.trim()?guessCat(t.value):'';pick.querySelectorAll('input[type=radio]').forEach(r=>{r.checked=r.value===k})});
 document.addEventListener('change',e=>{const r=e.target;if(!r||r.type!=='radio')return;const pick=r.closest('.cat-pick');if(!pick)return;pick.classList.add('manual');
   const scope=pick.closest('form,.op-card,.modal')||document;const inp=scope.querySelector(`input[name="${pick.dataset.catfor}"]`);if(inp)inp.setAttribute('list','dl-procs-'+r.value)});
+CHANGES.opNoPhone=(v,d,el)=>{if(!op)return;op.noPhone=el.checked;if(op.noPhone){op.phone='';op.dupes=null;op.noPhoneWhy=op.noPhoneWhy||NP_REASONS[0][0]}opRender()};
+CHANGES.opNoPhoneWhy=(v)=>{if(op)op.noPhoneWhy=v};
 CHANGES.opTxCat=(v,d,el)=>{if(!op||!op.tx[d.i])return;op.tx[d.i].cat=el.value;op.tx[d.i].catManual=true};
 /* filter strip used on patients and debts pages */
 const catSeg=(act,cur,count)=>`<div class="seg cat-seg" role="tablist" aria-label="تصفية حسب القسم"><button class="${!cur||cur==='all'?'on':''}" data-act="${act}" data-v="all">كل الأقسام</button>${TX_CATS.map(([k,l])=>{const n=count?count(k):null;return `<button class="${cur===k?'on':''}" data-act="${act}" data-v="${k}" style="--cc:${catHue(k)}"><span class="cat-dot"></span>${esc(l)}${n!=null?` <b>${n}</b>`:''}</button>`}).join('')}</div>`;
@@ -3234,7 +3252,43 @@ function accountBar(p){
   const late=instItems().filter(x=>x.patientId===p.id&&x.state==='late');
   return `<section class="card acct-bar ${bal>0?'owes':'clear'}"><div class="acct-main"><span>${bal>0?'المتبقي عليه':'الحساب'}</span><b>${bal>0?fmt(bal)+' <small>د.ع</small>':'مسدّد بالكامل ✓'}</b>
     <small>دفع ${fmt(pd)} من ${fmt(tot)}${last?' · آخر تسديد '+fmtDate(last):''}${late.length?` · <span class="bad-t">${late.length} قسط متأخر</span>`:''}</small>${tot>0?`<div class="vn-pbar"><i style="width:${pctOf(pd,tot)}%"></i></div>`:''}</div>
-    <div class="acct-acts">${bal>0&&can('pay')?`<button class="btn primary acct-pay" data-act="settle" data-pid="${p.id}">${ic('cash',18)} تسديد</button>`:''}${can('print')?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف الحساب</button>`:''}</div></section>`}
+    <div class="acct-acts">${bal>0&&can('pay')?`<button class="btn primary acct-pay" data-act="settle" data-pid="${p.id}">${ic('cash',18)} تسديد</button>`:''}${can('price')||can('pay')?`<button class="btn" data-act="editAcct" data-pid="${p.id}">${ic('edit',16)} تعديل المبلغ</button>`:''}${can('print')?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف الحساب</button>`:''}</div></section>`}
+
+/* ---------- Edit the patient's amounts: treatment cost, discount, and every payment, in one place ---------- */
+function editAcctModal(pid){
+  if(!can('price')&&!can('pay'))return noPerm();const p=get('patients',pid);if(!p)return;
+  const ts=all('treatments').filter(t=>t.patientId===pid&&(isAdmin()||cf(t))).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!ts.length)return toast('ما أكو علاج مسجّل لهذا المريض','warn');
+  const canPrice=can('price'),canPay=can('pay');
+  const card=t=>{const pays=(t.payments||[]).map((x,i)=>({x,i})).filter(o=>!o.x.old);const old=(t.payments||[]).filter(x=>x.old);
+    return `<article class="ea-card" data-tid="${t.id}" style="--cc:${catHue(txCat(t))}">
+     <div class="ea-h"><div style="min-width:0"><b>${esc(t.procedure||'علاج')}</b><small>${catChip(txCat(t))} ${fmtDate(t.date)} · ${esc(clinicName(t.clinicId))}</small></div><div class="ea-bal" data-bal>${fmt(tBal(t))}</div></div>
+     <div class="ea-grid">
+      <label>الكلفة الكلية<div class="money-in"><input type="text" inputmode="numeric" autocomplete="off" data-inp="money" data-eaf="fee" value="${fmt(t.fee)}" ${canPrice?'':'disabled'}><span>د.ع</span></div></label>
+      <label>الخصم<div class="money-in"><input type="text" inputmode="numeric" autocomplete="off" data-inp="money" data-eaf="discount" value="${num(t.discount)?fmt(t.discount):''}" placeholder="0" ${canPrice?'':'disabled'}><span>د.ع</span></div></label>
+     </div>
+     <div class="ea-pays"><div class="ea-pt">الدفعات${old.length?` <small class="muted">(+ ${fmt(sum(old,x=>x.amount))} مدفوع قبل النظام)</small>`:''}</div>
+      ${pays.length?pays.map(({x,i})=>`<div class="ea-pay"><span>${fmtDate(x.date)} · ${esc((PAY_METHODS.find(m=>m[0]===(x.method||'cash'))||['','نقد'])[1])}${x.note?' · '+esc(x.note):''}</span><b>${fmt(x.amount)}</b>${canPay?`<button type="button" class="icon-btn" data-act="editPayment" data-tid="${t.id}" data-idx="${i}" aria-label="تعديل الدفعة">${ic('edit',15)}</button><button type="button" class="icon-btn danger" data-act="delPayment" data-tid="${t.id}" data-idx="${i}" aria-label="حذف الدفعة">${ic('trash',15)}</button>`:''}</div>`).join(''):'<p class="muted" style="margin:0;font-size:13px">ما أكو دفعات مسجّلة</p>'}</div>
+     <div class="ea-warn" data-warn hidden></div>
+    </article>`};
+  openModal(`<form id="ea-form" novalidate><div class="m-head"><div><h3>تعديل حساب ${esc(p.name)}</h3><p>غيّر الكلفة أو الخصم، أو عدّل وامسح أي دفعة</p></div><button type="button" class="icon-btn" data-act="closeModal" aria-label="إغلاق">${ic('x')}</button></div>
+  <div class="m-body ea-body">${ts.map(card).join('')}</div>
+  <div class="m-foot"><span class="sp"></span><button type="button" class="btn ghost" data-act="closeModal">إلغاء</button><button type="submit" class="btn primary" ${canPrice?'':'disabled'}>حفظ التعديلات</button></div></form>`,true);
+  const form=document.getElementById('ea-form');
+  const recalc=()=>{let bad=false;form.querySelectorAll('.ea-card').forEach(c=>{const t=get('treatments',c.dataset.tid);const fee=num(c.querySelector('[data-eaf=fee]').value),dis=num(c.querySelector('[data-eaf=discount]').value);const tot=Math.max(0,fee-dis),paid=tPaid(t);
+    c.querySelector('[data-bal]').textContent=fmt(tot-paid);c.querySelector('[data-bal]').className='ea-bal '+(tot-paid>0?'bad-t':'good-t');
+    const w=c.querySelector('[data-warn]');const msg=dis>fee?'الخصم أكبر من الكلفة':tot<paid?`المدفوع (${fmt(paid)}) أكبر من الكلفة بعد الخصم (${fmt(tot)}). عدّل الدفعات أولاً أو زِد الكلفة.`:'';w.hidden=!msg;w.textContent=msg;if(msg)bad=true;c.classList.toggle('bad',!!msg)});return !bad};
+  form.addEventListener('input',recalc);recalc();
+  form.addEventListener('submit',async e=>{e.preventDefault();if(!recalc())return toast('صحّح الأرقام المعلّمة بالأحمر','warn');
+    const btn=form.querySelector('[type=submit]');btn.disabled=true;let n=0;
+    try{for(const c of form.querySelectorAll('.ea-card')){const t=get('treatments',c.dataset.tid);const fee=num(c.querySelector('[data-eaf=fee]').value),dis=num(c.querySelector('[data-eaf=discount]').value);
+      if(fee===num(t.fee)&&dis===num(t.discount))continue;const doc=clone(t);doc.fee=fee;doc.discount=dis;
+      doc.feeLog=(t.feeLog||[]).concat([{at:new Date().toISOString(),by:Store.me||null,fee:{from:num(t.fee),to:fee},discount:{from:num(t.discount),to:dis}}]).slice(-20);
+      if(t.plan==='cash'&&tPaid(t)<Math.max(0,fee-dis))doc.plan='partial';
+      await put('treatments',doc);n++}
+      closeModal();toast(n?`تم تعديل ${n} ${n===1?'علاج':'علاجات'}`:'ما تغيّر شي','good')}catch(err){btn.disabled=false;if(err&&!err.code)toast(err.message||'حدث خطأ','bad')}});
+}
+ACTIONS.editAcct=d=>editAcctModal(d.pid||d.id);
 
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
@@ -3362,9 +3416,9 @@ function payLabForm(id){const l=get('labs',id);const bal=labBilled(l)-labPaid(l)
 function patientForm(p,after){
   p=p||{};
   formModal({title:p.id?'تعديل بيانات المريض':'مريض جديد',fields:[
-    {k:'phone',label:'رقم موبايل المريض',type:'tel',ph:'07xxxxxxxxx',req:true,half:true,hint:'اكتبه أولاً: النظام يتأكد فوراً إن المريض مو مسجّل من قبل'},{k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},{k:'name',label:'الاسم الكامل',req:true},
-    {k:'dupbox',type:'html',html:'<div id="dup-box" data-mode="open"></div>',show:v=>findDupes(v.name,v.phone,p.id).length>0},
-    {k:'notDup',label:'تأكدت أنه مريض مختلف عن الموجودين',type:'checkbox',show:v=>findDupes(v.name,v.phone,p.id).length>0},
+    {k:'phone',label:'رقم موبايل المريض (مطلوب)',type:'tel',ph:'07xxxxxxxxx',half:true,hint:'اكتبه أولاً: النظام يتأكد فوراً إن المريض مو مسجّل من قبل',show:v=>!v.noPhone},{k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},...noPhoneFields('p',null).map(f=>f.k==='pNo'?Object.assign(f,{k:'noPhone'}):Object.assign(f,{k:'noPhoneWhy',show:v=>!!v.noPhone})),{k:'name',label:'الاسم الكامل',req:true,hint:'إذا ما عنده رقم اكتب الاسم الثلاثي والعمر حتى ما ينلخبط مع غيره'},
+    {k:'dupbox',type:'html',html:'<div id="dup-box" data-mode="open"></div>',show:v=>findDupes(v.name,v.noPhone?'':v.phone,p.id).length>0},
+    {k:'notDup',label:'تأكدت أنه مريض مختلف عن الموجودين',type:'checkbox',show:v=>findDupes(v.name,v.noPhone?'':v.phone,p.id).length>0},
     {k:'gender',label:'الجنس',type:'select',opts:[['أنثى','أنثى'],['ذكر','ذكر']],empty:'—',half:true},{k:'age',label:'العمر',type:'number',min:0,max:120,half:true},
     {k:'alerts',label:'تنبيهات طبية',type:'checks',opts:ALERTS.map(a=>[a,a])},{k:'notes',label:'ملاحظات',type:'textarea',rows:2},
     {k:'sFin',type:'section',label:seeMoney()?'العلاج والحساب':'العلاج',hint:seeMoney()?'اختياري. حدد العلاج والأسنان، واكتب الكلفة الكلية والمبلغ الواصل. المتبقي يُسجَّل تلقائياً في ذمم المرضى.':'اختياري. حدد العلاج والأسنان التي ستعمل عليها.',show:()=>!p.id},
@@ -3374,14 +3428,14 @@ function patientForm(p,after){
     {k:'fFee',label:'تكلفة العلاج الكلية',type:'money',half:true,show:()=>!p.id&&seeMoney()&&can('price')},{k:'fPaid',label:'المبلغ الواصل',type:'money',half:true,show:()=>!p.id&&seeMoney()&&can('price')&&can('pay')},
     {k:'fMethod',label:'طريقة الاستلام',type:'select',opts:PAY_METHODS,half:true,show:v=>!p.id&&seeMoney()&&num(v.fPaid)>0},{k:'fDate',label:'تاريخ العلاج',type:'date',half:true,show:v=>!p.id&&(num(v.fFee)>0||!!v.fProc||(v.fTeeth||[]).length>0)},
     {k:'fPrev',type:'html',html:'<div class="plan-preview" id="fin-prev" style="grid-column:auto"></div>',show:v=>!p.id&&seeMoney()&&num(v.fFee)>0}],
-    values:Object.assign({clinicId:defaultClinic(),fDate:TODAY,fMethod:'cash',fDoc:defaultDoctor()},p),
-    onChange:(v,form)=>{const box=form.querySelector('#dup-box');if(box)setBox(box,dupBoxHTML(findDupes(v.name,v.phone,p.id),'open'));
+    values:Object.assign({clinicId:defaultClinic(),fDate:TODAY,fMethod:'cash',fDoc:defaultDoctor(),noPhoneWhy:NP_REASONS[0][0]},p,{noPhone:!!p.noPhone}),
+    onChange:(v,form)=>{const box=form.querySelector('#dup-box');if(box)setBox(box,dupBoxHTML(findDupes(v.name,v.noPhone?'':v.phone,p.id),'open'));
       const fp=form.querySelector('#fin-prev');if(fp){const fee=num(v.fFee),pd=num(v.fPaid),rem=fee-pd;fp.textContent=!fee?'':pd>fee?'المبلغ الواصل أكبر من الكلفة':rem>0?`المتبقي ${fmt(rem)} د.ع، يُسجَّل ديناً على المريض في ذمم المرضى`:'مسدّد بالكامل، لا يوجد دين'}},
     danger:p.id&&isAdmin()?{label:'حذف المريض',onClick:()=>deletePatient(p.id)}:null,
-    onSubmit:async(v,form)=>{const pe=phoneErr(v.phone);if(pe)return fieldErr(form,'phone',pe);v.phone=phoneNorm(v.phone);if(!dupGate(findDupes(v.name,v.phone,p.id),v,form))return false;
+    onSubmit:async(v,form)=>{if(v.noPhone){v.phone='';if(!String(v.name||'').trim().includes(' ')&&!num(v.age)){toast('بدون رقم: اكتب الاسم الثلاثي أو العمر حتى نفرّقه عن غيره','warn');const el=form.querySelector('.fld[data-k="name"] input');el&&el.focus();return false}}else{const pe=phoneErr(v.phone);if(pe)return fieldErr(form,'phone',pe);v.phone=phoneNorm(v.phone)}if(!dupGate(findDupes(v.name,v.phone,p.id),v,form))return false;
       const fee=!p.id&&seeMoney()&&can('price')?num(v.fFee):0,paid=!p.id&&seeMoney()&&can('price')&&can('pay')?num(v.fPaid):0;
       if(paid>0&&!fee)fail('اكتب تكلفة العلاج الكلية أولاً');if(paid>fee)fail('المبلغ الواصل أكبر من تكلفة العلاج');
-      const id=await put('patients',Object.assign(clone(p),{name:v.name,phone:v.phone,clinicId:v.clinicId,gender:v.gender,age:v.age,alerts:v.alerts,notes:v.notes}));
+      const id=await put('patients',Object.assign(clone(p),{name:v.name,phone:v.phone,noPhone:!!v.noPhone,noPhoneWhy:v.noPhone?(v.noPhoneWhy||NP_REASONS[0][0]):'',clinicId:v.clinicId,gender:v.gender,age:v.age,alerts:v.alerts,notes:v.notes}));
       const teeth=!p.id?(v.fTeeth||[]):[];
       if(!p.id&&(fee>0||v.fProc||teeth.length)){const d=v.fDate||TODAY;await put('treatments',{patientId:id,procedure:v.fProc||'علاج',cat:v.fCat||guessCat(v.fProc),clinicId:v.clinicId,doctorId:v.fDoc||'',date:d,teeth,fee,discount:0,plan:fee&&paid>=fee?'cash':'partial',down:0,schedule:[],payments:paid>0?[{id:uid(),amount:paid,date:d,method:v.fMethod||'cash',by:Store.me||null}]:[],notes:'',plannedSessions:num(v.fSess)||'',byDoctor:isDoctor()||undefined});
         toast(fee-paid>0?`تم الحفظ · المتبقي ${fmt(fee-paid)} د.ع سُجّل في ذمم المرضى`:fee>0?'تم الحفظ · العلاج مسدّد بالكامل':'تم حفظ المريض والعلاج')}else toast('تم الحفظ');if(!p.id)(after||(id=>go('patient',{patientId:id})))(id)}});
