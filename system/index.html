@@ -427,6 +427,9 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 .fl-doc{text-align:start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);cursor:pointer;display:flex;flex-direction:column;gap:6px;font:inherit;color:var(--ink)}.fl-doc.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .fl-dh{display:flex;justify-content:space-between;align-items:center}.fl-doc small{color:var(--ink-3);font-size:11.5px}
 .fl-row .chip{align-self:flex-start;white-space:nowrap}
+
+.tw-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;padding:0 16px 10px}.tw-kpis>div{background:var(--surface-2);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column}.tw-kpis b{font-size:19px;font-variant-numeric:tabular-nums}.tw-kpis span{font-size:11.5px;color:var(--ink-3)}.tw-kpis .g b{color:var(--good,#15803d)}
+.tw-what{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
 /* ---- doctor performance ---- */
 .pf-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
 .pf-card{padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -1158,7 +1161,7 @@ PAGES.dashboard=()=>{
    ${kpi('صافي الربح',money(P.net),P.revenue?`الهامش ${margin}% · ${delta(P.net,prev.net)}`:'لا إيرادات بعد هذا الشهر','hl')}
    ${kpi('ديون المرضى المتبقية',money(debts),late.length?`<span class="bad-t">${late.length} قسط متأخر بقيمة ${fmt(sum(late,x=>x.left))}</span>`:'لا أقساط متأخرة')}
   </div>
-  ${pendingCard()}${bkCard()}${fuTodayCard()}${rows}${unpricedCard()}
+  ${pendingCard()}${bkCard()}${todayWorkCard(cid)}${fuTodayCard()}${rows}${unpricedCard()}
   <div class="two">
    ${trendChart(cid)}
    <section class="card"><div class="card-h"><h3>مواعيد اليوم</h3><span class="chip">${appts.length}</span></div>
@@ -1511,6 +1514,7 @@ PAGES.desk=()=>{
   const arrived=appts.filter(a=>a.status==='arrived'||a.status==='done').length;
   return `<div class="sec-head"><div><h3>${st.accountOnly?'لوحة '+esc(clinicName(st.clinicId)):'أهلاً '+esc(st.name)}</h3><p>${esc(clinicName(st.clinicId))}${(st.doctorIds||[]).length?' · أطبائي: '+(st.doctorIds||[]).map(docName).map(esc).join('، '):''}</p></div><div class="toolbar"><button class="btn primary" data-act="newAppt">${ic('calendar',16)} موعد جديد</button>${can('pay')?`<button class="btn" data-act="quickPay">${ic('cash',16)} تسجيل دفعة</button>`:''}</div></div>
   <div class="kpis">${kpi('مواعيد اليوم',String(appts.length),`${arrived} حضروا · ${tom.length} موعد غداً`)}${!seeMoney()?kpi('مواعيد الغد',String(tom.length),'أرسل لهم التذكير')+kpi('وصل من المختبر',String(ready.length),'بانتظار التركيب'):''}${!seeMoney()?'':kpi('المستلم اليوم',money(sum(paysToday,p=>p.amount)),paysToday.length+' دفعة')}${!seeMoney()?'':kpi('ديون مرضى العيادة',money(sum(debtors(),x=>x.bal)),late.length?`${late.length} قسط متأخر بقيمة ${fmt(sum(late,x=>x.left))}`:'لا أقساط متأخرة')}${!seeMoney()?'':kpi('النقد بذمة العيادة',money(drawerNow(st.clinicId)),pendingHandovers().some(x=>x.clinicId===st.clinicId)?'تسليم بانتظار تأكيد د. هدى':'سلّمه لـ د. هدى من الأسفل','hl')}</div>
+  ${todayWorkCard(null)}
   <div class="two">
    <section class="card"><div class="card-h"><h3>مواعيد اليوم</h3><a class="btn ghost sm" href="#appointments" data-act="go" data-page="appointments">الجدول الكامل</a></div>${appts.length?`<div class="list">${appts.map(a=>{const p=get('patients',a.patientId)||{};return `<div class="li"><span class="time">${t12(a.time)}</span><div class="grow"><a class="t" href="#patient" data-act="openPatient" data-id="${p.id||''}" style="text-decoration:none">${esc(p.name||'—')}</a><div class="s">${esc(a.procedure||'')} · ${esc(docName(a.doctorId))}</div></div>${apptSel(a)}${apptGo(a)}</div>`}).join('')}</div>`:empty('لا مواعيد اليوم','',`<button class="btn sm" data-act="newAppt">${ic('plus',16)} حجز موعد</button>`)}</section>
    <section class="card"><div class="card-h"><h3>تذكير مواعيد الغد</h3><a class="btn ghost sm" href="#reminders" data-act="go" data-page="reminders">صفحة التذكير</a></div>${tom.length?`<div class="list">${tom.map(a=>{const p=get('patients',a.patientId)||{};return `<div class="li"><span class="time">${t12(a.time)}</span><div class="grow"><div class="t">${esc(p.name||'—')}</div><div class="s">${esc(docName(a.doctorId))}</div></div>${remChip(a)}${remBtn(a)}</div>`}).join('')}</div>`:empty('لا مواعيد غداً','')}</section>
@@ -3013,6 +3017,7 @@ function clToday(c){
     ${seeMoney()?kpi('النقد بذمة العيادة',money(drawerNow(cid)),'لم يُسلَّم بعد'):''}
     ${seeMoney()?kpi('ديون مرضى العيادة',money(debt),late.length?`<span class="bad-t">${late.length} قسط متأخر</span>`:'لا أقساط متأخرة'):''}
   </div>
+  ${todayWorkCard(cid)}
   <div class="two">
    <section class="card"><div class="card-h"><h3>مواعيد اليوم · ${dayLabel(TODAY)}</h3><a class="btn ghost sm" href="#appointments" data-act="go" data-page="appointments">الأسبوع كاملاً</a></div>
     ${ap.length?Object.keys(byChair).sort().map(k=>`${k!=='all'?`<div class="cl-sub">${ic('chair',14)} ${k==='—'?'بدون كرسي':'الكرسي '+esc(k)} · ${byChair[k].length}</div>`:''}<div class="list">${byChair[k].map(row).join('')}</div>`).join(''):empty('لا مواعيد اليوم',tomorrow?`غداً ${tomorrow} موعد`:'',`<button class="btn sm primary" data-act="newAppt">${ic('plus',15)} موعد جديد</button>`)}
@@ -3467,6 +3472,30 @@ function changeDoctorForm(pid){
         for(const a of fut){if(a.doctorId===to)continue;const d=clone(a);d.doctorId=to;await put('appointments',d);mvA++}}
       toast(`صار طبيبه د. ${(get('doctors',to)||{}).name||''}${moved||mvA?` · نُقل ${moved} علاج و${mvA} موعد`:''}`,'good')}})}
 ACTIONS.changeDoc=d=>changeDoctorForm(d.pid||d.id);
+
+/* ---------- Today's work: everything done today, with or without an appointment ---------- */
+function todayWork(cid,day){day=day||TODAY;
+  const inC=x=>(!cid||x.clinicId===cid);const rows=new Map();const row=pid=>{if(!rows.has(pid))rows.set(pid,{pid,isNew:false,tx:[],sess:[],pays:[],doctors:new Set(),clinics:new Set(),by:new Set()});return rows.get(pid)};
+  for(const p of all('patients')){if(!(p.createdAt||'').startsWith(day))continue;if(!(cid?p.clinicId===cid:true))continue;if(!isAdmin()&&!pf(p))continue;const r=row(p.id);r.isNew=true;r.clinics.add(p.clinicId);if(p.createdBy)r.by.add(p.createdBy)}
+  for(const t of all('treatments')){if(!inC(t)||!(isAdmin()||cf(t)))continue;
+    const createdToday=(t.createdAt||'').startsWith(day)||t.date===day;
+    if(createdToday&&!t.legacy){const r=row(t.patientId);r.tx.push(t);if(t.doctorId)r.doctors.add(t.doctorId);r.clinics.add(t.clinicId);if(t.createdBy)r.by.add(t.createdBy)}
+    visitsOf(t).forEach(v=>{if(v.date===day&&!(createdToday&&!(t.sessions||[]).length)){const r=row(t.patientId);r.sess.push({t,v});if(v.doctorId)r.doctors.add(v.doctorId);r.clinics.add(t.clinicId)}});
+    (t.payments||[]).forEach(x=>{if(x.old||x.date!==day)return;const r=row(t.patientId);r.pays.push({t,x});r.clinics.add(t.clinicId);if(x.by)r.by.add(x.by);if(t.doctorId)r.doctors.add(t.doctorId)})}
+  const list=[...rows.values()].filter(r=>r.isNew||r.tx.length||r.sess.length||r.pays.length);
+  list.forEach(r=>{r.paid=sum(r.pays,o=>o.x.amount)});
+  list.sort((a,b)=>b.paid-a.paid||b.tx.length-a.tx.length);
+  return {list,newP:list.filter(r=>r.isNew).length,tx:sum(list,r=>r.tx.length),sess:sum(list,r=>r.sess.length),paid:sum(list,r=>r.paid),pays:sum(list,r=>r.pays.length)}}
+function todayWorkCard(cid,opt){opt=opt||{};const w=todayWork(cid);const m=seeMoney();
+  const head=`<div class="card-h"><h3>${ic('tooth',18)} شغل اليوم · ${dayLabel(TODAY)}</h3><span class="chip">${w.list.length} مريض</span></div>`;
+  if(!w.list.length)return `<section class="card tw-card">${head}${empty('ما انسجّل شغل اليوم بعد','المرضى المسجّلين والعلاجات والجلسات والدفعات اليوم تطلع هنا حتى لو ما إلهم موعد')}</section>`;
+  const row=r=>{const p=get('patients',r.pid)||{};const what=[];
+    if(r.isNew)what.push('<span class="chip info">مريض جديد</span>');
+    r.tx.forEach(t=>what.push(`<span class="chip" style="--cc:${catHue(txCat(t))}">${esc(t.procedure||'علاج')}${m?' · '+fmt(tTotal(t)):''}</span>`));
+    r.sess.forEach(({t,v})=>what.push(`<span class="chip accent">جلسة ${v.n} · ${esc(t.procedure||'')}</span>`));
+    const docs=[...r.doctors].map(d=>docName(d)).filter(x=>x&&x!=='—');const cl=[...r.clinics].map(clinicName);
+    return `<div class="li click tw-row" data-act="openPatient" data-id="${r.pid}"><div class="grow"><div class="t">${esc(p.name||'—')}${p.noPhone&&!p.phone?' <span class="chip warn">بدون رقم</span>':''}</div><div class="tw-what">${what.join('')||'<span class="muted" style="font-size:12.5px">دفعة فقط</span>'}</div><div class="s">${cid?'':esc(cl.join('، '))+(cl.length?' · ':'')}${esc(docs.join('، '))}</div></div>${m&&r.paid?`<b class="num good-t" title="${r.pays.length} دفعة">${fmt(r.paid)}</b>`:''}</div>`};
+  return `<section class="card tw-card">${head}<div class="tw-kpis"><div><b>${w.newP}</b><span>مرضى جدد</span></div><div><b>${w.tx}</b><span>علاجات جديدة</span></div><div><b>${w.sess}</b><span>جلسات</span></div>${m?`<div class="g"><b>${fmt(w.paid)}</b><span>المحصّل (${w.pays} دفعة)</span></div>`:''}</div><div class="list">${w.list.slice(0,opt.max||12).map(row).join('')}</div>${w.list.length>(opt.max||12)?`<p class="pad muted" style="margin:0;font-size:12.5px">و${w.list.length-(opt.max||12)} مريض آخر. افتح «المرضى» لعرض الباقي.</p>`:''}</section>`}
 
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
