@@ -164,7 +164,7 @@ small.cur{font-size:.72em;color:var(--ink-3);font-weight:500;margin-inline-start
 
 /* Lists */
 .list{display:flex;flex-direction:column}
-.li{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-2)}
+.li{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line-2);transition:background .12s}.li:last-child{border-bottom:0}.li.click:hover,.li.click:active{background:var(--surface-2)}.li>b.num,.li>.num{font-size:15px;white-space:nowrap}
 .li:last-child{border-bottom:0}
 .li .grow{flex:1;min-width:0}
 .li .t{font-weight:500}
@@ -515,6 +515,24 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 .xc-box{border-bottom:1px solid var(--line-2);background:var(--info-soft,var(--surface-2))}
 .xc-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px}.xc-h small{flex:1 1 100%;color:var(--ink-2);font-size:12.5px}
 
+
+/* ---- polished mobile chrome: one-line filter chips, tidy action bars ---- */
+@media (max-width:640px){
+  .seg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;max-width:100%;scroll-snap-type:x proximity}
+  .seg::-webkit-scrollbar{display:none}
+  .seg button{flex:none;white-space:nowrap;scroll-snap-align:start}
+  .sec-head{gap:10px}
+  .sec-head>.toolbar:last-child{width:100%;display:flex;flex-wrap:wrap;gap:8px}
+  .sec-head>.toolbar:last-child>.btn{flex:1 1 calc(50% - 4px);justify-content:center;min-width:0;white-space:normal;height:auto;min-height:42px;line-height:1.25;text-align:center;padding-block:8px}
+  .sec-head>.toolbar:last-child>.btn.primary{order:-1;flex-basis:100%;height:46px;font-size:15px}
+  .sec-head>.toolbar:last-child>.search{order:-2}
+  .sec-head h3{font-size:19px}
+  .card-h{padding:12px 14px}.li{padding:12px 14px}
+  .kpi .l{font-size:12.5px}
+  .kpi .v{font-size:18px !important;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 4px;line-height:1.2;min-width:0}
+  .kpi .v small.cur{font-size:11px}
+  .tw-card .card-h{flex-wrap:wrap}.tw-card .card-h h3{font-size:15px}
+}
 /* ---- clinic hub: professional layout ---- */
 .cl-hero{padding:16px;border-radius:20px}
 .cl-hero-top{gap:12px}.cl-hero h2{font-size:22px;line-height:1.2}.cl-hero-top p{margin:3px 0 0;font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -570,19 +588,22 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
   .seg{max-width:100%}
   .sec-head{flex-wrap:wrap}.sec-head>*{min-width:0;max-width:100%}
   .tbl-wrap.cards{overflow:visible}
-  .tbl.cards,.tbl.cards tbody,.tbl.cards tfoot,.tbl.cards tr,.tbl.cards td{display:block;width:100%;box-sizing:border-box}
+  .tbl.cards,.tbl.cards tbody,.tbl.cards tfoot{display:block;width:100%}
   .tbl.cards thead{display:none}
-  .tbl.cards tr{border:1px solid var(--line-2);border-radius:12px;margin:0 0 10px;padding:6px 12px;background:var(--surface)}
-  .tbl.cards tr.click:active{background:var(--surface-2)}
-  .tbl.cards td,.tbl.cards td.n{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border:0 !important;background:none !important;text-align:end;white-space:normal;font-size:13.5px;min-height:0}
-  .tbl.cards td[data-label]::before{content:attr(data-label);color:var(--ink-3);font-size:12px;flex:none;text-align:start}
-  .tbl.cards td>*{min-width:0}
-  .tbl.cards td:not([data-label]){justify-content:flex-start;text-align:start}
-  .tbl.cards td:first-child{font-weight:600;font-size:14.5px;padding-top:4px;border-bottom:1px dashed var(--line-2) !important;margin-bottom:2px}
+  .tbl.cards tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px 10px;border:1px solid var(--line);border-radius:16px;margin:0 0 10px;padding:12px 14px;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.04);position:relative}
+  .tbl.cards tr.click{cursor:pointer}.tbl.cards tr.click:active{transform:scale(.995);background:var(--surface-2)}
+  .tbl.cards td,.tbl.cards td.n{grid-column:span 3;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:1px;padding:6px 0;border:0 !important;background:none !important;text-align:start;white-space:normal;font-size:14px;min-width:0;width:auto}
+  .tbl.cards td.n{grid-column:span 2;font-variant-numeric:tabular-nums;font-weight:600}
+  .tbl.cards td[data-label]::before{content:attr(data-label);color:var(--ink-3);font-size:11.5px;font-weight:400;line-height:1.3}
+  .tbl.cards td>*{min-width:0;max-width:100%}
+  .tbl.cards td:first-child{grid-column:1/-1;font-weight:700;font-size:15.5px;padding:0 0 8px;margin-bottom:4px;border-bottom:1px solid var(--line-2) !important;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
   .tbl.cards td:empty,.tbl.cards td.nil{display:none}
-  .tbl.cards td.acts-c,.tbl.cards td:last-child:not([data-label]){justify-content:flex-end}
-  .tbl.cards tfoot tr{background:var(--surface-2);font-weight:600}
-  .tbl.cards .who{align-items:flex-end}
+  .tbl.cards td:last-child:not([data-label]),.tbl.cards td.acts-c{grid-column:1/-1;flex-direction:row;justify-content:flex-end;padding-top:8px;border-top:1px dashed var(--line-2) !important;margin-top:4px}
+  .tbl.cards td:last-child:not([data-label]):empty{display:none}
+  .tbl.cards .acts{width:100%;justify-content:flex-end;gap:6px}
+  .tbl.cards tfoot tr{background:var(--surface-2);border-style:dashed}
+  .tbl.cards .who{align-items:flex-start}
+  .tbl.cards .people{flex-wrap:wrap}
 }
 @media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two,.two.even{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:900px){
@@ -719,8 +740,8 @@ const NAV_DOCTOR=[{g:'عملي',items:[['mydash','لوحتي','grid'],['appointm
 const NAV_STAFF=[{g:'الاستقبال',items:[['desk','لوحة الاستقبال','grid'],['clinic','لوحة عيادتي','building'],['work','شغل اليوم','tooth'],['appointments','المواعيد','calendar'],['reminders','تذكير المواعيد','bell'],['bookings','طلبات الحجز','inbox'],['patients','المرضى','users'],['followup','متابعة المرضى','chat'],['accounts','الحسابات والأقساط','wallet'],['import','إدخال السجلات','file']]},{g:'العيادة',items:[['chairs','حساب الكراسي','chair'],['lab','طلبات المختبر','tooth'],['debts','ديون العيادة','alert'],['closing','الجرد اليومي','check'],['suppliers','موردو العيادة','box'],['expenses','مصاريف العيادة','receipt']]}];
 const APP_URL=window.STANDALONE?location.href.split('#')[0]:'https://claude.ai/artifact/E8EehSfNzuCZxu7PiyjbZt';
 const QA_DOCTOR=[['quickWork','تسجيل عمل','tooth'],['newAppt','موعد جديد','calendar'],['newPatient','مريض جديد','users'],['newLab','طلب مختبر','flask']];
-const QA_STAFF=[['newAppt','موعد جديد','calendar'],['newPatient','مريض جديد','users'],['oldPatient','مريض قديم','file'],['quickPay','تسجيل دفعة','cash'],['quickWork','تسجيل علاج','tooth'],['newLab','طلب مختبر','flask'],['newExpense','مصروف','receipt']];
-const QA=[['newAppt','موعد جديد','calendar'],['quickWork','تسجيل علاج','tooth'],['newPatient','مريض جديد','users'],['oldPatient','مريض قديم','file'],['quickPay','تسجيل دفعة','cash'],['newLab','طلب مختبر','tooth'],['newExpense','مصروف','receipt'],['newInvoice','فاتورة مورد','box']];
+const QA_STAFF=[['newAppt','موعد جديد','calendar'],['newPatient','مريض جديد','users'],['oldPatient','مريض قديم','file'],['quickPay','تسديد','cash'],['quickWork','تسجيل علاج','tooth'],['newLab','طلب مختبر','flask'],['newExpense','مصروف','receipt']];
+const QA=[['newAppt','موعد جديد','calendar'],['quickWork','تسجيل علاج','tooth'],['newPatient','مريض جديد','users'],['oldPatient','مريض قديم','file'],['quickPay','تسديد','cash'],['newLab','طلب مختبر','tooth'],['newExpense','مصروف','receipt'],['newInvoice','فاتورة مورد','box']];
 const ICONS={
  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
@@ -894,7 +915,7 @@ function buildSchedule(rem,n,first){
 }
 const payments=()=>M('pays',()=>{const out=[];for(const t of all('treatments'))(t.payments||[]).forEach((p,i)=>{if(p.old)return;out.push(Object.assign({},p,{idx:i,tid:t.id,t,clinicId:t.clinicId,doctorId:t.doctorId,patientId:t.patientId}))});return out.sort((a,b)=>(b.date||'').localeCompare(a.date||''))});
 const instItems=()=>M('inst',()=>{const out=[];for(const t of all('treatments')){if(!(t.schedule||[]).length)continue;const it=schedStatus(t);it.forEach((x,i)=>{if(x.state!=='paid')out.push(Object.assign({},x,{n:i+1,of:it.length,t,patientId:t.patientId,clinicId:t.clinicId,doctorId:t.doctorId,left:num(x.amount)-x.paid}))})}return out.sort((a,b)=>a.due.localeCompare(b.due))});
-const patientStats=()=>M('pst',()=>{const m=new Map();for(const t of all('treatments')){if(isDoctor()&&!cf(t))continue;const s=m.get(t.patientId)||{total:0,paid:0,count:0,last:''};s.total+=tTotal(t);s.paid+=tPaid(t);s.count++;if((t.date||'')>s.last)s.last=t.date;for(const p of t.payments||[])if((p.date||'')>s.last)s.last=p.date;m.set(t.patientId,s)}return m});
+const patientStats=()=>M('pst',()=>{const m=new Map();for(const t of all('treatments')){if(isDoctor()&&!cf(t))continue;const s=m.get(t.patientId)||{total:0,paid:0,count:0,last:''};s.total+=tTotal(t);s.paid+=tPaid(t);s.bal=(s.bal||0)+Math.max(0,tBal(t));s.count++;if((t.date||'')>s.last)s.last=t.date;for(const p of t.payments||[])if((p.date||'')>s.last)s.last=p.date;m.set(t.patientId,s)}return m});
 const periodM=c=>Math.max(1,num(c.rentPeriod)||1);
 const rentMonthly=c=>c.active===false?0:num(c.rent)/periodM(c);
 /* fixed costs count from the later of the start date and the day the record was added */
@@ -1187,7 +1208,7 @@ PAGES.dashboard=()=>{
   </div>
   <div class="two even">
    <section class="card"><div class="card-h"><h3>أقساط متأخرة</h3><a class="btn ghost sm" href="#accounts" data-act="go" data-page="accounts">كل الحسابات</a></div>
-    ${late.length?`<div class="list">${late.slice(0,6).map(x=>{const p=get('patients',x.patientId)||{};return `<div class="li"><div class="grow"><div class="t">${esc(p.name||'—')}</div><div class="s">${esc(x.t.procedure)} · القسط ${x.n} من ${x.of} · متأخر ${daysBetween(x.due,TODAY)} يوم</div></div><b class="num bad-t">${fmt(x.left)}</b>${waBtn(p.phone,remindText(p,x))}<button class="icon-btn" data-act="addPayment" data-tid="${x.t.id}" title="تسجيل دفعة" aria-label="تسجيل دفعة">${ic('cash',16)}</button></div>`}).join('')}</div>`:empty('كل الأقساط منتظمة','لا يوجد أي قسط متأخر في '+(cid?'هذه العيادة':'العيادات'))}
+    ${late.length?`<div class="list">${late.slice(0,6).map(x=>{const p=get('patients',x.patientId)||{};return `<div class="li"><div class="grow"><div class="t">${esc(p.name||'—')}</div><div class="s">${esc(x.t.procedure)} · القسط ${x.n} من ${x.of} · متأخر ${daysBetween(x.due,TODAY)} يوم</div></div><b class="num bad-t">${fmt(x.left)}</b>${waBtn(p.phone,remindText(p,x))}<button class="icon-btn" data-act="addPayment" data-tid="${x.t.id}" title="تسديد" aria-label="تسديد">${ic('cash',16)}</button></div>`}).join('')}</div>`:empty('كل الأقساط منتظمة','لا يوجد أي قسط متأخر في '+(cid?'هذه العيادة':'العيادات'))}
    </section>
    <section class="card"><div class="card-h"><h3>تنبيهات تحتاج متابعة</h3></div>
     ${(labBad.length||rents.length||pendingFixed(m).length||debtors().some(s=>s.promise&&s.promise<=TODAY))?`<div class="list">
@@ -1226,7 +1247,7 @@ function patientTableIn(){
   ps.sort((a,b)=>((st.get(b.id)?.last||b.createdAt||'')).localeCompare(st.get(a.id)?.last||a.createdAt||''));
   if(!ps.length)return empty(q?'لا نتائج مطابقة':'لا يوجد مرضى بعد',q?'جرّب جزءاً من الاسم أو آخر أرقام الهاتف':'أضف أول مريض أو احجز موعداً لمريض جديد',q?'':`<button class="btn primary sm" data-act="newPatient">${ic('plus',16)} مريض جديد</button>`);
   if(!seeMoney())return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">عدد الأعمال</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{count:0,last:''};return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${s.count}</td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>`;
-  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{total:0,paid:0,last:''};const b=s.total-s.paid;return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n ${b>0?'bad-t':''}"><b>${fmt(b)}</b></td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>${ps.length>300?`<p class="pad muted">يظهر أول 300 مريض، استخدم البحث للوصول إلى البقية.</p>`:''}`;
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>الهاتف</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${ps.slice(0,300).map(p=>{const s=st.get(p.id)||{total:0,paid:0,last:''};const b=(s.bal||0);return `<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}${(p.alerts||[]).length?` <span class="chip bad" title="${esc(p.alerts.join('، '))}">${ic('alert',12)} ${p.alerts.length}</span>`:''}</td><td dir="ltr" style="text-align:end">${esc(p.phone||'—')}</td><td>${clinicChips(p)}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n ${b>0?'bad-t':''}"><b>${fmt(b)}</b></td><td class="muted">${fmtDate(s.last||p.createdAt?.slice(0,10))}</td></tr>`}).join('')}</tbody></table></div>${ps.length>300?`<p class="pad muted">يظهر أول 300 مريض، استخدم البحث للوصول إلى البقية.</p>`:''}`;
 }
 INPUTS.q=v=>{state.q=normDigits(v);const el=$('#pat-list');if(el)el.innerHTML=patientTable()};
 
@@ -1268,22 +1289,22 @@ function treatmentCard(t){
   <div class="progress" role="img" aria-label="نسبة السداد ${pctOf(pd,tot)}%"><i style="width:${Math.min(100,pctOf(pd,tot))}%"></i></div>
   ${sch.length?`<div class="sched">${num(t.down)?`<div class="inst ${pd>=num(t.down)?'paid':'open'}"><span class="n">م</span><span>المقدّمة</span><b>${fmt(t.down)}</b><em>${pd>=num(t.down)?'مدفوعة':'غير مدفوعة'}</em></div>`:''}${sch.map((x,i)=>`<div class="inst ${x.state}"><span class="n">${i+1}</span><span>${fmtDate(x.due)}</span><b>${fmt(x.amount)}</b><em>${INST_ST[x.state]}${x.state!=='paid'&&x.paid?` · دُفع ${fmt(x.paid)}`:''}</em></div>`).join('')}</div>`:''}
   ${t.notes?`<p class="note" style="margin:0">${esc(t.notes)}</p>`:''}
-  <div class="tx-f"><button class="btn sm" data-act="addSession" data-tid="${t.id}">${ic('plus',16)} تسجيل جلسة</button><button class="btn sm" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} الجلسة القادمة</button>${bal>0&&can('pay')?`<button class="btn primary sm" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} تسجيل دفعة</button>`:''}${can('price')&&!t.legacy?`<button class="btn sm" data-act="extendTx" data-tid="${t.id}">${ic('tooth',16)} أسنان / عمل إضافي</button><button class="btn sm ghost danger" data-act="failTx" data-tid="${t.id}">${ic('alert',15)} حالة فاشلة</button>`:''}<button class="btn ghost sm" data-act="editTreatment" data-id="${t.id}">${ic('edit',16)} تعديل</button></div>${extrasHTML(t)}</article>`;
+  <div class="tx-f"><button class="btn sm" data-act="addSession" data-tid="${t.id}">${ic('plus',16)} تسجيل جلسة</button><button class="btn sm" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} الجلسة القادمة</button>${bal>0&&can('pay')?`<button class="btn primary sm" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} تسديد</button>`:''}${can('price')&&!t.legacy?`<button class="btn sm" data-act="extendTx" data-tid="${t.id}">${ic('tooth',16)} أسنان / عمل إضافي</button><button class="btn sm ghost danger" data-act="failTx" data-tid="${t.id}">${ic('alert',15)} حالة فاشلة</button>`:''}<button class="btn ghost sm" data-act="editTreatment" data-id="${t.id}">${ic('edit',16)} تعديل</button></div>${extrasHTML(t)}</article>`;
 }
 
 PAGES.accounts=()=>{
   const m=state.month;const it=instItems().filter(cf);const late=it.filter(x=>x.state==='late'),soon=it.filter(x=>x.state==='soon');
   const pays=payments().filter(p=>monthOf(p.date)===m&&cf(p));const st=patientStats();
-  const debtors=all('patients').filter(pf).map(p=>[p,st.get(p.id)]).filter(([,s])=>s&&s.total-s.paid>0).sort((a,b)=>(b[1].total-b[1].paid)-(a[1].total-a[1].paid));
+  const debtors=all('patients').filter(pf).map(p=>[p,st.get(p.id)]).filter(([,s])=>s&&(s.bal||0)>0).sort((a,b)=>(b[1].total-b[1].paid)-(a[1].total-a[1].paid));
   const tab=state.accTab;
   let body='';
   const instRow=x=>{const p=get('patients',x.patientId)||{};const dl=daysBetween(x.due,TODAY);return `<tr><td><div class="who"><a href="#patient" data-act="openPatient" data-id="${p.id||''}" style="text-decoration:none;font-weight:500">${esc(p.name||'—')}</a><small dir="ltr" style="text-align:end">${esc(p.phone||'')}</small></div></td><td>${esc(clinicName(x.clinicId))}</td><td>${esc(x.t.procedure)}</td><td>${x.n} / ${x.of}</td><td>${fmtDate(x.due)}</td><td>${x.state==='late'?chip(`متأخر ${dl} يوم`,'bad'):chip(dl===0?'اليوم':`بعد ${-dl} يوم`,'warn')}</td><td class="n"><b>${fmt(x.left)}</b></td><td><div class="acts">${waBtn(p.phone,remindText(p,x))}<button class="btn sm" data-act="addPayment" data-tid="${x.t.id}">تسديد</button></div></td></tr>`};
   if(tab==='late'||tab==='soon'){const rows=tab==='late'?late:soon;body=rows.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>العيادة</th><th>العلاج</th><th>القسط</th><th>تاريخ الاستحقاق</th><th>الحالة</th><th class="n">المبلغ</th><th></th></tr></thead><tbody>${rows.map(instRow).join('')}</tbody><tfoot><tr><td colspan="6">المجموع</td><td class="n">${fmt(sum(rows,x=>x.left))}</td><td></td></tr></tfoot></table></div>`:empty(tab==='late'?'لا أقساط متأخرة':'لا أقساط خلال الأيام السبعة القادمة','')}
-  else if(tab==='debts'){body=debtors.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${debtors.map(([p,s])=>`<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}</td><td>${esc(clinicName(p.clinicId))}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n bad-t"><b>${fmt(s.total-s.paid)}</b></td><td class="muted">${fmtDate(s.last)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="4">إجمالي الذمم</td><td class="n">${fmt(sum(debtors,([,s])=>s.total-s.paid))}</td><td></td></tr></tfoot></table></div>`:empty('لا ذمم على المرضى','')}
+  else if(tab==='debts'){body=debtors.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المريض</th><th>العيادة</th><th class="n">إجمالي العلاج</th><th class="n">المدفوع</th><th class="n">المتبقي</th><th>آخر نشاط</th></tr></thead><tbody>${debtors.map(([p,s])=>`<tr class="click" data-act="openPatient" data-id="${p.id}"><td><b>${esc(p.name)}</b>${sampleTag(p)}${p.noPhone&&!p.phone?' <span class="chip warn" title="'+esc(p.noPhoneWhy||'')+'">بدون رقم</span>':''}</td><td>${esc(clinicName(p.clinicId))}</td><td class="n">${fmt(s.total)}</td><td class="n good-t">${fmt(s.paid)}</td><td class="n bad-t"><b>${fmt((s.bal||0))}</b></td><td class="muted">${fmtDate(s.last)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="4">إجمالي الذمم</td><td class="n">${fmt(sum(debtors,([,s])=>(s.bal||0)))}</td><td></td></tr></tfoot></table></div>`:empty('لا ذمم على المرضى','')}
   else{const byM={};pays.forEach(p=>byM[p.method||'cash']=(byM[p.method||'cash']||0)+num(p.amount));
     body=`<div class="pad cat-row" style="border-bottom:1px solid var(--line-2)">${PAY_METHODS.filter(([k])=>byM[k]).map(([k,l])=>`<span class="chip accent">${l}: ${fmt(byM[k])}</span>`).join('')||'<span class="muted">لا دفعات في هذا الشهر</span>'}</div>${pays.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>التاريخ</th><th>المريض</th><th>العيادة</th><th>الطبيب</th><th>العلاج</th><th>الطريقة</th><th class="n">المبلغ</th><th>سجّلها</th></tr></thead><tbody>${pays.map(x=>`<tr><td>${fmtDate(x.date)}</td><td><a href="#patient" data-act="openPatient" data-id="${x.patientId}" style="text-decoration:none;font-weight:500">${esc(patientName(x.patientId))}</a></td><td>${esc(clinicName(x.clinicId))}</td><td>${esc(docName(x.doctorId))}</td><td>${esc(x.t.procedure)}</td><td>${esc((PAY_METHODS.find(m=>m[0]===x.method)||[,'نقد'])[1])}</td><td class="n"><b>${fmt(x.amount)}</b></td><td>${who(x.by)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="6">مجموع ${monthLabel(m)}</td><td class="n">${fmt(sum(pays,p=>p.amount))}</td><td></td></tr></tfoot></table></div>`:''}`}
-  return `<div class="kpis">${kpi('المحصّل هذا الشهر',money(sum(pays,p=>p.amount)),pays.length+' دفعة')}${kpi('أقساط متأخرة',money(sum(late,x=>x.left)),late.length+' قسط')}${kpi('مستحق خلال 7 أيام',money(sum(soon,x=>x.left)),soon.length+' قسط')}${kpi('إجمالي ذمم المرضى',money(sum(debtors,([,s])=>s.total-s.paid)),debtors.length+' مريض')}</div>
-  <div class="sec-head">${seg('accTab',tab,[['late','المتأخرة',late.length],['soon','القادمة',soon.length],['debts','ذمم المرضى',debtors.length],['log','سجل الدفعات',pays.length]])}<button class="btn primary" data-act="quickPay">${ic('cash',16)} تسجيل دفعة</button></div>
+  return `<div class="kpis">${kpi('المحصّل هذا الشهر',money(sum(pays,p=>p.amount)),pays.length+' دفعة')}${kpi('أقساط متأخرة',money(sum(late,x=>x.left)),late.length+' قسط')}${kpi('مستحق خلال 7 أيام',money(sum(soon,x=>x.left)),soon.length+' قسط')}${kpi('إجمالي ذمم المرضى',money(sum(debtors,([,s])=>(s.bal||0))),debtors.length+' مريض')}</div>
+  <div class="sec-head">${seg('accTab',tab,[['late','المتأخرة',late.length],['soon','القادمة',soon.length],['debts','ذمم المرضى',debtors.length],['log','سجل التسديدات',pays.length]])}<button class="btn primary" data-act="quickPay">${ic('cash',16)} تسديد</button></div>
   <section class="card">${body}</section>`;
 };
 
@@ -1529,7 +1550,7 @@ PAGES.desk=()=>{
   const late=instItems().filter(x=>x.state==='late'&&cf(x));
   const ready=all('labOrders').filter(o=>cf(o)&&o.status==='ready');
   const arrived=appts.filter(a=>a.status==='arrived'||a.status==='done').length;
-  return `<div class="sec-head"><div><h3>${st.accountOnly?'لوحة '+esc(clinicName(st.clinicId)):'أهلاً '+esc(st.name)}</h3><p>${esc(clinicName(st.clinicId))}${(st.doctorIds||[]).length?' · أطبائي: '+(st.doctorIds||[]).map(docName).map(esc).join('، '):''}</p></div><div class="toolbar"><button class="btn primary" data-act="newAppt">${ic('calendar',16)} موعد جديد</button>${can('pay')?`<button class="btn" data-act="quickPay">${ic('cash',16)} تسجيل دفعة</button>`:''}</div></div>
+  return `<div class="sec-head"><div><h3>${st.accountOnly?'لوحة '+esc(clinicName(st.clinicId)):'أهلاً '+esc(st.name)}</h3><p>${esc(clinicName(st.clinicId))}${(st.doctorIds||[]).length?' · أطبائي: '+(st.doctorIds||[]).map(docName).map(esc).join('، '):''}</p></div><div class="toolbar"><button class="btn primary" data-act="newAppt">${ic('calendar',16)} موعد جديد</button>${can('pay')?`<button class="btn" data-act="quickPay">${ic('cash',16)} تسديد</button>`:''}</div></div>
   <div class="kpis">${kpi('مواعيد اليوم',String(appts.length),`${arrived} حضروا · ${tom.length} موعد غداً`)}${!seeMoney()?kpi('مواعيد الغد',String(tom.length),'أرسل لهم التذكير')+kpi('وصل من المختبر',String(ready.length),'بانتظار التركيب'):''}${!seeMoney()?'':kpi('المستلم اليوم',money(sum(paysToday,p=>p.amount)),paysToday.length+' دفعة')}${!seeMoney()?'':kpi('ديون مرضى العيادة',money(sum(debtors(),x=>x.bal)),late.length?`${late.length} قسط متأخر بقيمة ${fmt(sum(late,x=>x.left))}`:'لا أقساط متأخرة')}${!seeMoney()?'':kpi('النقد بذمة العيادة',money(drawerNow(st.clinicId)),pendingHandovers().some(x=>x.clinicId===st.clinicId)?'تسليم بانتظار تأكيد د. هدى':'سلّمه لـ د. هدى من الأسفل','hl')}</div>
   ${todayWorkCard(null)}
   <div class="two">
@@ -1537,7 +1558,7 @@ PAGES.desk=()=>{
    <section class="card"><div class="card-h"><h3>تذكير مواعيد الغد</h3><a class="btn ghost sm" href="#reminders" data-act="go" data-page="reminders">صفحة التذكير</a></div>${tom.length?`<div class="list">${tom.map(a=>{const p=get('patients',a.patientId)||{};return `<div class="li"><span class="time">${t12(a.time)}</span><div class="grow"><div class="t">${esc(p.name||'—')}</div><div class="s">${esc(docName(a.doctorId))}</div></div>${remChip(a)}${remBtn(a)}</div>`}).join('')}</div>`:empty('لا مواعيد غداً','')}</section>
   </div>
   <div class="two even">
-   ${!seeMoney()?'':`<section class="card"><div class="card-h"><h3>أقساط متأخرة</h3><a class="btn ghost sm" href="#accounts" data-act="go" data-page="accounts">كل الحسابات</a></div>${late.length?`<div class="list">${late.slice(0,8).map(x=>{const p=get('patients',x.patientId)||{};return `<div class="li"><div class="grow"><div class="t">${esc(p.name||'—')}</div><div class="s">${esc(x.t.procedure)} · متأخر ${daysBetween(x.due,TODAY)} يوم</div></div><b class="num bad-t">${fmt(x.left)}</b>${waBtn(p.phone,remindText(p,x))}<button class="icon-btn" data-act="addPayment" data-tid="${x.t.id}" aria-label="تسجيل دفعة">${ic('cash',16)}</button></div>`}).join('')}</div>`:empty('كل الأقساط منتظمة','')}</section>`}
+   ${!seeMoney()?'':`<section class="card"><div class="card-h"><h3>أقساط متأخرة</h3><a class="btn ghost sm" href="#accounts" data-act="go" data-page="accounts">كل الحسابات</a></div>${late.length?`<div class="list">${late.slice(0,8).map(x=>{const p=get('patients',x.patientId)||{};return `<div class="li"><div class="grow"><div class="t">${esc(p.name||'—')}</div><div class="s">${esc(x.t.procedure)} · متأخر ${daysBetween(x.due,TODAY)} يوم</div></div><b class="num bad-t">${fmt(x.left)}</b>${waBtn(p.phone,remindText(p,x))}<button class="icon-btn" data-act="addPayment" data-tid="${x.t.id}" aria-label="تسديد">${ic('cash',16)}</button></div>`}).join('')}</div>`:empty('كل الأقساط منتظمة','')}</section>`}
    <section class="card"><div class="card-h"><h3>وصل من المختبر</h3></div>${ready.length?`<div class="list">${ready.map(o=>{const p=get('patients',o.patientId)||{};return `<div class="li"><div class="grow"><div class="t">${esc(o.work)} · ${esc(p.name||'—')}</div><div class="s">${esc(docName(o.doctorId))} · ${esc(get('labs',o.labId)?.name||'')}</div></div>${waBtn(p.phone,`مرحباً ${p.name||''}، عملكم (${o.work}) أصبح جاهزاً في ${clinicName(o.clinicId)}. نرجو التواصل لحجز موعد التركيب.\n${SIGN}`)}</div>`}).join('')}</div>`:empty('لا أعمال جاهزة','')}</section>
   </div>${bkCard()}${can('p_followup')?fuTodayCard():''}${unpricedCard()}${seeMoney()?custodyCard(staffClinicIds(st),'النقد بذمة العيادة · التسليم لـ د. هدى'):''}`;
 };
@@ -1989,7 +2010,7 @@ function dupGroups(){const ps=all('patients');const parent=new Map(ps.map(p=>[p.
   const ign=new Set(state.dupIgnore||[]);return [...g.values()].filter(x=>x.length>1).filter(x=>!ign.has(x.map(p=>p.id).sort().join('|'))).map(x=>x.sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||'')))}
 function dupToolModal(){const gs=dupGroups();
   openModal(`<div class="m-head"><div><h3>فحص المرضى المكررين</h3><p>${gs.length?`${gs.length} مجموعة لها نفس رقم الهاتف أو نفس الاسم`:'لا يوجد تكرار'}</p></div><button class="icon-btn" data-act="closeModal" aria-label="إغلاق">${ic('x')}</button></div>
-  <div class="m-body" style="display:flex;flex-direction:column;gap:12px">${gs.length?gs.map((g,i)=>`<div class="dup-box"><div class="list">${g.map((p,j)=>{const s=patientStats().get(p.id)||{count:0,total:0,paid:0};return `<div class="dup-row"><label class="chk" style="padding:0"><input type="radio" name="keep${i}" value="${p.id}" ${j===0?'checked':''}><span></span></label><div class="grow"><div class="t">${esc(p.name)}</div><div class="s"><span dir="ltr">${esc(p.phone||'بدون رقم')}</span> · ${esc(clinicName(p.clinicId))} · ${s.count} عمل · المتبقي ${fmt(s.total-s.paid)}</div></div></div>`}).join('')}</div>
+  <div class="m-body" style="display:flex;flex-direction:column;gap:12px">${gs.length?gs.map((g,i)=>`<div class="dup-box"><div class="list">${g.map((p,j)=>{const s=patientStats().get(p.id)||{count:0,total:0,paid:0};return `<div class="dup-row"><label class="chk" style="padding:0"><input type="radio" name="keep${i}" value="${p.id}" ${j===0?'checked':''}><span></span></label><div class="grow"><div class="t">${esc(p.name)}</div><div class="s"><span dir="ltr">${esc(p.phone||'بدون رقم')}</span> · ${esc(clinicName(p.clinicId))} · ${s.count} عمل · المتبقي ${fmt((s.bal||0))}</div></div></div>`}).join('')}</div>
    <div class="toolbar"><button class="btn primary sm" data-act="dupMerge" data-g="${i}">دمج في المحدد</button><button class="btn ghost sm" data-act="dupIgnore" data-g="${i}">ليسوا نفس الشخص</button></div></div>`).join('')+'<p class="muted" style="margin:0;font-size:12.5px">الدمج ينقل كل العلاجات والدفعات والمواعيد وأعمال المختبر إلى الملف المحدد، ويجمع التنبيهات والملاحظات، ثم يحذف الملفات الأخرى.</p>':empty('كل ملفات المرضى فريدة','')}</div>`,true);
   window.__dupGroups=gs;
 }
@@ -3014,7 +3035,7 @@ PAGES.clinic=()=>{
   const hero=`<section class="cl-hero" style="--ch:${hue}">
     <div class="cl-hero-top"><div class="cl-badge">${ic('building',22)}</div><div class="grow" style="min-width:0"><h2>${esc(c.name)}${sampleTag(c)}</h2><p>${esc(c.area||'')||'—'}</p></div>${c.active===false?chip('مغلقة'):''}${isAdmin()?`<button class="icon-btn" data-act="editClinic" data-id="${cid}" aria-label="بيانات العيادة" title="بيانات العيادة">${ic('edit',17)}</button>`:''}</div>
     <div class="cl-stats">${stat(chairCount(cid),'كرسي')}${stat(ds.length,'طبيب')}${stat(ss.length,'موظف')}${stat(nP,'مريض')}</div>
-    <div class="cl-quick"><button data-act="newAppt" class="q-main">${ic('calendar',20)}<span>موعد</span></button><button data-act="newPatient">${ic('plus',20)}<span>مريض</span></button><button data-act="quickPay">${ic('cash',20)}<span>دفعة</span></button><button data-act="newExpense">${ic('receipt',20)}<span>مصروف</span></button></div>
+    <div class="cl-quick"><button data-act="newAppt" class="q-main">${ic('calendar',20)}<span>موعد</span></button><button data-act="newPatient">${ic('plus',20)}<span>مريض</span></button><button data-act="quickPay">${ic('cash',20)}<span>تسديد</span></button><button data-act="newExpense">${ic('receipt',20)}<span>مصروف</span></button></div>
     ${others.length?`<div class="cl-switch"><span class="cl-sw-l">${ic('building',14)} العيادات</span><div class="cl-sw-row">${others.map(o=>`<button style="--ch:${clinicHue(o.id)}" data-act="openClinic" data-id="${o.id}"><span class="scope-dot"></span>${esc(o.name)}</button>`).join('')}<button data-act="allClinics">كل العيادات</button></div></div>`:''}
   </section>
   <nav class="cl-tabs" role="tablist" style="--n:${TB.length}">${TB.map(([k,l,i])=>`<button role="tab" aria-selected="${tab===k}" class="${tab===k?'on':''}" data-act="cTab" data-v="${k}">${ic(i,16)}<span>${l}</span></button>`).join('')}</nav>`;
@@ -3172,7 +3193,7 @@ function visitNow(p){
     const moneyBox=money_?`<div class="vn-money ${bal>0?'':'paid'}"><span>${bal>0?'المتبقي عليه':'الحساب'}</span><b>${bal>0?fmt(bal):'مسدّد'}</b><small>${bal>0?`دفع ${fmt(pd)} من ${fmt(tot)}`:fmt(tot)+' د.ع'}</small>${tot>0?`<div class="vn-pbar"><i style="width:${pctOf(pd,tot)}%"></i></div>`:''}</div>`:'';
     const acts=[];
     if(!legacyOnly&&!finished&&!s.todayDone)acts.push(`<button class="btn primary vn-go" data-act="addSession" data-tid="${t.id}">${ic('tooth',17)} تسجيل الجلسة ${nextN}${money_&&bal>0&&can('pay')?' والدفعة':''}</button>`);
-    if(money_&&bal>0&&can('pay'))acts.push(`<button class="btn ${legacyOnly||finished||s.todayDone?'primary vn-go':''}" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} دفعة فقط</button>`);
+    if(money_&&bal>0&&can('pay'))acts.push(`<button class="btn ${legacyOnly||finished||s.todayDone?'primary vn-go':''}" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} تسديد فقط</button>`);
     if(!legacyOnly&&!finished&&!nxAp)acts.push(`<button class="btn" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} حجز موعد الجلسة</button>`);
     if(money_&&can('price')&&!legacyOnly)acts.push(`<button class="btn ghost" data-act="extendTx" data-tid="${t.id}">${ic('plus',15)} أسنان / عمل إضافي</button>`);
     if(s.todayDone&&!finished&&!legacyOnly)acts.push(`<button class="btn ghost" data-act="addSession" data-tid="${t.id}">${ic('plus',15)} جلسة أخرى</button>`);
@@ -3193,7 +3214,7 @@ function deletePatient(pid){
   const ts=all('treatments').filter(t=>t.patientId===pid);const debt=sum(ts,t=>Math.max(0,tBal(t)));
   if(debt>0){const open=ts.filter(t=>tBal(t)>0);
     return openModal(`<div class="m-head"><div><h3>${ic('alert',18)} ما يمكن حذف ${esc(p.name)}</h3><p>عليه دين متبقٍ <b class="bad-t">${fmt(debt)}</b> د.ع</p></div><button class="icon-btn" data-act="closeModal" aria-label="إغلاق">${ic('x')}</button></div>
-    <div class="m-body"><p style="margin:0 0 10px">المريض اللي عليه ديون ممنوع ينحذف حتى ما تضيع الفلوس من ذمم المرضى. أول شي سدّد الدين، أو إذا كان الدين غلط عدّل كلفة العلاج.</p><div class="list">${open.map(t=>`<div class="li"><div class="grow"><div class="t">${esc(t.procedure||'علاج')}</div><div class="s">${esc(clinicName(t.clinicId))} · ${fmtDate(t.date)}</div></div><b class="num bad-t">${fmt(tBal(t))}</b>${can('pay')?`<button class="btn sm" data-act="addPayment" data-tid="${t.id}">${ic('cash',14)} دفعة</button>`:''}<button class="btn sm ghost" data-act="editTreatment" data-id="${t.id}">${ic('edit',14)} تعديل</button></div>`).join('')}</div></div>
+    <div class="m-body"><p style="margin:0 0 10px">المريض اللي عليه ديون ممنوع ينحذف حتى ما تضيع الفلوس من ذمم المرضى. أول شي سدّد الدين، أو إذا كان الدين غلط عدّل كلفة العلاج.</p><div class="list">${open.map(t=>`<div class="li"><div class="grow"><div class="t">${esc(t.procedure||'علاج')}</div><div class="s">${esc(clinicName(t.clinicId))} · ${fmtDate(t.date)}</div></div><b class="num bad-t">${fmt(tBal(t))}</b>${can('pay')?`<button class="btn sm" data-act="addPayment" data-tid="${t.id}">${ic('cash',14)} تسديد</button>`:''}<button class="btn sm ghost" data-act="editTreatment" data-id="${t.id}">${ic('edit',14)} تعديل</button></div>`).join('')}</div></div>
     <div class="m-foot"><span class="sp"></span><button class="btn" data-act="closeModal">حسناً</button></div>`)}
   const lockedT=ts.find(t=>lockViolation('treatments',null,t.id));const labs=all('labOrders').filter(o=>o.patientId===pid);const lockedL=labs.find(o=>lockViolation('labOrders',null,o.id));
   if(lockedT||lockedL){const d=lockedT?(lockedT.payments||[]).find(x=>isLocked(x.date))?.date:lockedL.sentDate;return toast(`ما يمكن حذفه: عنده دفعات بشهر مقفل (${monthLabel(monthOf(d||TODAY))}). افتح القفل من «إقفال الشهر» أولاً.`,'bad')}
@@ -3315,6 +3336,11 @@ function accountBar(p){
     <div class="acct-acts">${bal>0&&can('pay')?`<button class="btn primary acct-pay" data-act="settle" data-pid="${p.id}">${ic('cash',18)} تسديد</button>`:''}${can('price')||can('pay')?`<button class="btn" data-act="editAcct" data-pid="${p.id}">${ic('edit',16)} تعديل المبلغ</button>`:''}${can('print')?`<button class="btn" data-act="printRc" data-pid="${p.id}">${ic('receipt',16)} كشف الحساب</button>`:''}</div></section>`}
 
 /* ---------- Edit the patient's amounts: treatment cost, discount, and every payment, in one place ---------- */
+/* when a treatment's total changes on an installment plan, move the difference onto the unpaid installments */
+function adjustSchedule(doc,delta){if(doc.plan!=='installments'||!delta)return doc;const sch=(doc.schedule||[]).map(x=>Object.assign({},x));const st=schedStatus(Object.assign({},doc,{schedule:sch}));
+  if(delta>0){const last=sch.length?sch[sch.length-1]:null;if(last&&st[st.length-1].state!=='paid')last.amount=num(last.amount)+delta;else sch.push({due:addMonths(last&&last.due>TODAY?last.due:TODAY,1),amount:delta})}
+  else{let left=-delta;for(let i=sch.length-1;i>=0&&left>0;i--){if(st[i].state==='paid')continue;const free=num(sch[i].amount)-st[i].paid;const cut=Math.min(free,left);sch[i].amount=num(sch[i].amount)-cut;left-=cut}for(let i=sch.length-1;i>=0;i--)if(num(sch[i].amount)<=0)sch.splice(i,1)}
+  doc.schedule=sch;return doc}
 function editAcctModal(pid){
   if(!can('price')&&!can('pay'))return noPerm();const p=get('patients',pid);if(!p)return;
   const ts=all('treatments').filter(t=>t.patientId===pid&&(isAdmin()||cf(t))).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
@@ -3342,7 +3368,7 @@ function editAcctModal(pid){
   form.addEventListener('submit',async e=>{e.preventDefault();if(!recalc())return toast('صحّح الأرقام المعلّمة بالأحمر','warn');
     const btn=form.querySelector('[type=submit]');btn.disabled=true;let n=0;
     try{for(const c of form.querySelectorAll('.ea-card')){const t=get('treatments',c.dataset.tid);const fee=num(c.querySelector('[data-eaf=fee]').value),dis=num(c.querySelector('[data-eaf=discount]').value);
-      if(fee===num(t.fee)&&dis===num(t.discount))continue;const doc=clone(t);doc.fee=fee;doc.discount=dis;
+      if(fee===num(t.fee)&&dis===num(t.discount))continue;const doc=clone(t);doc.fee=fee;doc.discount=dis;adjustSchedule(doc,Math.max(0,fee-dis)-tTotal(t));
       doc.feeLog=(t.feeLog||[]).concat([{at:new Date().toISOString(),by:Store.me||null,fee:{from:num(t.fee),to:fee},discount:{from:num(t.discount),to:dis}}]).slice(-20);
       if(t.plan==='cash'&&tPaid(t)<Math.max(0,fee-dis))doc.plan='partial';
       await put('treatments',doc);n++}
@@ -3520,7 +3546,7 @@ function todayWorkCard(cid,opt){opt=opt||{};const day=opt.day||TODAY;const w=tod
     r.tx.forEach(t=>what.push(`<span class="chip" style="--cc:${catHue(txCat(t))}">${esc(t.procedure||'علاج')}${m?' · '+fmt(tTotal(t)):''}</span>`));
     r.sess.forEach(({t,v})=>what.push(`<span class="chip accent">جلسة ${v.n} · ${esc(t.procedure||'')}</span>`));
     const docs=[...r.doctors].map(d=>docName(d)).filter(x=>x&&x!=='—');const cl=[...r.clinics].map(clinicName);
-    return `<div class="li click tw-row" data-act="openPatient" data-id="${r.pid}"><div class="grow"><div class="t">${esc(p.name||'—')}${p.noPhone&&!p.phone?' <span class="chip warn">بدون رقم</span>':''}</div><div class="tw-what">${what.join('')||'<span class="muted" style="font-size:12.5px">دفعة فقط</span>'}</div><div class="s">${cid?'':esc(cl.join('، '))+(cl.length?' · ':'')}${esc(docs.join('، '))}</div></div>${m&&r.paid?`<b class="num good-t" title="${r.pays.length} دفعة">${fmt(r.paid)}</b>`:''}</div>`};
+    return `<div class="li click tw-row" data-act="openPatient" data-id="${r.pid}"><div class="grow"><div class="t">${esc(p.name||'—')}${p.noPhone&&!p.phone?' <span class="chip warn">بدون رقم</span>':''}</div><div class="tw-what">${what.join('')||'<span class="muted" style="font-size:12.5px">تسديد فقط</span>'}</div><div class="s">${cid?'':esc(cl.join('، '))+(cl.length?' · ':'')}${esc(docs.join('، '))}</div></div>${m&&r.paid?`<b class="num good-t" title="${r.pays.length} دفعة">${fmt(r.paid)}</b>`:''}</div>`};
   return `<section class="card tw-card">${head}<div class="tw-kpis"><div><b>${w.newP}</b><span>مرضى جدد</span></div><div><b>${w.tx}</b><span>علاجات جديدة</span></div><div><b>${w.sess}</b><span>جلسات</span></div>${m?`<div class="g"><b>${fmt(w.paid)}</b><span>المحصّل (${w.pays} دفعة)</span></div>`:''}</div><div class="list tw-list">${w.list.map(row).join('')}</div></section>`}
 
 /* ---------- Forms ---------- */
@@ -3623,7 +3649,7 @@ function paySupplierForm(id,invId,acctPick){const s=get('suppliers',id);if(!s)re
     {k:'amount',label:'المبلغ المدفوع',type:'money',req:true,ph:'اكتب المبلغ'},{k:'fill',type:'html',html:`<div id="sup-fill">${fillFor({inv:invId||'',acct:defAcct})}</div>`},
     {k:'date',label:'تاريخ الدفع',type:'date',req:true,half:true},{k:'paidFrom',label:'مدفوع من',type:'select',opts:PAID_FROM,half:true},{k:'clinicId',label:'من صندوق أي عيادة',type:'select',opts:optClinics(),half:true,show:v=>v.paidFrom==='drawer'},{k:'note',label:'ملاحظة',half:true},
     {k:'prev',type:'html',html:'<div class="plan-preview" id="sp-prev"></div>'}],
-    values:{inv:invId||'',acct:defAcct,date:TODAY,paidFrom:'drawer',clinicId:sc||defAcct||defaultClinic()},submit:'حفظ الدفعة',
+    values:{inv:invId||'',acct:defAcct,date:TODAY,paidFrom:'drawer',clinicId:sc||defAcct||defaultClinic()},submit:'حفظ التسديد',
     onChange:(v,form)=>{if(!v.inv&&sc!==undefined)v.acct=sc;const box=form.querySelector('#sup-fill');if(box)setBox(box,fillFor(v));const el=form.querySelector('#sp-prev');const a=num(v.amount);const lim=limitOf(v);if(el)el.textContent=a?(a>lim+1?`المبلغ أكبر من الباقي (${fmt(lim)})`:`بعد هذه الدفعة يبقى ${v.inv?'على القائمة':'على حساب '+bucketName(v.acct||'')} ${fmt(lim-a)} د.ع`):''},
     onSubmit:async v=>{if(!v.inv&&sc!==undefined)v.acct=sc;const a=num(v.amount);if(a<=0)fail('أدخل المبلغ');const lim=limitOf(v);if(a>lim+1)fail(`المبلغ أكبر من الباقي (${fmt(lim)} د.ع)`);
       const acct=v.inv?(invInfo(v.inv)||{}).b||'':(v.acct||'');
@@ -3642,7 +3668,7 @@ function labCoForm(l){l=l||{};formModal({title:l.id?'تعديل المختبر':
   danger:l.id?{onClick:()=>{if(all('labOrders').some(o=>o.labId===l.id))return toast('لا يمكن حذف مختبر له طلبات مسجلة','warn');confirmBox('حذف المختبر؟',async()=>{await del('labs',l.id)})}}:null,
   onSubmit:async v=>{await put('labs',Object.assign(clone(l),{name:v.name,phone:v.phone,specialty:v.specialty,notes:v.notes,opening:num(v.opening),openingDate:num(v.opening)?v.openingDate:''}));toast('تم الحفظ')}})}
 function payLabForm(id){const l=get('labs',id);const bal=labBilled(l)-labPaid(l);const last=labLastPay(l);
-  formModal({title:'تسديد للمختبر',sub:`${esc(l.name)} · الباقي له <b>${fmt(bal)}</b> د.ع${last?' · آخر دفعة '+fmtDate(last):''}`,fields:[{k:'amount',label:'المبلغ المدفوع',type:'money',req:true,ph:'اكتب المبلغ'},fillField('amount',[[`كامل الباقي (${fmt(bal)})`,bal]]),{k:'date',label:'تاريخ الدفع',type:'date',req:true,half:true},{k:'paidFrom',label:'مدفوع من',type:'select',opts:PAID_FROM.filter(x=>x[0]!=='drawer'),half:true},{k:'note',label:'ملاحظة',ph:'مثال: حساب شهر تشرين الأول'},{k:'prev',type:'html',html:'<div class="plan-preview" id="lp-prev"></div>'}],values:{date:TODAY,paidFrom:'main'},submit:'حفظ الدفعة',
+  formModal({title:'تسديد للمختبر',sub:`${esc(l.name)} · الباقي له <b>${fmt(bal)}</b> د.ع${last?' · آخر دفعة '+fmtDate(last):''}`,fields:[{k:'amount',label:'المبلغ المدفوع',type:'money',req:true,ph:'اكتب المبلغ'},fillField('amount',[[`كامل الباقي (${fmt(bal)})`,bal]]),{k:'date',label:'تاريخ الدفع',type:'date',req:true,half:true},{k:'paidFrom',label:'مدفوع من',type:'select',opts:PAID_FROM.filter(x=>x[0]!=='drawer'),half:true},{k:'note',label:'ملاحظة',ph:'مثال: حساب شهر تشرين الأول'},{k:'prev',type:'html',html:'<div class="plan-preview" id="lp-prev"></div>'}],values:{date:TODAY,paidFrom:'main'},submit:'حفظ التسديد',
     onChange:(v,form)=>{const el=form.querySelector('#lp-prev');const a=num(v.amount);if(el)el.textContent=a?(a>bal+1?`المبلغ أكبر من الباقي (${fmt(bal)})`:`بعد هذه الدفعة يبقى للمختبر ${fmt(bal-a)} د.ع`):''},
     onSubmit:async v=>{const a=num(v.amount);if(a<=0)fail('أدخل المبلغ');if(a>bal+1)fail(`المبلغ أكبر من الباقي (${fmt(bal)} د.ع)`);await put('labPayments',{labId:id,amount:a,date:v.date,note:v.note,paidFrom:v.paidFrom});toast(`تم تسجيل ${fmt(a)} · الباقي للمختبر ${fmt(bal-a)} د.ع`)}})}
 
@@ -3710,11 +3736,11 @@ function paymentForm(tid){
   const t=get('treatments',tid);if(!t)return;const bal=tBal(t);const nx=schedStatus(t).find(x=>x.state!=='paid');const pd=tPaid(t);
   let def=bal;if(t.plan==='installments'){if(pd<num(t.down))def=num(t.down)-pd;else if(nx)def=Math.min(bal,num(nx.amount)-nx.paid)}
   const others=all('treatments').filter(x=>x.patientId===t.patientId&&x.id!==t.id&&tBal(x)>0);
-  formModal({title:'تسجيل دفعة',sub:`${esc(patientName(t.patientId))} · المتبقي على هذا العلاج <b>${fmt(bal)}</b> د.ع${others.length?` · وعلاجات أخرى ${fmt(sum(others,tBal))}`:''}`,fields:[
+  formModal({title:'تسديد',sub:`${esc(patientName(t.patientId))} · المتبقي على هذا العلاج <b>${fmt(bal)}</b> د.ع${others.length?` · وعلاجات أخرى ${fmt(sum(others,tBal))}`:''}`,fields:[
     {k:'sum',type:'html',html:txSummaryHTML(t)},
     {k:'amount',label:'المبلغ المستلم الآن',type:'money',req:true,ph:'اكتب المبلغ الذي دفعه المريض'},fillField('amount',[[`تسديد كامل المتبقي (${fmt(bal)})`,bal]].concat(def!==bal?[[`القسط المستحق (${fmt(def)})`,def]]:[])),{k:'date',label:'التاريخ',type:'date',req:true,half:true},{k:'method',label:'طريقة الدفع',type:'select',opts:PAY_METHODS,half:true},{k:'note',label:'ملاحظة',half:true},
     {k:'prev',type:'html',html:'<div class="plan-preview" id="pay-prev"></div>'}],
-    values:{date:TODAY,method:'cash'},submit:'حفظ الدفعة',
+    values:{date:TODAY,method:'cash'},submit:'حفظ التسديد',
     onChange:(v,form)=>{const el=form.querySelector('#pay-prev');if(el){const a=num(v.amount);el.textContent=a>bal+1?`المبلغ أكبر من المتبقي (${fmt(bal)})`:a>0?`بعد هذه الدفعة يبقى على المريض ${fmt(bal-a)} د.ع${bal-a<=0?' · يصبح العلاج مسدّداً بالكامل':''}`:''}},
     onSubmit:async v=>{const a=num(v.amount);if(a<=0)fail('أدخل مبلغاً صحيحاً');if(a>bal+1)fail(`المبلغ أكبر من المتبقي (${fmt(bal)} د.ع)`);
       const pay={id:uid(),amount:a,date:v.date,method:v.method,note:v.note,by:Store.me||null};const doc=clone(t);doc.payments=(doc.payments||[]).concat([pay]);await put('treatments',doc);toast(`تم تسجيل ${fmt(a)} د.ع · المتبقي ${fmt(bal-a)}`);setTimeout(()=>receiptModal(t.id,pay.id),60)}});
@@ -3722,7 +3748,7 @@ function paymentForm(tid){
 function quickPay(){
   const open=all('treatments').filter(t=>tBal(t)>0&&cf(t));if(!open.length)return toast('لا توجد مبالغ متبقية على المرضى حالياً','warn');
   const pids=[...new Set(open.map(t=>t.patientId))];const bal=pid=>sum(open.filter(t=>t.patientId===pid),tBal);
-  formModal({title:'تسجيل دفعة',sub:'اختر المريض ليظهر حسابه كاملاً: العلاجات والجلسات والطبيب والمتبقي',wide:true,fields:[{k:'pid',label:'المريض · المتبقي عليه',type:'select',req:true,empty:'— اختر المريض —',opts:pids.map(id=>[id,`${patientName(id)} · ${fmt(bal(id))}`]).sort((a,b)=>a[1].localeCompare(b[1],'ar'))},{k:'acc',type:'html',html:'<div id="qp-acc" style="display:flex;flex-direction:column;gap:10px"></div>'}],submit:'فتح ملف المريض',
+  formModal({title:'تسديد',sub:'اختر المريض ليظهر حسابه كاملاً: العلاجات والجلسات والطبيب والمتبقي',wide:true,fields:[{k:'pid',label:'المريض · المتبقي عليه',type:'select',req:true,empty:'— اختر المريض —',opts:pids.map(id=>[id,`${patientName(id)} · ${fmt(bal(id))}`]).sort((a,b)=>a[1].localeCompare(b[1],'ar'))},{k:'acc',type:'html',html:'<div id="qp-acc" style="display:flex;flex-direction:column;gap:10px"></div>'}],submit:'فتح ملف المريض',
     onChange:(v,form)=>{const el=form.querySelector('#qp-acc');if(el)setBox(el,v.pid?patAccountBox(v.pid):'<p class="muted" style="margin:0">بعد اختيار المريض يظهر حسابه وتسدد من العلاج المطلوب مباشرة.</p>')},
     onSubmit:v=>{setTimeout(()=>go('patient',{patientId:v.pid}),30)}});
 }
