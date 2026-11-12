@@ -514,6 +514,23 @@ html.modal-open,html.modal-open body{overflow:hidden;overscroll-behavior:none}
 .pc-chips{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px}
 .xc-box{border-bottom:1px solid var(--line-2);background:var(--info-soft,var(--surface-2))}
 .xc-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px}.xc-h small{flex:1 1 100%;color:var(--ink-2);font-size:12.5px}
+
+/* ---- clinic hub: professional layout ---- */
+.cl-hero{padding:16px;border-radius:20px}
+.cl-hero-top{gap:12px}.cl-hero h2{font-size:22px;line-height:1.2}.cl-hero-top p{margin:3px 0 0;font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.cl-stat{background:color-mix(in srgb,var(--ch) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--ch) 20%,var(--line));border-radius:12px;padding:8px 6px;text-align:center;display:flex;flex-direction:column;gap:1px}.cl-stat b{font-size:19px;font-variant-numeric:tabular-nums;line-height:1.1}.cl-stat span{font-size:11.5px;color:var(--ink-3)}
+.cl-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.cl-quick button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:64px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;font-size:13px;font-weight:600}
+.cl-quick button.q-main{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}.cl-quick button:active{transform:scale(.97)}
+.cl-switch{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed color-mix(in srgb,var(--ch) 30%,var(--line));min-width:0}
+.cl-sw-l{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-3);white-space:nowrap;flex:none}
+.cl-sw-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px;min-width:0;flex:1}.cl-sw-row::-webkit-scrollbar{display:none}.cl-sw-row button{flex:none}
+.cl-tabs{margin-top:0}
+.day-bar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;margin-bottom:14px}
+.day-cur{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;cursor:pointer;border-radius:10px}.day-cur b{font-size:16px}.day-cur small{font-size:12px;color:var(--ink-3)}
+.day-cur input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+@media (max-width:560px){.cl-hero h2{font-size:20px}.cl-quick button{height:60px}.cl-sw-l span{display:none}}
 /* ---- clinic workspace ---- */
 .scope-dot{width:10px;height:10px;border-radius:50%;background:var(--ch,var(--primary));flex:none;display:inline-block}
 .scope-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:color-mix(in srgb,var(--ch) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--ch) 35%,var(--line));border-inline-start:4px solid var(--ch);border-radius:12px;padding:9px 12px;margin-bottom:16px;font-size:13.5px}
@@ -1007,7 +1024,7 @@ function renderSide(){
 }
 const MONTH_PAGES=['clinic','chairs','safe','monthclose','debts','dashboard','accounts','expenses','payroll','reports','doctors','labs','mydash','docreport'];
 function renderTop(){
-  const showMonth=MONTH_PAGES.includes(state.page);
+  const showMonth=MONTH_PAGES.includes(state.page)&&!(state.page==='clinic'&&['today','patients','team'].includes(state.cTab||'today'));
   $('#top').innerHTML=`<button class="icon-btn only-m" data-act="toggleSide" aria-label="فتح القائمة">${ic('menu',20)}</button>${navDepth>0||state.page!==homeOf()?`<button class="icon-btn back-btn" data-act="navBack" aria-label="رجوع" title="رجوع">${ic('back',20)}</button>`:''}
   <div class="top-title"><h1>${esc(isDoctor()&&state.page==='doctorsReport'?'تقرير عملي':state.page==='clinic'&&get('clinics',state.clinic)?get('clinics',state.clinic).name:(TITLES[state.page]||''))}</h1><p>${dayLabel(TODAY)} ${TODAY.slice(0,4)}</p></div>
   <div class="top-ctl">
@@ -2993,33 +3010,37 @@ PAGES.clinic=()=>{
   const ds=all('doctors').filter(d=>d.active!==false&&(d.clinicIds||[]).includes(cid));
   const ss=all('staff').filter(s=>s.clinicId===cid&&s.active!==false&&!s.accountOnly);
   const nP=clinicPatientIds(cid).size;const others=all('clinics').filter(x=>x.active!==false&&x.id!==cid&&mine.includes(x.id)).sort(byName);
+  const stat=(n,l,ic_)=>`<div class="cl-stat"><b>${n}</b><span>${l}</span></div>`;
   const hero=`<section class="cl-hero" style="--ch:${hue}">
-    <div class="cl-hero-top"><div class="cl-badge">${ic('building',22)}</div><div class="grow" style="min-width:0"><h2>${esc(c.name)}${sampleTag(c)}</h2><p>${esc(c.area||'')}${c.area?' · ':''}${chairCount(cid)} كرسي · ${ds.length} طبيب · ${ss.length} موظف · ${nP} مريض</p></div>${c.active===false?chip('مغلقة'):''}</div>
-    <div class="cl-hero-acts"><button class="btn sm primary" data-act="newAppt">${ic('calendar',15)} موعد</button><button class="btn sm" data-act="newPatient">${ic('plus',15)} مريض</button><button class="btn sm" data-act="quickPay">${ic('cash',15)} دفعة</button><button class="btn sm" data-act="newExpense">${ic('receipt',15)} مصروف</button>${isAdmin()?`<button class="btn sm ghost" data-act="editClinic" data-id="${cid}">${ic('edit',15)} بيانات العيادة</button>`:''}</div>
-    ${others.length?`<div class="cl-switch">${ic('building',14)}<span>انتقل إلى:</span>${others.map(o=>`<button style="--ch:${clinicHue(o.id)}" data-act="openClinic" data-id="${o.id}"><span class="scope-dot"></span>${esc(o.name)}</button>`).join('')}<button data-act="allClinics">كل العيادات</button></div>`:''}
+    <div class="cl-hero-top"><div class="cl-badge">${ic('building',22)}</div><div class="grow" style="min-width:0"><h2>${esc(c.name)}${sampleTag(c)}</h2><p>${esc(c.area||'')||'—'}</p></div>${c.active===false?chip('مغلقة'):''}${isAdmin()?`<button class="icon-btn" data-act="editClinic" data-id="${cid}" aria-label="بيانات العيادة" title="بيانات العيادة">${ic('edit',17)}</button>`:''}</div>
+    <div class="cl-stats">${stat(chairCount(cid),'كرسي')}${stat(ds.length,'طبيب')}${stat(ss.length,'موظف')}${stat(nP,'مريض')}</div>
+    <div class="cl-quick"><button data-act="newAppt" class="q-main">${ic('calendar',20)}<span>موعد</span></button><button data-act="newPatient">${ic('plus',20)}<span>مريض</span></button><button data-act="quickPay">${ic('cash',20)}<span>دفعة</span></button><button data-act="newExpense">${ic('receipt',20)}<span>مصروف</span></button></div>
+    ${others.length?`<div class="cl-switch"><span class="cl-sw-l">${ic('building',14)} العيادات</span><div class="cl-sw-row">${others.map(o=>`<button style="--ch:${clinicHue(o.id)}" data-act="openClinic" data-id="${o.id}"><span class="scope-dot"></span>${esc(o.name)}</button>`).join('')}<button data-act="allClinics">كل العيادات</button></div></div>`:''}
   </section>
   <nav class="cl-tabs" role="tablist" style="--n:${TB.length}">${TB.map(([k,l,i])=>`<button role="tab" aria-selected="${tab===k}" class="${tab===k?'on':''}" data-act="cTab" data-v="${k}">${ic(i,16)}<span>${l}</span></button>`).join('')}</nav>`;
   return hero+({today:clToday,patients:clPatients,money:clMoney,report:clReport,team:clTeam}[tab])(c);
 };
 
+const dayBar=day=>`<div class="day-bar"><button class="icon-btn" data-act="clDay" data-d="-1" aria-label="اليوم السابق">${ic('prev')}</button><label class="day-cur"><b>${day===TODAY?'اليوم':dayLabel(day)}</b><small>${day===TODAY?dayLabel(day):day.slice(0,4)}</small><input type="date" value="${day}" data-chg="clDate" aria-label="اختيار التاريخ"></label><button class="icon-btn" data-act="clDay" data-d="1" aria-label="اليوم التالي">${ic('next')}</button>${day!==TODAY?`<button class="btn sm primary" data-act="clDay" data-d="0">اليوم</button>`:''}</div>`;
+ACTIONS.clDay=d=>{state.cday=Number(d.d)===0?TODAY:addDays(state.cday||TODAY,Number(d.d));render()};CHANGES.clDate=v=>{if(v){state.cday=v;render()}};
 function clToday(c){
-  const cid=c.id;const ap=all('appointments').filter(a=>a.clinicId===cid&&a.date===TODAY&&a.status!=='cancelled').sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  const cid=c.id;const day=state.cday||TODAY;const isT=day===TODAY;const ap=all('appointments').filter(a=>a.clinicId===cid&&a.date===day&&a.status!=='cancelled').sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   const done=ap.filter(a=>a.status==='done').length,nos=ap.filter(a=>a.status==='noshow').length,waiting=ap.filter(a=>a.status==='arrived').length;
-  const todayPays=payments().filter(p=>p.clinicId===cid&&p.date===TODAY);const tomorrow=all('appointments').filter(a=>a.clinicId===cid&&a.date===addDays(TODAY,1)&&a.status!=='cancelled').length;
+  const todayPays=payments().filter(p=>p.clinicId===cid&&p.date===day);const tomorrow=all('appointments').filter(a=>a.clinicId===cid&&a.date===addDays(day,1)&&a.status!=='cancelled').length;
   const late=instItems().filter(x=>x.state==='late'&&x.t.clinicId===cid);
   const labBad=all('labOrders').filter(o=>o.clinicId===cid&&o.status!=='delivered'&&(o.status==='redo'||labLate(o)));
   const r=rentState(c);const debt=sum(all('treatments').filter(t=>t.clinicId===cid),t=>Math.max(0,tBal(t)));
   const nC=chairCount(cid);const byChair={};ap.forEach(a=>{const k=nC>1?(a.chair||'—'):'all';(byChair[k]=byChair[k]||[]).push(a)});
   const row=a=>{const p=get('patients',a.patientId)||{};return `<div class="li"><span class="time">${t12(a.time)}</span><div class="grow"><div class="t"><a href="#patient" data-act="openPatient" data-id="${p.id||''}">${esc(p.name||'—')}</a></div><div class="s">${esc(a.procedure||'')}${a.procedure?' · ':''}${esc(docName(a.doctorId))}${nC>1&&a.chair?' · كرسي '+esc(a.chair):''}</div></div>${chip(APPT_ST[a.status]?.[0]||'',APPT_ST[a.status]?.[1])}${waBtn(p.phone,'')}</div>`};
-  return `<div class="kpis">
-    ${kpi('مواعيد اليوم',String(ap.length),`${done} منتهي${waiting?` · ${waiting} بالانتظار`:''}${nos?` · <span class="bad-t">${nos} لم يحضر</span>`:''}`)}
-    ${seeMoney()?kpi('محصّل اليوم',money(sum(todayPays,p=>p.amount)),`${todayPays.length} دفعة`,'hl'):kpi('مواعيد الغد',String(tomorrow),'')}
+  return `${dayBar(day)}<div class="kpis">
+    ${kpi(isT?'مواعيد اليوم':'المواعيد',String(ap.length),`${done} منتهي${waiting?` · ${waiting} بالانتظار`:''}${nos?` · <span class="bad-t">${nos} لم يحضر</span>`:''}`)}
+    ${seeMoney()?kpi(isT?'محصّل اليوم':'المحصّل',money(sum(todayPays,p=>p.amount)),`${todayPays.length} دفعة`,'hl'):kpi(isT?'مواعيد الغد':'مواعيد اليوم التالي',String(tomorrow),'')}
     ${seeMoney()?kpi('النقد بذمة العيادة',money(drawerNow(cid)),'لم يُسلَّم بعد'):''}
     ${seeMoney()?kpi('ديون مرضى العيادة',money(debt),late.length?`<span class="bad-t">${late.length} قسط متأخر</span>`:'لا أقساط متأخرة'):''}
   </div>
-  ${todayWorkCard(cid)}
+  ${todayWorkCard(cid,{day})}
   <div class="two">
-   <section class="card"><div class="card-h"><h3>مواعيد اليوم · ${dayLabel(TODAY)}</h3><a class="btn ghost sm" href="#appointments" data-act="go" data-page="appointments">الأسبوع كاملاً</a></div>
+   <section class="card"><div class="card-h"><h3>${isT?'مواعيد اليوم':'مواعيد'} · ${dayLabel(day)}</h3><a class="btn ghost sm" href="#appointments" data-act="go" data-page="appointments">الأسبوع كاملاً</a></div>
     ${ap.length?Object.keys(byChair).sort().map(k=>`${k!=='all'?`<div class="cl-sub">${ic('chair',14)} ${k==='—'?'بدون كرسي':'الكرسي '+esc(k)} · ${byChair[k].length}</div>`:''}<div class="list">${byChair[k].map(row).join('')}</div>`).join(''):empty('لا مواعيد اليوم',tomorrow?`غداً ${tomorrow} موعد`:'',`<button class="btn sm primary" data-act="newAppt">${ic('plus',15)} موعد جديد</button>`)}
    </section>
    <section class="card"><div class="card-h"><h3>يحتاج متابعة</h3></div>
