@@ -3192,7 +3192,7 @@ function visitNow(p){
       :`<div class="vn-big"><span>الجلسة القادمة</span><b>${nextN}</b><small>${pl?'من '+pl:s.done?'بعد '+s.done+' '+(s.done===1?'جلسة':'جلسات'):'أول جلسة'}</small></div>`;
     const moneyBox=money_?`<div class="vn-money ${bal>0?'':'paid'}"><span>${bal>0?'المتبقي عليه':'الحساب'}</span><b>${bal>0?fmt(bal):'مسدّد'}</b><small>${bal>0?`دفع ${fmt(pd)} من ${fmt(tot)}`:fmt(tot)+' د.ع'}</small>${tot>0?`<div class="vn-pbar"><i style="width:${pctOf(pd,tot)}%"></i></div>`:''}</div>`:'';
     const acts=[];
-    if(!legacyOnly&&!finished&&!s.todayDone)acts.push(`<button class="btn primary vn-go" data-act="addSession" data-tid="${t.id}">${ic('tooth',17)} تسجيل الجلسة ${nextN}${money_&&bal>0&&can('pay')?' والدفعة':''}</button>`);
+    if(!legacyOnly&&!finished&&!s.todayDone)acts.push(`<button class="btn primary vn-go" data-act="addSession" data-tid="${t.id}">${ic('tooth',17)} تسجيل الجلسة ${nextN}${money_&&bal>0&&can('pay')?' والتسديد':''}</button>`);
     if(money_&&bal>0&&can('pay'))acts.push(`<button class="btn ${legacyOnly||finished||s.todayDone?'primary vn-go':''}" data-act="addPayment" data-tid="${t.id}">${ic('cash',16)} تسديد فقط</button>`);
     if(!legacyOnly&&!finished&&!nxAp)acts.push(`<button class="btn" data-act="bookNext" data-tid="${t.id}">${ic('calendar',16)} حجز موعد الجلسة</button>`);
     if(money_&&can('price')&&!legacyOnly)acts.push(`<button class="btn ghost" data-act="extendTx" data-tid="${t.id}">${ic('plus',15)} أسنان / عمل إضافي</button>`);
