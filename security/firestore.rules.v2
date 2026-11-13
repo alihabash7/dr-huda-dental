@@ -1,0 +1,112 @@
+rules_version = '2';
+// ============================================================================
+// قواعد حماية قاعدة بيانات عيادات د. هدى · الإصدار 2 (مرحلة أ)
+// متوافقة مع النظام الحالي بدون أي تغيير بالبيانات أو أسماء المجموعات.
+// تسدّ الثغرات:
+//  1) منع أي موظف من منح نفسه صلاحية مدير أو تعديل صلاحياته أو صلاحيات غيره.
+//  2) الإعدادات والعيادات وإقفال الأشهر والرواتب والأطباء والموظفين: للإدارة فقط.
+//  3) الحذف النهائي للمرضى للإدارة فقط، وباقي السجلات يحذفها المدير أو من أنشأها.
+//  4) التحقق من شكل البيانات الأساسية قبل قبولها.
+//  5) سجل تدقيق (auditLog) يُكتب ولا يُعدَّل ولا يُحذف.
+// ملاحظة: القراءة باقية لكل الأعضاء لأن النظام الحالي يحمّل المجموعات كاملة؛
+// عزل القراءة حسب العيادة يأتي بالمرحلة ب مع تحديث طريقة التحميل في V2.
+// ============================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owners() { return ['sallihli.iq@gmail.com','huda64957@gmail.com']; }
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function isOwner() { return signedIn() && myEmail() in owners(); }
+    function memPath() { return /databases/$(database)/documents/members/$(myEmail()); }
+    function hasMem() { return signedIn() && exists(memPath()); }
+    function isMember() { return isOwner() || hasMem(); }
+    function mem() { return get(memPath()).data; }
+    // «مدير عام» = موظف صلاحيته owner في سجله
+    function isGM() { return !isOwner() && hasMem() && mem().get('kind','') == 'staff'
+      && get(/databases/$(database)/documents/staff/$(mem().get('refId','-'))).data.get('access','') == 'owner'; }
+    function isAdmin() { return isOwner() || isGM(); }
+    function changedOnly(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+    function selfRec(kind, id) { return hasMem() && !isOwner() && mem().get('kind','') == kind && mem().get('refId','') == id; }
+    // ربط الحساب برمز الدعوة: يغيّر فقط userId/linkedAt/inviteCode لسجله هو
+    function claimOwn(kind, id) { return selfRec(kind, id)
+      && changedOnly(['userId','linkedAt','inviteCode','updatedAt'])
+      && request.resource.data.get('userId','') == request.auth.uid; }
+    function mine() { return resource.data.get('createdBy','') == request.auth.uid; }
+    function str(d, k, mn, mx) { return (k in d) && d[k] is string && d[k].size() >= mn && d[k].size() <= mx; }
+    function optStr(d, k, n) { return !(k in d) || (d[k] is string && d[k].size() <= n); }
+    function optNum(d, k) { return !(k in d) || d[k] is number || d[k] == ''; }
+
+    // ---- الحسابات والصلاحيات ----
+    match /members/{email} {
+      allow get: if signedIn() && (isOwner() || email == myEmail());
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /people/{uid} {
+      allow read: if isMember();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+    match /staff/{id} {
+      allow read: if isMember();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || claimOwn('staff', id);
+    }
+    match /doctors/{id} {
+      allow read: if isMember();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || claimOwn('doctor', id);
+    }
+
+    // ---- إعدادات الإدارة ----
+    match /clinics/{id}   { allow read: if isMember(); allow write: if isAdmin(); }
+    match /settings/{id}  { allow read: if isMember(); allow write: if isAdmin(); }
+    match /months/{id}    { allow read: if isMember(); allow write: if isAdmin(); }
+    match /payouts/{id}   { allow read: if isMember(); allow write: if isAdmin(); }
+    match /publicSite/{id}{ allow read: if true;       allow write: if isAdmin(); }
+
+    // ---- المرضى والعلاجات ----
+    match /patients/{id} {
+      allow read: if isMember();
+      allow create, update: if isMember() && str(request.resource.data, 'name', 1, 120)
+        && optStr(request.resource.data, 'phone', 20) && optStr(request.resource.data, 'notes', 4000);
+      allow delete: if isAdmin();
+    }
+    match /treatments/{id} {
+      allow read: if isMember();
+      allow create, update: if isMember() && str(request.resource.data, 'patientId', 1, 80)
+        && optNum(request.resource.data, 'fee') && optNum(request.resource.data, 'discount')
+        && (!('payments' in request.resource.data) || request.resource.data.payments is list);
+      allow delete: if isAdmin() || mine();
+    }
+
+    // ---- العمل اليومي (المواعيد، المختبر، الموردون، المصاريف، الجرد، المتابعة) ----
+    match /{col}/{id} {
+      allow read: if isMember() && col in ['appointments','labs','labOrders','labPayments','suppliers','supplierTx','expenses','closings','cashMoves','followups'];
+      allow create, update: if isMember() && col in ['appointments','labs','labOrders','labPayments','suppliers','supplierTx','expenses','closings','cashMoves','followups'];
+      allow delete: if col in ['appointments','labs','labOrders','labPayments','suppliers','supplierTx','expenses','closings','cashMoves','followups'] && (isAdmin() || (isMember() && mine()));
+    }
+
+    // ---- طلبات الحجز من الموقع ----
+    function validBooking(d) {
+      return d.keys().hasOnly(['name','phone','clinicId','clinicName','service','date','period','note','status','source','createdAt','doctorId','time'])
+        && d.keys().hasAll(['name','phone','status','createdAt'])
+        && d['status'] == 'new'
+        && str(d, 'name', 2, 80) && str(d, 'phone', 7, 25) && str(d, 'createdAt', 4, 40)
+        && optStr(d, 'clinicId', 60) && optStr(d, 'clinicName', 100) && optStr(d, 'service', 80)
+        && optStr(d, 'date', 10) && optStr(d, 'period', 20) && optStr(d, 'note', 500) && optStr(d, 'source', 20)
+        && optStr(d, 'doctorId', 60) && optStr(d, 'time', 5);
+    }
+    match /bookings/{id} {
+      allow create: if validBooking(request.resource.data);
+      allow read, update: if isMember();
+      allow delete: if isAdmin();
+    }
+
+    // ---- سجل التدقيق: يُكتب فقط، باسم كاتبه، ولا يُعدَّل ولا يُحذف ----
+    match /auditLog/{id} {
+      allow create: if isMember() && request.resource.data.get('by','') == request.auth.uid && str(request.resource.data, 'action', 1, 60);
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}

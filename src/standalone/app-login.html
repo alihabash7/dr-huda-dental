@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>دخول تطبيق عيادات د. هدى</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(70% 60% at 20% 10%,rgba(176,138,78,.25),transparent 70%),#0E3533;font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;color:#0F201E}
+.bx{width:min(420px,100%);background:#fff;border-radius:22px;padding:30px 24px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:14px;text-align:center}
+.sig{font-family:"Aref Ruqaa",serif;font-size:34px;color:#7A5B28;line-height:1.2}
+.sub{color:#71827E;font-size:13.5px;margin-top:-8px}
+h1{font-size:18px;margin:6px 0 0}
+p{margin:0;font-size:14.5px;line-height:1.8;color:#465955}
+button,a.btn{font-family:inherit;height:50px;border-radius:12px;border:1px solid #DCE5E2;background:#fff;color:#0F201E;font-size:15.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none}
+.pr{background:#0E3533;color:#fff;border-color:#0E3533}
+button:disabled{opacity:.6}
+.msg{font-size:13.5px;min-height:20px}.msg.bad{color:#B03E38}.msg.ok{color:#17775F}
+.ok-ic{width:60px;height:60px;border-radius:50%;background:#E3F2EC;color:#17775F;display:grid;place-items:center;margin:0 auto;font-size:30px}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="bx">
+  <div class="sig">د. هدى ياسين</div>
+  <div class="sub">الدخول لتطبيق عيادات د. هدى</div>
+
+  <div id="s1">
+    <h1>الدخول بحساب Google</h1>
+    <p style="margin:8px 0 14px">اختاري حسابج، وبعدها ترجعين للتطبيق وتدخلين تلقائياً.</p>
+    <button id="go" type="button" class="pr" style="width:100%">المتابعة بحساب Google</button>
+  </div>
+
+  <div id="s2" hidden>
+    <div class="ok-ic">✓</div>
+    <h1 style="margin-top:10px">تم تسجيل الدخول</h1>
+    <p id="who" style="margin:6px 0 14px"></p>
+    <a id="back" class="btn pr" href="#">العودة إلى التطبيق</a>
+    <p style="margin-top:12px;font-size:13px;color:#71827E">إذا ما فتح التطبيق، افتحيه من أيقونته وانتظري ثواني.</p>
+  </div>
+
+  <div class="msg" id="msg" role="status"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $=function(s){return document.querySelector(s)};
+  var say=function(t,k){var m=$('#msg');m.textContent=t||'';m.className='msg '+(k||'')};
+  var C=window.FIREBASE_CONFIG;
+  if(!C||!C.firebase||!window.firebase){say('تعذّر تحميل الصفحة، تأكدي من الإنترنت وأعيدي المحاولة','bad');return}
+  firebase.initializeApp(C.firebase);var auth=firebase.auth();
+  var PKG='iq.drhuda.clinics';
+  function err(e){var c=(e&&e.code)||'';return c.indexOf('popup-closed')>=0||c.indexOf('cancelled')>=0?'أُغلقت نافذة Google قبل إكمال الدخول':c.indexOf('popup-blocked')>=0?'المتصفح منع نافذة Google. اسمحي بالنوافذ المنبثقة وأعيدي':c.indexOf('network')>=0?'لا يوجد اتصال بالإنترنت':'تعذّر الدخول ('+c+')'}
+  $('#go').onclick=function(){
+    var b=this;b.disabled=true;say('');
+    var p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
+    auth.signInWithPopup(p).then(function(r){
+      var cr=r.credential;
+      if(!cr||!cr.idToken){b.disabled=false;say('لم يصل رمز الدخول من Google. أعيدي المحاولة','bad');return}
+      var url='intent://login?idToken='+encodeURIComponent(cr.idToken)+'&accessToken='+encodeURIComponent(cr.accessToken||'')
+        +'#Intent;scheme=huda;package='+PKG+';S.browser_fallback_url='+encodeURIComponent(location.origin+'/system/')+';end';
+      $('#back').href=url;$('#who').textContent=(r.user&&r.user.email)||'';
+      $('#s1').hidden=true;$('#s2').hidden=false;say('');
+      auth.signOut().catch(function(){});
+    }).catch(function(e){b.disabled=false;say(err(e),'bad')});
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+rules_version = '2';
+// قواعد حماية قاعدة بيانات العيادات:
+// - المالك (البريد المكتوب في OWNERS) يرى ويعدّل كل شيء ويضيف المستخدمين.
+// - الموظف أو الطبيب يدخل فقط إذا أضاف المالك بريده من «دعوة للدخول» (مجموعة members).
+// - أي حساب آخر لا يرى شيئاً.
+// غيّر البريد في السطر التالي ليطابق ownerEmails في firebase-config.js (بأحرف صغيرة).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owners() { return ['sallihli.iq@gmail.com','huda64957@gmail.com']; }
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function isOwner() { return signedIn() && myEmail() in owners(); }
+    function isMember() { return signedIn() && (isOwner() || exists(/databases/$(database)/documents/members/$(myEmail()))); }
+
+    match /members/{email} {
+      allow get: if signedIn() && (isOwner() || email == myEmail());
+      allow list: if isMember();
+      allow write: if isOwner();
+    }
+    match /people/{uid} {
+      allow read: if isMember();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+    // موقع العيادات: أي زائر يقرأ قائمة العيادات المنشورة، والإدارة فقط تعدّلها
+    match /publicSite/{id} {
+      allow read: if true;
+    }
+    // طلبات الحجز من الموقع: أي زائر يرسل طلباً جديداً بحقول محددة فقط، ولا يقرأ أي طلب
+    function optStr(d, k, n) { return !(k in d) || (d[k] is string && d[k].size() <= n); }
+    function validBooking(d) {
+      return d.keys().hasOnly(['name','phone','clinicId','clinicName','service','date','period','note','status','source','createdAt'])
+        && d.keys().hasAll(['name','phone','status','createdAt'])
+        && d['status'] == 'new'
+        && d['name'] is string && d['name'].size() >= 2 && d['name'].size() <= 80
+        && d['phone'] is string && d['phone'].size() >= 7 && d['phone'].size() <= 25
+        && d['createdAt'] is string && d['createdAt'].size() <= 40
+        && optStr(d, 'clinicId', 60) && optStr(d, 'clinicName', 100) && optStr(d, 'service', 80)
+        && optStr(d, 'date', 10) && optStr(d, 'period', 20) && optStr(d, 'note', 500) && optStr(d, 'source', 20);
+    }
+    match /bookings/{id} {
+      allow create: if validBooking(request.resource.data);
+    }
+    match /{col}/{id} {
+      allow read, write: if isMember() && col != 'members' && col != 'people';
+    }
+  }
+}

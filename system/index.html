@@ -3066,7 +3066,7 @@ function clToday(c){
    </section>
    <section class="card"><div class="card-h"><h3>يحتاج متابعة</h3></div>
     ${(late.length||labBad.length||(r&&r[0]!=='good'))?`<div class="list">
-     ${r&&r[0]!=='good'?`<div class="li">${ic('building',18)}<div class="grow"><div class="t">إيجار العيادة</div><div class="s">${fmt(c.rent)} د.ع · يستحق ${fmtDate(c.rentNext)}</div></div>${chip(r[1],r[0])}<button class="btn sm" data-act="payRent" data-id="${cid}">دفع</button></div>`:''}
+     ${r&&r[0]!=='good'?`<div class="li">${ic('building',18)}<div class="grow"><div class="t">إيجار العيادة</div><div class="s">${fmt(c.rent)} د.ع · يستحق ${fmtDate(c.rentNext)}</div></div>${chip(r[1],r[0])}${isAdmin()?`<button class="btn sm" data-act="payRent" data-id="${cid}">دفع</button>`:''}</div>`:''}
      ${seeMoney()?late.slice(0,5).map(x=>{const p=get('patients',x.patientId)||{};return `<div class="li">${ic('wallet',18)}<div class="grow"><div class="t">${esc(p.name||'—')}</div><div class="s">قسط ${x.n} من ${x.of} · متأخر ${daysBetween(x.due,TODAY)} يوم</div></div><b class="num bad-t">${fmt(x.left)}</b>${waBtn(p.phone,remindText(p,x))}</div>`}).join(''):''}
      ${labBad.slice(0,4).map(o=>`<div class="li">${ic('tooth',18)}<div class="grow"><div class="t">${esc(o.work)} · ${esc(patientName(o.patientId))}</div><div class="s">${esc(get('labs',o.labId)?.name||'')} · التسليم ${fmtDate(o.dueDate)}</div></div>${o.status==='redo'?chip('إعادة','bad'):chip('متأخر','warn')}</div>`).join('')}
     </div>`:empty('كل شيء منتظم','لا أقساط متأخرة ولا مختبرات متأخرة')}
@@ -3870,7 +3870,7 @@ Object.assign(ACTIONS,{
   newLabCo:()=>labCoForm(),editLabCo:d=>labCoForm(get('labs',d.id)),payLab:d=>payLabForm(d.id),
   labStatement:d=>{state.labId=d.id||null;render();if(d.id)setTimeout(()=>$('#stmt')?.scrollIntoView({behavior:'smooth'}),40)},
   newSupplier:()=>supplierForm(),editSupplier:d=>supplierForm(get('suppliers',d.id)),newInvoice:d=>invoiceForm(d&&d.sid),paySupplier:d=>{closeModal();paySupplierForm(d.id,d.inv,d.acct)},pickSupplier:d=>{state.supplierId=d.id||null;render()},
-  newClinic:()=>clinicForm(),editClinic:d=>clinicForm(get('clinics',d.id)),payRent:d=>rentForm(d.id),
+  newClinic:()=>clinicForm(),editClinic:d=>clinicForm(get('clinics',d.id)),payRent:d=>isAdmin()?rentForm(d.id):toast('دفع الإيجار من صلاحية الإدارة فقط','warn'),
   newDoctor:()=>doctorForm(),editDoctor:d=>doctorForm(get('doctors',d.id)),
   newStaff:()=>staffForm(),editStaff:d=>staffForm(get('staff',d.id)),
   newExpense:()=>expenseForm(),editExpense:d=>expenseForm(get('expenses',d.id)),
