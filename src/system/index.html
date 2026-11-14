@@ -713,14 +713,14 @@ const INST_ST={paid:'مدفوع',late:'متأخر',soon:'قريب',open:'قاد�
 const MONTHS_AR=['كانون الثاني','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
 const DAYS_AR=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const COLS=['clinics','doctors','staff','patients','treatments','appointments','labs','labOrders','labPayments','suppliers','supplierTx','expenses','payouts','closings','cashMoves','months','settings','followups','bookings','publicSite'];
-const TITLES={dashboard:'لوحة التحكم',appointments:'المواعيد',patients:'المرضى',patient:'ملف المريض',accounts:'الحسابات والأقساط',lab:'طلبات المختبر',labs:'حسابات المختبرات',suppliers:'الموردون والمواد',clinics:'العيادات',doctors:'الأطباء',staff:'السكرتارية والموظفون',expenses:'المصاريف التشغيلية',payroll:'الرواتب والمستحقات',reports:'التقرير المالي',prefs:'الإعدادات والنسخ الاحتياطي',mydash:'لوحتي',debts:'ذمم المرضى',import:'إدخال السجلات القديمة',safe:'صندوق د. هدى',monthclose:'إقفال الشهر',closing:'الجرد اليومي',myday:'جرد عملي اليومي',docreport:'تقرير عمل الطبيب',desk:'لوحة الاستقبال',join:'ربط الحساب',chairs:'حساب الكراسي',users:'المستخدمون والصلاحيات',noaccess:'لا صلاحيات',followup:'متابعة المرضى',reminders:'تذكير المواعيد',bookings:'طلبات الحجز من الموقع',clinic:'لوحة العيادة',work:'شغل اليوم',doctorsReport:'تقرير الأطباء',perf:'أداء وتقييم الأطباء',failed:'الحالات الفاشلة'};
+const TITLES={dashboard:'لوحة التحكم',appointments:'المواعيد',patients:'المرضى',patient:'ملف المريض',accounts:'الحسابات والأقساط',lab:'طلبات المختبر',labs:'حسابات المختبرات',suppliers:'الموردون والمواد',clinics:'العيادات',doctors:'الأطباء',staff:'السكرتارية والموظفون',expenses:'المصاريف التشغيلية',payroll:'الرواتب والمستحقات',reports:'التقرير المالي',prefs:'الإعدادات والنسخ الاحتياطي',mydash:'لوحتي',debts:'ذمم المرضى',import:'إدخال السجلات القديمة',safe:'صندوق د. هدى',monthclose:'إقفال الشهر',closing:'الجرد اليومي',myday:'جرد عملي اليومي',docreport:'تقرير عمل الطبيب',desk:'لوحة الاستقبال',join:'ربط الحساب',chairs:'حساب الكراسي',users:'المستخدمون والصلاحيات',noaccess:'لا صلاحيات',followup:'متابعة المرضى',reminders:'تذكير المواعيد',bookings:'طلبات الحجز من الموقع',clinic:'لوحة العيادة',work:'شغل اليوم',audit:'سجل التدقيق',doctorsReport:'تقرير الأطباء',perf:'أداء وتقييم الأطباء',failed:'الحالات الفاشلة'};
 const NAV=[
  {g:'نظرة عامة',items:[['dashboard','لوحة التحكم','grid']]},
  {g:'العمل اليومي',items:[['work','شغل اليوم','tooth'],['appointments','المواعيد','calendar'],['reminders','تذكير المواعيد','bell'],['bookings','طلبات الحجز','inbox'],['patients','المرضى','users'],['followup','متابعة المرضى','chat'],['accounts','الحسابات والأقساط','wallet'],['chairs','حساب الكراسي','chair'],['import','إدخال السجلات القديمة','file']]},
  {g:'المالية',items:[['debts','ذمم المرضى','alert'],['closing','الجرد اليومي','receipt'],['safe','صندوق د. هدى','cash'],['monthclose','إقفال الشهر','check']]},
  {g:'المختبرات',items:[['lab','طلبات المختبر','tooth'],['labs','حسابات المختبرات','flask']]},
  {g:'المشتريات',items:[['suppliers','الموردون والمواد','box']]},
- {g:'الإدارة',items:[['clinics','العيادات','building'],['doctors','الأطباء','steth'],['staff','السكرتارية','id'],['users','المستخدمون والصلاحيات','gear'],['expenses','المصاريف','receipt'],['payroll','الرواتب والمستحقات','cash']]},
+ {g:'الإدارة',items:[['clinics','العيادات','building'],['doctors','الأطباء','steth'],['staff','السكرتارية','id'],['users','المستخدمون والصلاحيات','gear'],['audit','سجل التدقيق','receipt'],['expenses','المصاريف','receipt'],['payroll','الرواتب والمستحقات','cash']]},
  {g:'التقارير',items:[['reports','التقرير المالي','chart'],['doctorsReport','تقرير الأطباء','steth'],['perf','أداء وتقييم الأطباء','chart'],['failed','الحالات الفاشلة','alert'],['docreport','تقرير طبيب شهري','id'],['prefs','الإعدادات','gear']]},
 ];
 const NAV_DOCTOR=[{g:'عملي',items:[['mydash','لوحتي','grid'],['appointments','مواعيدي','calendar'],['patients','مرضاي','users'],['lab','طلبات المختبر','tooth'],['myday','جرد عملي اليومي','receipt'],['doctorsReport','تقرير عملي','chart']]}];
@@ -1793,8 +1793,8 @@ Object.assign(ACTIONS,{
   lockMonth:()=>{const m=state.month;if(m>TODAY.slice(0,7))return toast('لا يمكن إقفال شهر لم يبدأ بعد','warn');const T=pl(m,null);
     confirmBox(`إقفال حسابات ${monthLabel(m)}؟ بعد الإقفال لن يستطيع أحد إضافة أو تعديل أو حذف دفعات ومصاريف ورواتب وجرد بتاريخ هذا الشهر. يمكن فتح القفل لاحقاً.`,async()=>{
       const per={};all('clinics').forEach(c=>{const p=pl(m,c.id);per[c.id]={name:c.name,revenue:p.revenue,cost:p.cost,net:p.net}});
-      await put('months',{id:m,month:m,locked:true,closedAt:new Date().toISOString(),closedBy:Store.me||null,snapshot:{revenue:T.revenue,cost:T.cost,net:T.net,perClinic:per}});toast(`تم إقفال ${monthLabel(m)}`)},'إقفال الشهر')},
-  unlockMonth:()=>{const m=state.month;const L=get('months',m);if(!L)return;confirmBox(`فتح قفل ${monthLabel(m)}؟ ستصبح حركاته قابلة للتعديل مرة أخرى.`,async()=>{const n=clone(L);n.locked=false;n.reopenedAt=new Date().toISOString();n.reopenedBy=Store.me||null;await put('months',n);toast('تم فتح القفل')},'فتح القفل')},
+      audit('month_lock',monthLabel(m),{col:'months',id:m});await put('months',{id:m,month:m,locked:true,closedAt:new Date().toISOString(),closedBy:Store.me||null,snapshot:{revenue:T.revenue,cost:T.cost,net:T.net,perClinic:per}});toast(`تم إقفال ${monthLabel(m)}`)},'إقفال الشهر')},
+  unlockMonth:()=>{const m=state.month;const L=get('months',m);if(!L)return;confirmBox(`فتح قفل ${monthLabel(m)}؟ ستصبح حركاته قابلة للتعديل مرة أخرى.`,async()=>{const n=clone(L);n.locked=false;n.reopenedAt=new Date().toISOString();n.reopenedBy=Store.me||null;await put('months',n);audit('month_unlock',monthLabel(m),{col:'months',id:m});toast('تم فتح القفل')},'فتح القفل')},
 });
 
 /* ---------- Doctor: my day (work only, no money) ---------- */
@@ -2038,7 +2038,7 @@ function sessionForm(tid,pre){
     onSubmit:async v=>{const a=money_?num(v.amount):0;if(a>bal+1)fail(`المبلغ أكبر من المتبقي (${fmt(bal)} د.ع)`);nextCheck(v,nxCtx);
       const doc=clone(t);let pay=null;doc.sessions=(doc.sessions||[]).concat([{id:uid(),date:v.date,doctorId:v.doctorId,chair:v.chair||'',note:v.note,paid:a||0,by:Store.me||null}]);if(v.chair&&!doc.chair)doc.chair=v.chair;
       if(a>0){pay={id:uid(),amount:a,date:v.date,method:v.method,chair:v.chair||'',note:'جلسة '+doc.sessions.length,by:Store.me||null};doc.payments=(doc.payments||[]).concat([pay])}
-      await put('treatments',doc);markApptDone(pre.apptId);const nid=await nextBook(v,nxCtx,t.patientId,`${t.procedure} · جلسة ${doc.sessions.length+1}${pl?' من '+pl:''}`,t.id);
+      if(pay)audit('payment_add',`${t.procedure||'علاج'} · جلسة · ${fmt(pay.amount)} د.ع`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});await put('treatments',doc);markApptDone(pre.apptId);const nid=await nextBook(v,nxCtx,t.patientId,`${t.procedure} · جلسة ${doc.sessions.length+1}${pl?' من '+pl:''}`,t.id);
       toast((a>0?`سُجّلت الجلسة ودفعة ${fmt(a)} · المتبقي ${fmt(bal-a)}`:'سُجّلت الجلسة')+(nid?' · وحُجزت الجلسة القادمة':''));
       if(pay)setTimeout(()=>receiptModal(t.id,pay.id),60);else if(nid)setTimeout(()=>bookedModal(nid),60)}});
 }
@@ -2268,7 +2268,7 @@ function permsModal(id){
     onSubmit:async v=>{const perms={};PERM_KEYS.forEach(k=>perms[k]=false);PERM_GROUPS.forEach((g,i)=>(v['g'+i]||[]).forEach(k=>perms[k]=true));
       if(v.access==='secretary'&&!PERM_GROUPS[0].items.some(([k])=>perms[k]))fail('اختر صفحة واحدة على الأقل');
       const n=Object.assign(clone(s),{access:v.access,perms,clinicIds:[...new Set((v.clinicIds||[]).concat([s.clinicId]))].filter(Boolean),doctorIds:v.doctorIds||[]});
-      await put('staff',n);toast('تم حفظ صلاحيات '+s.name)}});
+      await put('staff',n);audit('perms_edit',`${s.name} · ${v.access==='owner'?'مدير عام':v.access==='admin'?'كاملة داخل عياداتها':'صلاحيات محددة'}`,{col:'staff',id:s.id,clinicId:s.clinicId});toast('تم حفظ صلاحيات '+s.name)}});
   return form;
 }
 ACTIONS.editPerms=d=>permsModal(d.id);
@@ -2984,11 +2984,11 @@ function editPaymentForm(tid,idx){
     values:{amount:x.amount,date:x.date,method:x.method||'cash',note:x.note||''},submit:'حفظ التعديل',
     onChange:(v,form)=>{const el=form.querySelector('#ep-prev');if(el){const a=num(v.amount);el.textContent=a>0?`المتبقي بعد التعديل: ${fmt(Math.max(0,tTotal(t)-others-a))} د.ع${others+a>tTotal(t)?' · المدفوع أكبر من الكلفة':''}`:''}},
     onSubmit:async v=>{const a=num(v.amount);if(a<=0)fail('أدخل مبلغاً صحيحاً');if(others+a>tTotal(t)+1)fail(`المدفوع (${fmt(others+a)}) أكبر من كلفة العلاج (${fmt(tTotal(t))})`);if(v.date>TODAY)fail('تاريخ الدفعة في المستقبل');
-      const doc=clone(t);doc.payments[Number(idx)]=Object.assign({},doc.payments[Number(idx)],{amount:a,date:v.date,method:v.method,note:v.note||''});await put('treatments',doc);toast('تم تعديل الدفعة')}});
+      const doc=clone(t);doc.payments[Number(idx)]=Object.assign({},doc.payments[Number(idx)],{amount:a,date:v.date,method:v.method,note:v.note||''});await put('treatments',doc);audit('payment_edit',`${t.procedure||'علاج'} · ${fmt(x.amount)} ← ${fmt(a)} د.ع${x.date!==v.date?' · التاريخ '+x.date+' ← '+v.date:''}`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});toast('تم تعديل الدفعة')}});
 }
 ACTIONS.editSession=d=>editSessionForm(d.tid,d.n);
 ACTIONS.editPayment=d=>can('pay')?editPaymentForm(d.tid,d.idx):noPerm();
-ACTIONS.delSession=d=>{const t=get('treatments',d.tid);const x=t&&sessByN(t,d.n);if(!x)return;confirmBox(`حذف الجلسة ${x.n} (${fmtDate(x.date)})؟ الدفعات المسجلة لا تتأثر، وترقيم الجلسات يُعاد تلقائياً.`,async()=>{const doc=clone(t);doc.sessions=(doc.sessions||[]).filter((s,i)=>x.id?s.id!==x.id:i!==x._i);await put('treatments',doc);toast('تم حذف الجلسة')})};
+ACTIONS.delSession=d=>{const t=get('treatments',d.tid);const x=t&&sessByN(t,d.n);if(!x)return;confirmBox(`حذف الجلسة ${x.n} (${fmtDate(x.date)})؟ الدفعات المسجلة لا تتأثر، وترقيم الجلسات يُعاد تلقائياً.`,async()=>{const doc=clone(t);doc.sessions=(doc.sessions||[]).filter((s,i)=>x.id?s.id!==x.id:i!==x._i);await put('treatments',doc);audit('session_delete',`${t.procedure||'علاج'} · الجلسة ${x.n} (${x.date||''})`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});toast('تم حذف الجلسة')})};
 /* patient-level summary chips for the statement */
 function patientSessChips(p,ts){
   const all_=ts.flatMap(t=>sessSorted(t).map(s=>Object.assign({},s,{t})));const total=all_.length;if(!ts.length)return '';
@@ -3209,7 +3209,7 @@ function deletePatient(pid){
   const parts=[ts.length?`${ts.length} علاج`:'',pays.length?`${pays.length} دفعة بمجموع ${fmt(sum(pays,x=>x.amount))} د.ع (تختفي من الإيرادات والتقارير)`:'',ap.length?`${ap.length} موعد`:'',labs.length?`${labs.length} طلب مختبر`:''].filter(Boolean);
   confirmBox(`حذف ملف ${p.name} نهائياً؟${parts.length?' سيُحذف معه: '+parts.join('، ')+'.':''} لا يمكن التراجع.`,async()=>{
     const ops=[...ts.map(t=>()=>del('treatments',t.id)),...ap.map(a=>()=>del('appointments',a.id)),...labs.map(o=>()=>del('labOrders',o.id)),...fu.map(f=>()=>del('followups',f.id)),()=>del('patients',pid)];
-    await bulk(ops,'جارِ الحذف');closeModal();go('patients');toast('تم حذف ملف '+p.name)},'حذف نهائي')}
+    await bulk(ops,'جارِ الحذف');audit('patient_delete',`${p.name} · ${p.phone||'بدون رقم'} · ${ts.length} علاج`,{patientId:'',clinicId:p.clinicId,col:'patients',id:pid});closeModal();go('patients');toast('تم حذف ملف '+p.name)},'حذف نهائي')}
 ACTIONS.delPatient=d=>deletePatient(d.id);
 /* ---------- Extra work on an open treatment: more teeth, more money, more sessions — without starting over ---------- */
 function extendForm(tid){
@@ -3304,7 +3304,7 @@ function settleForm(pid){
     onSubmit:async v=>{const a=num(v.amount);if(!(a>0))fail('اكتب المبلغ');const only=v.to&&v.to!=='auto'?v.to:null;const maxA=only?tBal(get('treatments',only)):bal;
       if(a>maxA+1)fail(`المبلغ أكبر من المتبقي (${fmt(maxA)} د.ع)`);
       const {out}=allocate(list,a,only);const made=[];
-      for(const [t,x] of out){const pay={id:uid(),amount:x,date:v.date||TODAY,method:v.method||'cash',note:v.note||'',by:Store.me||null};const doc=clone(t);doc.payments=(doc.payments||[]).concat([pay]);await put('treatments',doc);made.push([t.id,pay.id,x])}
+      for(const [t,x] of out){const pay={id:uid(),amount:x,date:v.date||TODAY,method:v.method||'cash',note:v.note||'',by:Store.me||null};const doc=clone(t);doc.payments=(doc.payments||[]).concat([pay]);await put('treatments',doc);audit('payment_add',`${t.procedure||'علاج'} · ${fmt(x)} د.ع`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});made.push([t.id,pay.id,x])}
       toast(`تم تسديد ${fmt(a)} د.ع · المتبقي ${fmt(Math.max(0,bal-a))}`,'good');
       setTimeout(()=>made.length===1?receiptModal(made[0][0],made[0][1]):settledModal(pid,a,made),60)}});
 }
@@ -3358,7 +3358,7 @@ function editAcctModal(pid){
       if(fee===num(t.fee)&&dis===num(t.discount))continue;const doc=clone(t);doc.fee=fee;doc.discount=dis;adjustSchedule(doc,Math.max(0,fee-dis)-tTotal(t));
       doc.feeLog=(t.feeLog||[]).concat([{at:new Date().toISOString(),by:Store.me||null,fee:{from:num(t.fee),to:fee},discount:{from:num(t.discount),to:dis}}]).slice(-20);
       if(t.plan==='cash'&&tPaid(t)<Math.max(0,fee-dis))doc.plan='partial';
-      await put('treatments',doc);n++}
+      await put('treatments',doc);audit('amount_edit',`${t.procedure||'علاج'} · الكلفة ${fmt(t.fee)} ← ${fmt(fee)}${dis!==num(t.discount)?' · الخصم '+fmt(t.discount)+' ← '+fmt(dis):''}`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});n++}
       closeModal();toast(n?`تم تعديل ${n} ${n===1?'علاج':'علاجات'}`:'ما تغيّر شي','good')}catch(err){btn.disabled=false;if(err&&!err.code)toast(err.message||'حدث خطأ','bad')}});
 }
 ACTIONS.editAcct=d=>editAcctModal(d.pid||d.id);
@@ -3504,7 +3504,7 @@ function changeDoctorForm(pid){
       const n=clone(p);n.doctorId=to;n.doctorLog=(p.doctorLog||[]).concat([{date:TODAY,from,to,scope:v.scope,note:v.note||'',by:Store.me||null}]).slice(-20);await put('patients',n);let moved=0,mvA=0;
       if(v.scope==='open'||v.scope==='all'){for(const t of (v.scope==='all'?ts:open)){if(t.doctorId===to)continue;const d=clone(t);d.doctorId=to;await put('treatments',d);moved++}
         for(const a of fut){if(a.doctorId===to)continue;const d=clone(a);d.doctorId=to;await put('appointments',d);mvA++}}
-      toast(`صار طبيبه د. ${(get('doctors',to)||{}).name||''}${moved||mvA?` · نُقل ${moved} علاج و${mvA} موعد`:''}`,'good')}})}
+      audit('doctor_change',`${from?docName(from):'غير محدد'} ← ${docName(to)} · ${v.scope==='all'?'كل العلاجات':v.scope==='open'?'العلاجات المفتوحة':'الملف فقط'}${moved?' · '+moved+' علاج':''}${v.note?' · '+v.note:''}`,{patientId:pid,clinicId:p.clinicId,col:'patients',id:pid});toast(`صار طبيبه د. ${(get('doctors',to)||{}).name||''}${moved||mvA?` · نُقل ${moved} علاج و${mvA} موعد`:''}`,'good')}})}
 ACTIONS.changeDoc=d=>changeDoctorForm(d.pid||d.id);
 
 /* ---------- Today's work: everything done today, with or without an appointment ---------- */
@@ -3535,6 +3535,32 @@ function todayWorkCard(cid,opt){opt=opt||{};const day=opt.day||TODAY;const w=tod
     const docs=[...r.doctors].map(d=>docName(d)).filter(x=>x&&x!=='—');const cl=[...r.clinics].map(clinicName);
     return `<div class="li click tw-row" data-act="openPatient" data-id="${r.pid}"><div class="grow"><div class="t">${esc(p.name||'—')}${p.noPhone&&!p.phone?' <span class="chip warn">بدون رقم</span>':''}</div><div class="tw-what">${what.join('')||'<span class="muted" style="font-size:12.5px">تسديد فقط</span>'}</div><div class="s">${cid?'':esc(cl.join('، '))+(cl.length?' · ':'')}${esc(docs.join('، '))}</div></div>${m&&r.paid?`<b class="num good-t" title="${r.pays.length} دفعة">${fmt(r.paid)}</b>`:''}</div>`};
   return `<section class="card tw-card">${head}<div class="tw-kpis"><div><b>${w.newP}</b><span>مرضى جدد</span></div><div><b>${w.tx}</b><span>علاجات جديدة</span></div><div><b>${w.sess}</b><span>جلسات</span></div>${m?`<div class="g"><b>${fmt(w.paid)}</b><span>المحصّل (${w.pays} دفعة)</span></div>`:''}</div><div class="list tw-list">${w.list.map(row).join('')}</div></section>`}
+
+/* ---------- Audit log: who changed what, and when (write-only in the database rules) ---------- */
+const AUDIT_LBL={patient_delete:'حذف مريض',treatment_delete:'حذف علاج',session_delete:'حذف جلسة',payment_add:'تسديد',payment_edit:'تعديل تسديد',payment_delete:'حذف تسديد',amount_edit:'تعديل كلفة علاج',doctor_change:'تغيير طبيب المريض',perms_edit:'تعديل صلاحيات',staff_delete:'حذف موظف',month_lock:'قفل شهر',month_unlock:'فتح قفل شهر'};
+const AUDIT_TONE={patient_delete:'bad',treatment_delete:'bad',payment_delete:'bad',session_delete:'warn',payment_edit:'warn',amount_edit:'warn',perms_edit:'warn',staff_delete:'bad',month_unlock:'warn',doctor_change:'info',payment_add:'good',month_lock:'info'};
+const auditLocal=[];
+function audit(action,detail,ref){try{
+  const e={at:new Date().toISOString(),by:Store.me||'local',action,detail:String(detail||'').slice(0,480),role:role().kind,patientId:(ref&&ref.patientId)||'',clinicId:(ref&&ref.clinicId)||'',refCol:(ref&&ref.col)||'',refId:(ref&&ref.id)||''};
+  if(Store.mode==='cloud'&&Store.db&&Store.me)Store.db.collection('auditLog').doc(uid()).set(e).catch(()=>{});else auditLocal.unshift(e);
+}catch(_){}}
+let auditCache=null,auditBusy=false;
+async function loadAudit(force){if(auditBusy)return;if(auditCache&&!force)return;auditBusy=true;
+  try{if(Store.mode==='cloud'&&Store.db){const q=await Store.db.collection('auditLog').orderBy('at','desc').limit(300).get();auditCache=q.docs.map(d=>Object.assign({id:d.id},d.data()))}else auditCache=auditLocal.slice()}
+  catch(e){auditCache={error:(e&&e.code)||'error'}}auditBusy=false;scheduleRender()}
+PAGES.audit=()=>{
+  if(!isAdmin())return `<section class="card">${empty('لا صلاحية','سجل التدقيق للإدارة فقط')}</section>`;
+  if(!auditCache){setTimeout(()=>loadAudit(),0);return secHead('سجل التدقيق','')+`<section class="card pad"><div class="loader"><i></i>جارِ تحميل السجل…</div></section>`}
+  if(auditCache.error)return secHead('سجل التدقيق','')+`<section class="card pad">${empty('تعذّر تحميل السجل',auditCache.error==='permission-denied'?'قواعد الحماية الجديدة لازم تكون مطبقة حتى يشتغل السجل.':'تحقق من الاتصال وأعد المحاولة.',`<button class="btn sm" data-act="auditReload">إعادة المحاولة</button>`)}</section>`;
+  const f=state.auf||'all',q=(state.auq||'').trim();
+  let L=auditCache.filter(e=>(f==='all'||e.action===f)&&(!q||(e.detail||'').includes(q)||patientName(e.patientId).includes(q)));
+  const kinds=[...new Set(auditCache.map(e=>e.action))];
+  return `${secHead('سجل التدقيق','آخر 300 عملية حساسة: من عملها ومتى. السجل لا يمكن تعديله أو حذفه من النظام.',`<button class="btn" data-act="auditReload">${ic('redo',16)} تحديث</button>`)}
+  <div class="sec-head"><div class="toolbar"><label class="search">${ic('search',16)}<input data-inp="auq" value="${esc(state.auq||'')}" placeholder="بحث باسم المريض أو التفاصيل" aria-label="بحث"></label></div></div>
+  <div class="seg" style="margin-bottom:12px">${[['all','الكل']].concat(kinds.map(k=>[k,AUDIT_LBL[k]||k])).map(([k,l])=>`<button class="${f===k?'on':''}" data-act="auditKind" data-v="${k}">${esc(l)} <b>${k==='all'?auditCache.length:auditCache.filter(e=>e.action===k).length}</b></button>`).join('')}</div>
+  <section class="card">${L.length?`<div class="list">${L.map(e=>{const d=new Date(e.at);return `<div class="li au-row ${e.patientId?'click':''}" ${e.patientId?`data-act="openPatient" data-id="${esc(e.patientId)}"`:''}><span class="chip ${AUDIT_TONE[e.action]||''}">${esc(AUDIT_LBL[e.action]||e.action)}</span><div class="grow"><div class="t">${e.patientId?esc(patientName(e.patientId))+' · ':''}${esc(e.detail||'')}</div><div class="s">${fmtDate(e.at.slice(0,10))} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} · ${who(e.by)}${e.role&&e.role!=='admin'?' ('+(e.role==='staff'?'سكرتارية':e.role==='doctor'?'طبيب':e.role)+')':''}${e.clinicId?' · '+esc(clinicName(e.clinicId)):''}</div></div></div>`}).join('')}</div>`:empty('لا عمليات مسجلة بعد','أي حذف أو تعديل على المبالغ والصلاحيات يُسجَّل هنا تلقائياً.')}</section>`};
+ACTIONS.auditReload=()=>{auditCache=null;render()};ACTIONS.auditKind=d=>{state.auf=d.v;render()};
+INPUTS.auq=v=>{state.auq=v;clearTimeout(window.__auT);window.__auT=setTimeout(render,250)};
 
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
@@ -3710,7 +3736,7 @@ function treatmentForm(t,pid,pre){
       if(v.plan==='installments'&&tot>0){const n=Math.max(1,Math.round(num(v.count)||1));const sch=buildSchedule(tot-num(v.down),n,v.firstDue||TODAY);el.textContent=sch.length?`الصافي ${fmt(tot)} د.ع · المقدّمة ${fmt(v.down)} · ${n} أقساط بقيمة ${fmt(sch[0].amount)}${sch[n-1]&&sch[n-1].amount!==sch[0].amount?` (الأخير ${fmt(sch[n-1].amount)})`:''} · آخر قسط ${fmtDate(sch[n-1].due)}`:''}
       else if(isNew&&money_&&tot>0){const pd=v.paidNow===''?(v.plan==='cash'?tot:0):num(v.paidNow);el.textContent=pd>tot?'المبلغ المستلم أكبر من الكلفة':pd>=tot?'سيُسجَّل العلاج مسدّداً بالكامل':`الكلفة ${fmt(tot)} · المستلم ${fmt(pd)} · المتبقي ${fmt(tot-pd)} د.ع يُسجَّل ديناً على المريض`}
       else el.textContent=tot>0&&num(t.discount)?`الصافي بعد الخصم: ${fmt(tot)} د.ع`:''},
-    danger:isNew||!isAdmin()?null:{label:'حذف العلاج',onClick:()=>confirmBox('سيُحذف هذا العلاج مع كل دفعاته.',async()=>{await del('treatments',t.id);toast('تم الحذف')})},
+    danger:isNew||!isAdmin()?null:{label:'حذف العلاج',onClick:()=>confirmBox('سيُحذف هذا العلاج مع كل دفعاته.',async()=>{await del('treatments',t.id);audit('treatment_delete',`${t.procedure||'علاج'} · كلفة ${fmt(tTotal(t))} · مدفوع ${fmt(tPaid(t))}`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});toast('تم الحذف')})},
     onSubmit:async v=>{if(isNew)nextCheck(v,nxCtx);const nxProc=()=>`${v.procedure} · الجلسة القادمة`;
       if(!money_){const doc=Object.assign(isNew?{payments:[],schedule:[],fee:0,discount:0,plan:'partial',down:0}:clone(t),{patientId:pid,procedure:v.procedure,cat:v.cat||guessCat(v.procedure),clinicId:v.clinicId,doctorId:v.doctorId,chair:v.chair||'',date:v.date,teeth:v.teeth,notes:v.notes,plannedSessions:num(v.plannedSessions)||'',qty:num(v.qty)||''});if(isNew)doc.byDoctor=true;const tid=await put('treatments',doc);markApptDone(pre.apptId);const nid=isNew?await nextBook(v,nxCtx,pid,nxProc(),tid):null;toast('تم تسجيل العمل'+(nid?' · وحُجزت الجلسة القادمة':''));if(nid)setTimeout(()=>bookedModal(nid),60);return}
       const total=Math.max(0,num(v.fee)-num(t.discount));if(total<=0)fail('أدخل كلفة العلاج');
@@ -3730,7 +3756,7 @@ function paymentForm(tid){
     values:{date:TODAY,method:'cash'},submit:'حفظ التسديد',
     onChange:(v,form)=>{const el=form.querySelector('#pay-prev');if(el){const a=num(v.amount);el.textContent=a>bal+1?`المبلغ أكبر من المتبقي (${fmt(bal)})`:a>0?`بعد هذه الدفعة يبقى على المريض ${fmt(bal-a)} د.ع${bal-a<=0?' · يصبح العلاج مسدّداً بالكامل':''}`:''}},
     onSubmit:async v=>{const a=num(v.amount);if(a<=0)fail('أدخل مبلغاً صحيحاً');if(a>bal+1)fail(`المبلغ أكبر من المتبقي (${fmt(bal)} د.ع)`);
-      const pay={id:uid(),amount:a,date:v.date,method:v.method,note:v.note,by:Store.me||null};const doc=clone(t);doc.payments=(doc.payments||[]).concat([pay]);await put('treatments',doc);toast(`تم تسجيل ${fmt(a)} د.ع · المتبقي ${fmt(bal-a)}`);setTimeout(()=>receiptModal(t.id,pay.id),60)}});
+      const pay={id:uid(),amount:a,date:v.date,method:v.method,note:v.note,by:Store.me||null};const doc=clone(t);doc.payments=(doc.payments||[]).concat([pay]);await put('treatments',doc);audit('payment_add',`${t.procedure||'علاج'} · ${fmt(a)} د.ع`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});toast(`تم تسجيل ${fmt(a)} د.ع · المتبقي ${fmt(bal-a)}`);setTimeout(()=>receiptModal(t.id,pay.id),60)}});
 }
 function quickPay(){
   const open=all('treatments').filter(t=>tBal(t)>0&&cf(t));if(!open.length)return toast('لا توجد مبالغ متبقية على المرضى حالياً','warn');
@@ -3819,7 +3845,7 @@ function doctorForm(d){d=d||{};formModal({title:d.id?'تعديل بيانات ا
   onSubmit:async v=>{await put('doctors',Object.assign(clone(d),v,{percent:num(v.percent),salary:num(v.salary)}));toast('تم الحفظ')}})}
 function removeStaff(id){const s=get('staff',id);if(!s)return;confirmBox(`حذف ${s.name} نهائياً؟${s.userId||s.loginEmail?' سيُقطع دخولها للنظام فوراً.':''} سجل الرواتب المصروفة سابقاً يبقى. إذا تريد فقط إيقافها مؤقتاً استخدم «إيقاف الدخول».`,async()=>{
   if(window.STANDALONE&&s.loginEmail&&Store.db){try{await Store.db.collection('members').doc(s.loginEmail).delete()}catch(e){}}
-  await del('staff',id);closeModal();toast('تم حذف '+s.name)},'حذف نهائي')}
+  await del('staff',id);audit('staff_delete',s.name+' · '+(s.role||'سكرتيرة'),{col:'staff',id,clinicId:s.clinicId});closeModal();toast('تم حذف '+s.name)},'حذف نهائي')}
 ACTIONS.delStaff=d=>removeStaff(d.id);
 function staffForm(s){s=s||{};formModal({title:s.id?'تعديل بيانات الموظف':'موظف جديد',fields:[{k:'name',label:'الاسم',req:true,half:true},{k:'phone',label:'الهاتف',type:'tel',half:true},{k:'role',label:'الوظيفة',type:'select',opts:ROLES.map(r=>[r,r]),half:true},{k:'clinicId',label:'العيادة',type:'select',opts:optClinics(),req:true,half:true},{k:'salary',label:'الراتب الشهري',type:'money',req:true,half:true},{k:'start',label:'تاريخ المباشرة',type:'date',half:true},{k:'doctorIds',label:'الأطباء المرتبطون بها (تدير مواعيدهم ومرضاهم)',type:'checks',opts:allDoctorOpts()},{k:'access',label:'الصلاحية عند الدخول',type:'select',opts:ACCESS_OPTS},{k:'active',label:'على رأس العمل',type:'checkbox'}],
   values:Object.assign({role:'سكرتيرة',clinicId:defaultClinic(),active:true,access:'secretary',doctorIds:[]},s),
@@ -3851,7 +3877,7 @@ Object.assign(ACTIONS,{
   newPatient:()=>can('addPatient')?patientForm():noPerm(),editPatient:d=>can('editPatient')?patientForm(get('patients',d.id)):noPerm(),
   newTreatment:d=>treatmentForm(null,d.pid),addDebt:d=>can('price')?treatmentForm(null,d.pid,{debt:true}):noPerm(),editTreatment:d=>treatmentForm(get('treatments',d.id)),
   addPayment:d=>can('pay')?paymentForm(d.tid):noPerm(),quickPay:()=>can('pay')?quickPay():noPerm(),
-  delPayment:d=>confirmBox('حذف هذه الدفعة من سجل المريض؟',async()=>{const t=clone(get('treatments',d.tid));t.payments.splice(Number(d.idx),1);await put('treatments',t);toast('تم حذف الدفعة')}),
+  delPayment:d=>confirmBox('حذف هذه الدفعة من سجل المريض؟',async()=>{const t=clone(get('treatments',d.tid));const x=t.payments[Number(d.idx)]||{};t.payments.splice(Number(d.idx),1);await put('treatments',t);audit('payment_delete',`${t.procedure||'علاج'} · ${fmt(x.amount)} د.ع بتاريخ ${x.date||''}`,{patientId:t.patientId,clinicId:t.clinicId,col:'treatments',id:t.id});toast('تم حذف الدفعة')}),
   newAppt:d=>{if(!optClinics().length)return clinicForm();apptForm(null,d&&d.pid)},editAppt:d=>apptForm(get('appointments',d.id)),
   newLab:d=>labForm(null,d&&d.pid),editLab:d=>labForm(get('labOrders',d.id)),redoLab:d=>redoForm(d.id),
   newLabCo:()=>labCoForm(),editLabCo:d=>labCoForm(get('labs',d.id)),payLab:d=>payLabForm(d.id),
