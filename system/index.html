@@ -844,9 +844,15 @@ async function initStore(){
 function writeErr(e){const c=e&&e.code;toast(c==='invalid_argument'||c==='permission-denied'?'لا تملك صلاحية التعديل على هذه البيانات':c==='quota_exceeded'?'امتلأت سعة قاعدة البيانات، احذف سجلات قديمة':c==='resource_exhausted'?'عمليات كثيرة بسرعة، انتظر لحظة وأعد المحاولة':'تعذّر الحفظ، تحقق من الاتصال وأعد المحاولة','bad')}
 /* ---------- connection & save status: shown under the page title ---------- */
 const NET={pending:0,since:0,lastOk:0,failed:0};
+/* Firestore keeps every change on the device first and sends it when the internet is back, but its promise waits for the server.
+   So the screen does not freeze offline: after a short wait (none when offline) we carry on; the queued change keeps counting until it is sent. */
 async function tracked(job){NET.pending++;if(NET.pending===1)NET.since=Date.now();updateNet();
-  try{const r=await job();NET.lastOk=Date.now();NET.failed=0;return r}catch(e){NET.failed++;writeErr(e);throw e}
-  finally{NET.pending=Math.max(0,NET.pending-1);updateNet()}}
+  let settled=false;
+  const pr=Promise.resolve().then(job).then(r=>{settled=true;NET.lastOk=Date.now();NET.failed=0;return r},e=>{settled=true;NET.failed++;writeErr(e);throw e}).finally(()=>{NET.pending=Math.max(0,NET.pending-1);updateNet()});
+  const wait=new Promise(res=>setTimeout(res,typeof navigator!=='undefined'&&navigator.onLine===false?300:5000));
+  await Promise.race([pr,wait]);
+  if(settled)return pr;
+  pr.catch(()=>{});return null}
 function netState(){if(Store.mode==='local')return null;const off=typeof navigator!=='undefined'&&navigator.onLine===false;
   if(Store.mode==='loading')return ['wait','جارِ الاتصال…'];
   if(off)return ['bad',NET.pending?`بدون إنترنت · ${NET.pending} تعديل ينحفظ من يرجع الاتصال`:'بدون إنترنت · التعديلات تنحفظ من يرجع الاتصال'];
