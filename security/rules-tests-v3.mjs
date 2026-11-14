@@ -32,6 +32,12 @@ await t('doctor still adds lab order',assertSucceeds(doc.doc('labOrders/lo1').se
 await t('doctor still adds appointment',assertSucceeds(doc.doc('appointments/ad1').set({patientId:'p1',createdBy:'d'})));
 await t('secretary CANNOT record lab payment',assertFails(sec3.doc('labPayments/x').set({amount:1,createdBy:'s3'})));
 await t('owner records lab payment',assertSucceeds(owner.doc('labPayments/x').set({amount:1,createdBy:'o'})));
+const img='data:image/jpeg;base64,'+'A'.repeat(200);
+await t('owner publishes gallery item',assertSucceeds(owner.doc('publicGallery/g1').set({kind:'gallery',title:'تبييض',cat:'تجميل',before:img,after:img,show:true,at:'2026'})));
+await t('anyone can see the gallery',assertSucceeds(anon.collection('publicGallery').get()));
+await t('secretary CANNOT publish to gallery',assertFails(sec3.doc('publicGallery/g2').set({kind:'gallery',before:img,after:img})));
+await t('gallery item with patient name field rejected',assertFails(owner.doc('publicGallery/g3').set({kind:'gallery',before:img,after:img,patientName:'x'})));
+await t('anon CANNOT delete gallery item',assertFails(anon.doc('publicGallery/g1').delete()));
 await t('public booking still works',assertSucceeds(anon.collection('bookings').add({name:'زينب',phone:'07701234567',status:'new',createdAt:'2026-11-14',time:'16:30',doctorId:'d1',date:'2026-11-15'})));
 await t('stranger cannot read patients',assertFails(stranger.collection('patients').get()));
 await t('unverified email blocked',assertFails(unver.collection('patients').get()));

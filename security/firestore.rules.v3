@@ -10,6 +10,7 @@ rules_version = '2';
 //  5) سجل تدقيق (auditLog) يُكتب ولا يُعدَّل ولا يُحذف.
 //  6) الطبيب ما يقرأ أي بيانات مالية: الرواتب، المصاريف، الجرد، الصندوق، الموردين، حسابات المختبر، طلبات الحجز.
 //  7) حسابات المختبرات (دفعات المختبر) للإدارة فقط.
+//  8) معرض قبل وبعد (publicGallery): يقراه الكل، وتنشره الإدارة فقط وبدون أي بيانات مريض.
 // ملاحظة: السكرتارية تقرأ بيانات كل العيادات لأن المريض يتنقل بين العيادات (السجل الموحد).
 // ============================================================================
 service cloud.firestore {
@@ -66,6 +67,10 @@ service cloud.firestore {
     match /months/{id}    { allow read: if isMember(); allow write: if isAdmin(); }
     match /payouts/{id}   { allow read: if seesMoney(); allow write: if isAdmin(); }
     match /publicSite/{id}{ allow read: if true;       allow write: if isAdmin(); }
+    // معرض قبل وبعد: يُنشر من النظام بموافقة المريض، بدون اسم أو رقم، صورتين مضغوطتين بكل سجل
+    match /publicGallery/{id} { allow read: if true; allow write: if isAdmin()
+      && request.resource.data.keys().hasOnly(['kind','title','cat','note','before','after','show','at','by','order'])
+      && str(request.resource.data, 'before', 30, 450000) && str(request.resource.data, 'after', 30, 450000); allow delete: if isAdmin(); }
 
     // ---- المرضى والعلاجات ----
     match /patients/{id} {

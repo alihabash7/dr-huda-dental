@@ -6,13 +6,13 @@
 <title>عيادات د. هدى ياسين لطب وجراحة الأسنان</title>
 <meta name="description" content="عيادات د. هدى ياسين لطب وجراحة الأسنان: فحص وتشخيص، حشوات تجميلية، علاج العصب، تيجان زيركون، تقويم، زراعة وتجميل. احجز موعدك أونلاين أو عبر الواتساب.">
 <meta name="theme-color" content="#0c3a35">
-<link rel="canonical" href="https://alihabash7.github.io/dr-huda-dental/">
+<link rel="canonical" href="https://drhudaclinics.github.io/dr-huda-dental/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ar_IQ">
 <meta property="og:title" content="عيادات د. هدى ياسين لطب وجراحة الأسنان">
 <meta property="og:description" content="ابتسامتك بأيدٍ أمينة. خطة علاج واضحة، أقساط مريحة، وعيادات قريبة منك. احجز موعدك الآن.">
-<meta property="og:url" content="https://alihabash7.github.io/dr-huda-dental/">
-<meta property="og:image" content="https://alihabash7.github.io/dr-huda-dental/img/og.png">
+<meta property="og:url" content="https://drhudaclinics.github.io/dr-huda-dental/">
+<meta property="og:image" content="https://drhudaclinics.github.io/dr-huda-dental/img/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -150,6 +150,17 @@ section.band{padding:96px 0}
 @media (max-width:420px){.clinic-grid{grid-template-columns:1fr}}
 
 /* booking */
+.gal-filter{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:0 0 22px}.gal-filter button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;color:var(--ink-2)}.gal-filter button[aria-selected=true]{background:var(--emerald);border-color:var(--emerald);color:#fff}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:22px}
+.ba{background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);min-width:0}
+.ba-view{position:relative;aspect-ratio:4/3;background:#e9e4da;overflow:hidden;touch-action:pan-y;user-select:none}
+.ba-view img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.ba-view .ba-after{clip-path:inset(0 0 0 var(--cut,50%))}
+.ba-line{position:absolute;top:0;bottom:0;left:var(--cut,50%);width:3px;margin-left:-1.5px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.35);pointer-events:none}
+.ba-line::after{content:'⇆';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:#fff;color:var(--emerald);display:grid;place-items:center;font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.ba-tag{position:absolute;top:12px;padding:4px 10px;border-radius:999px;background:rgba(12,32,30,.72);color:#fff;font-size:12.5px;font-weight:600}.ba-tag.b{left:12px}.ba-tag.a{right:12px}
+.ba-range{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0;direction:ltr}
+.ba-cap{padding:14px 18px}.ba-cap b{display:block;font-size:16px}.ba-cap span{color:var(--ink-3);font-size:13.5px}
 .book{display:grid;grid-template-columns:.9fr 1.1fr;gap:44px;align-items:start}
 .book-side h2{font:700 clamp(28px,3.4vw,40px)/1.25 var(--head);margin:12px 0}
 .book-side ul{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:12px}
@@ -235,7 +246,7 @@ footer a{text-decoration:none}footer a:hover{color:var(--gold-2)}
 
 <header id="top"><div class="wrap nav">
   <a class="logo" href="#"><b>د. هدى ياسين</b><small>مجموعة عيادات طب وجراحة الأسنان</small></a>
-  <nav class="links" aria-label="الأقسام"><a href="#services">الخدمات</a><a href="#why">لماذا نحن</a><a href="#clinics">العيادات</a><a href="#faq">الأسئلة</a></nav>
+  <nav class="links" aria-label="الأقسام"><a href="#services">الخدمات</a><a href="#why">لماذا نحن</a><a href="#gallery" data-gal-link hidden>قبل وبعد</a><a href="#clinics">العيادات</a><a href="#faq">الأسئلة</a></nav>
   <a class="btn gold" href="#book" aria-label="احجز موعدك"><svg class="i"><use href="#i-cal"/></svg><span class="cta-txt">احجز موعدك</span></a>
 </div></header>
 
@@ -305,6 +316,14 @@ footer a{text-decoration:none}footer a:hover{color:var(--gold-2)}
  <div class="wrap">
   <div class="sec-head rv"><span class="eyebrow">جولة في عياداتنا</span><h2>مكان مريح ومجهز</h2></div>
   <div class="tour rv"><div class="ph" data-img="tour1"><svg class="ph-art"><use href="#ph-chair"/></svg><span class="ph-tag">صورة مؤقتة · الاستقبال</span></div><div class="ph dark" data-img="tour2"><svg class="ph-art"><use href="#ph-tooth"/></svg><span class="ph-tag">صورة مؤقتة · غرفة العلاج</span></div><div class="ph" data-img="tour3"><svg class="ph-art"><use href="#ph-tooth"/></svg><span class="ph-tag">صورة مؤقتة · التعقيم</span></div><div class="ph dark" data-img="tour4"><svg class="ph-art"><use href="#ph-chair"/></svg><span class="ph-tag">صورة مؤقتة · الأشعة</span></div><div class="ph" data-img="tour5"><svg class="ph-art"><use href="#ph-tooth"/></svg><span class="ph-tag">صورة مؤقتة · الفريق</span></div></div>
+ </div>
+</section>
+
+<section class="band" id="gallery" hidden>
+ <div class="wrap">
+  <div class="sec-head rv in"><span class="eyebrow">نتائج حقيقية</span><h2>قبل وبعد</h2><p>صور من حالات عالجناها، تُنشر بموافقة المرضى. اسحب الخط لتشوف الفرق.</p></div>
+  <div class="gal-filter" id="gal-filter" role="tablist"></div>
+  <div class="gal-grid" id="gal-grid"></div>
  </div>
 </section>
 
@@ -451,7 +470,8 @@ function renderClinics(){
 }
 /* SEO: one Dentist entry per clinic */
 function structuredData(){const el=document.getElementById('ld')||Object.assign(document.createElement('script'),{id:'ld',type:'application/ld+json'});
-  el.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[{'@type':'MedicalOrganization','name':'عيادات د. هدى ياسين لطب وجراحة الأسنان','url':location.href.split('#')[0],'telephone':'+'+waNum(SITE.whatsapp),'medicalSpecialty':'Dentistry'}].concat(SITE.clinics.map(c=>({'@type':'Dentist','name':c.name,'telephone':'+'+waNum(phoneOf(c)),'address':{'@type':'PostalAddress','streetAddress':[c.area,c.address].filter(Boolean).join('، '),'addressCountry':'IQ'},...(c.lat!=null?{'geo':{'@type':'GeoCoordinates','latitude':c.lat,'longitude':c.lng}}:{}),...(c.hours?{'openingHours':c.hours}:{})})))});
+  const faq=[...document.querySelectorAll('#faq details')].map(d=>({'@type':'Question','name':d.querySelector('summary').textContent.trim(),'acceptedAnswer':{'@type':'Answer','text':d.querySelector('p').textContent.trim()}}));
+  el.textContent=JSON.stringify({'@context':'https://schema.org','@graph':(faq.length?[{'@type':'FAQPage','mainEntity':faq}]:[]).concat([{'@type':'MedicalOrganization','name':'عيادات د. هدى ياسين لطب وجراحة الأسنان','url':location.href.split('#')[0],'telephone':'+'+waNum(SITE.whatsapp),'medicalSpecialty':'Dentistry'}].concat(SITE.clinics.map(c=>({'@type':'Dentist','name':c.name,'telephone':'+'+waNum(phoneOf(c)),'address':{'@type':'PostalAddress','streetAddress':[c.area,c.address].filter(Boolean).join('، '),'addressCountry':'IQ'},...(c.lat!=null?{'geo':{'@type':'GeoCoordinates','latitude':c.lat,'longitude':c.lng}}:{}),...(c.hours?{'openingHours':c.hours}:{})}))))});
   if(!el.parentNode)document.head.appendChild(el)}
 renderClinics();
 document.addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(!b)return;$('#bk-clinic').value=b.dataset.pick;$('#book').scrollIntoView({behavior:'smooth'});setTimeout(()=>$('#bk-name').focus({preventScroll:true}),500)});
@@ -469,9 +489,17 @@ const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء',
 const MONTHS=['كانون الثاني','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
 const normDigits=s=>String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 let DB=null;const T0=Date.now();
-let BUSY={},BUSY_FROM='';
+let BUSY={},BUSY_FROM='';let GAL=[],galCat='all';
+/* ---- before / after gallery: published from the system only with the patient's consent ---- */
+function renderGallery(){const sec=$('#gallery');const on=GAL.length>0;sec.hidden=!on;document.querySelectorAll('[data-gal-link]').forEach(a=>a.hidden=!on);if(!on)return;
+  const cats=[...new Set(GAL.map(g=>g.cat).filter(Boolean))];
+  $('#gal-filter').innerHTML=cats.length>1?[['all','الكل']].concat(cats.map(c=>[c,c])).map(([k,l])=>`<button type="button" role="tab" aria-selected="${galCat===k}" data-gcat="${esc(k)}">${esc(l)}</button>`).join(''):'';
+  $('#gal-grid').innerHTML=GAL.filter(g=>galCat==='all'||g.cat===galCat).map(g=>`<figure class="ba" style="margin:0"><div class="ba-view" style="--cut:50%"><img src="${esc(g.before)}" alt="قبل العلاج${g.title?' · '+esc(g.title):''}" loading="lazy"><img class="ba-after" src="${esc(g.after)}" alt="بعد العلاج${g.title?' · '+esc(g.title):''}" loading="lazy"><span class="ba-tag b">قبل</span><span class="ba-tag a">بعد</span><i class="ba-line"></i><input class="ba-range" type="range" min="0" max="100" value="50" aria-label="مقارنة قبل وبعد"></div><figcaption class="ba-cap"><b>${esc(g.title||g.cat||'')}</b>${g.note?`<span>${esc(g.note)}</span>`:''}</figcaption></figure>`).join('')}
+document.addEventListener('input',e=>{if(e.target.classList.contains('ba-range'))e.target.closest('.ba-view').style.setProperty('--cut',e.target.value+'%')});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-gcat]');if(b){galCat=b.dataset.gcat;renderGallery()}});
 function initDB(){try{const C=window.FIREBASE_CONFIG;if(!window.firebase||!C||!C.firebase)return;firebase.initializeApp(C.firebase);DB=firebase.firestore();
   DB.collection('publicSite').doc('clinics').get().then(d=>{const l=d.exists&&(d.data()||{}).clinics;if(Array.isArray(l)&&l.length){SITE.clinics=l;renderClinics();renderSlots()}}).catch(()=>{});
+  DB.collection('publicGallery').get().then(q=>{GAL=q.docs.map(d=>Object.assign({id:d.id},d.data())).filter(g=>g.before&&g.after&&g.show!==false).sort((a,b)=>(b.at||'').localeCompare(a.at||''));renderGallery()}).catch(()=>{});
   DB.collection('publicSite').doc('busy').get().then(d=>{const v=d.exists?d.data()||{}:{};BUSY=v.days||{};BUSY_FROM=v.from||'';renderSlots()}).catch(()=>{})}catch(e){DB=null}}
 /* ---- available times: from the clinic's booking hours minus the busy times the system publishes (no names) ---- */
 const tm=t=>{const q=String(t||'0:0').split(':').map(Number);return q[0]*60+(q[1]||0)};
