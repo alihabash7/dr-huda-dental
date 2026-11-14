@@ -84,6 +84,9 @@ small.cur{font-size:.72em;color:var(--ink-3);font-weight:500;margin-inline-start
 .top-title h1{font-size:23px}
 .top-title p{margin:0;font-size:12.5px;color:var(--ink-3)}
 .net-st{display:inline-flex;align-items:center;gap:5px;margin-inline-start:6px;font-size:11.5px;font-weight:600;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}.net-st[hidden]{display:none}
+.gal-picks{display:grid;grid-template-columns:1fr 1fr;gap:12px}.gal-pick{position:relative;display:block;aspect-ratio:4/3;border:1.5px dashed var(--line);border-radius:14px;overflow:hidden;cursor:pointer;background:var(--bg-2,#f4f6f5)}.gal-pick.has{border-style:solid}
+.gal-ph{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:4px;color:var(--ink-3);text-align:center}.gal-ph b{color:var(--ink);font-size:14px}.gal-ph small{font-size:12px}.gal-pick img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gal-adm{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:14px}.gal-it{overflow:hidden;padding:0}.gal-it.off{opacity:.55}.gal-two{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--line)}.gal-two figure{margin:0;position:relative;aspect-ratio:4/3;background:#ddd}.gal-two img{width:100%;height:100%;object-fit:cover;display:block}.gal-two figcaption{position:absolute;top:8px;inset-inline-start:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11.5px;padding:2px 8px;border-radius:999px}
 .net-st::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}.net-st.ok{color:var(--good)}.net-st.wait{color:var(--ink-3)}.net-st.wait::before{animation:netp 1s infinite alternate}.net-st.warn{color:var(--warn)}.net-st.bad{color:var(--bad)}
 @keyframes netp{to{opacity:.25}}
 @media (max-width:560px){.net-st{display:flex;margin:2px 0 0}}
@@ -730,14 +733,14 @@ const INST_ST={paid:'مدفوع',late:'متأخر',soon:'قريب',open:'قاد�
 const MONTHS_AR=['كانون الثاني','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
 const DAYS_AR=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const COLS=['clinics','doctors','staff','patients','treatments','appointments','labs','labOrders','labPayments','suppliers','supplierTx','expenses','payouts','closings','cashMoves','months','settings','followups','bookings','publicSite'];
-const TITLES={dashboard:'لوحة التحكم',appointments:'المواعيد',patients:'المرضى',patient:'ملف المريض',accounts:'الحسابات والأقساط',lab:'طلبات المختبر',labs:'حسابات المختبرات',suppliers:'الموردون والمواد',clinics:'العيادات',doctors:'الأطباء',staff:'السكرتارية والموظفون',expenses:'المصاريف التشغيلية',payroll:'الرواتب والمستحقات',reports:'التقرير المالي',prefs:'الإعدادات والنسخ الاحتياطي',mydash:'لوحتي',debts:'ذمم المرضى',import:'إدخال السجلات القديمة',safe:'صندوق د. هدى',monthclose:'إقفال الشهر',closing:'الجرد اليومي',myday:'جرد عملي اليومي',docreport:'تقرير عمل الطبيب',desk:'لوحة الاستقبال',join:'ربط الحساب',chairs:'حساب الكراسي',users:'المستخدمون والصلاحيات',noaccess:'لا صلاحيات',followup:'متابعة المرضى',reminders:'تذكير المواعيد',bookings:'طلبات الحجز من الموقع',clinic:'لوحة العيادة',work:'شغل اليوم',audit:'سجل التدقيق',doctorsReport:'تقرير الأطباء',perf:'أداء وتقييم الأطباء',failed:'الحالات الفاشلة'};
+const TITLES={dashboard:'لوحة التحكم',appointments:'المواعيد',patients:'المرضى',patient:'ملف المريض',accounts:'الحسابات والأقساط',lab:'طلبات المختبر',labs:'حسابات المختبرات',suppliers:'الموردون والمواد',clinics:'العيادات',doctors:'الأطباء',staff:'السكرتارية والموظفون',expenses:'المصاريف التشغيلية',payroll:'الرواتب والمستحقات',reports:'التقرير المالي',prefs:'الإعدادات والنسخ الاحتياطي',mydash:'لوحتي',debts:'ذمم المرضى',import:'إدخال السجلات القديمة',safe:'صندوق د. هدى',monthclose:'إقفال الشهر',closing:'الجرد اليومي',myday:'جرد عملي اليومي',docreport:'تقرير عمل الطبيب',desk:'لوحة الاستقبال',join:'ربط الحساب',chairs:'حساب الكراسي',users:'المستخدمون والصلاحيات',noaccess:'لا صلاحيات',followup:'متابعة المرضى',reminders:'تذكير المواعيد',bookings:'طلبات الحجز من الموقع',clinic:'لوحة العيادة',work:'شغل اليوم',audit:'سجل التدقيق',gallery:'معرض قبل وبعد',doctorsReport:'تقرير الأطباء',perf:'أداء وتقييم الأطباء',failed:'الحالات الفاشلة'};
 const NAV=[
  {g:'نظرة عامة',items:[['dashboard','لوحة التحكم','grid']]},
  {g:'العمل اليومي',items:[['work','شغل اليوم','tooth'],['appointments','المواعيد','calendar'],['reminders','تذكير المواعيد','bell'],['bookings','طلبات الحجز','inbox'],['patients','المرضى','users'],['followup','متابعة المرضى','chat'],['accounts','الحسابات والأقساط','wallet'],['chairs','حساب الكراسي','chair'],['import','إدخال السجلات القديمة','file']]},
  {g:'المالية',items:[['debts','ذمم المرضى','alert'],['closing','الجرد اليومي','receipt'],['safe','صندوق د. هدى','cash'],['monthclose','إقفال الشهر','check']]},
  {g:'المختبرات',items:[['lab','طلبات المختبر','tooth'],['labs','حسابات المختبرات','flask']]},
  {g:'المشتريات',items:[['suppliers','الموردون والمواد','box']]},
- {g:'الإدارة',items:[['clinics','العيادات','building'],['doctors','الأطباء','steth'],['staff','السكرتارية','id'],['users','المستخدمون والصلاحيات','gear'],['audit','سجل التدقيق','receipt'],['expenses','المصاريف','receipt'],['payroll','الرواتب والمستحقات','cash']]},
+ {g:'الإدارة',items:[['clinics','العيادات','building'],['doctors','الأطباء','steth'],['staff','السكرتارية','id'],['users','المستخدمون والصلاحيات','gear'],['audit','سجل التدقيق','receipt'],['gallery','معرض قبل وبعد','file'],['expenses','المصاريف','receipt'],['payroll','الرواتب والمستحقات','cash']]},
  {g:'التقارير',items:[['reports','التقرير المالي','chart'],['doctorsReport','تقرير الأطباء','steth'],['perf','أداء وتقييم الأطباء','chart'],['failed','الحالات الفاشلة','alert'],['docreport','تقرير طبيب شهري','id'],['prefs','الإعدادات','gear']]},
 ];
 const NAV_DOCTOR=[{g:'عملي',items:[['mydash','لوحتي','grid'],['appointments','مواعيدي','calendar'],['patients','مرضاي','users'],['lab','طلبات المختبر','tooth'],['myday','جرد عملي اليومي','receipt'],['doctorsReport','تقرير عملي','chart']]}];
@@ -2617,7 +2620,8 @@ const withMap=(txt,c)=>{const u=clinicMapUrl(c);if(txt.includes('{map}'))return 
 /* coordinates from "36.34, 43.13" or from a Google Maps link that carries them */
 function parseLoc(s){s=normDigits(String(s||''));const m=s.match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/);if(m)return {lat:+m[1],lng:+m[2]};return null}
 function publicClinics(){return all('clinics').filter(c=>c.active!==false&&c.onSite!==false).sort(byName).map(c=>{const loc=parseLoc(c.mapLoc);const url=!loc&&/^https?:\/\//.test(String(c.mapLoc||'').trim())?String(c.mapLoc).trim():'';
-  const bk=c.bkFrom&&c.bkTo&&tmin(c.bkTo)>tmin(c.bkFrom)?{bkFrom:c.bkFrom,bkTo:c.bkTo,bkSlot:num(c.bkSlot)||30,bkOff:(c.bkOff||['5']).map(Number),chairs:Math.max(1,num(c.chairs)||1)}:{};
+  /* clinics that never set booking hours get the defaults shown in the clinic form (4–9 pm, 30 min, Friday off) */
+  const f=c.bkFrom||'16:00',t=c.bkTo||'21:00';const bk=tmin(t)>tmin(f)?{bkFrom:f,bkTo:t,bkSlot:num(c.bkSlot)||30,bkOff:(c.bkOff||['5']).map(Number),chairs:Math.max(1,num(c.chairs)||1)}:{};
   const docs=all('doctors').filter(d=>d.active!==false&&(d.clinicIds||[]).includes(c.id)).sort(byName).map(d=>({id:d.id,name:d.name||'',sp:d.specialty||''}));
   return Object.assign({id:c.id,name:c.name||'',area:c.area||'',address:c.address||'',phone:c.phone||'',hours:c.hours||'',lat:loc?loc.lat:null,lng:loc?loc.lng:null,mapUrl:url,doctors:docs},bk)})}
 /* busy times for the next 3 weeks: start minute, length, doctor. No names, phones or procedures leave the system */
@@ -3622,7 +3626,7 @@ function todayWorkCard(cid,opt){opt=opt||{};const day=opt.day||TODAY;const w=tod
   return `<section class="card tw-card">${head}<div class="tw-kpis"><div><b>${w.newP}</b><span>مرضى جدد</span></div><div><b>${w.tx}</b><span>علاجات جديدة</span></div><div><b>${w.sess}</b><span>جلسات</span></div>${m?`<div class="g"><b>${fmt(w.paid)}</b><span>المحصّل (${w.pays} دفعة)</span></div>`:''}</div><div class="list tw-list">${w.list.map(row).join('')}</div></section>`}
 
 /* ---------- Audit log: who changed what, and when (write-only in the database rules) ---------- */
-const AUDIT_LBL={patient_delete:'حذف مريض',treatment_delete:'حذف علاج',session_delete:'حذف جلسة',payment_add:'تسديد',payment_edit:'تعديل تسديد',payment_delete:'حذف تسديد',amount_edit:'تعديل كلفة علاج',doctor_change:'تغيير طبيب المريض',perms_edit:'تعديل صلاحيات',staff_delete:'حذف موظف',month_lock:'قفل شهر',month_unlock:'فتح قفل شهر'};
+const AUDIT_LBL={gallery_add:'نشر صورة قبل وبعد',gallery_delete:'حذف صورة من المعرض',patient_delete:'حذف مريض',treatment_delete:'حذف علاج',session_delete:'حذف جلسة',payment_add:'تسديد',payment_edit:'تعديل تسديد',payment_delete:'حذف تسديد',amount_edit:'تعديل كلفة علاج',doctor_change:'تغيير طبيب المريض',perms_edit:'تعديل صلاحيات',staff_delete:'حذف موظف',month_lock:'قفل شهر',month_unlock:'فتح قفل شهر'};
 const AUDIT_TONE={patient_delete:'bad',treatment_delete:'bad',payment_delete:'bad',session_delete:'warn',payment_edit:'warn',amount_edit:'warn',perms_edit:'warn',staff_delete:'bad',month_unlock:'warn',doctor_change:'info',payment_add:'good',month_lock:'info'};
 const auditLocal=[];
 function audit(action,detail,ref){try{
@@ -3646,6 +3650,46 @@ PAGES.audit=()=>{
   <section class="card">${L.length?`<div class="list">${L.map(e=>{const d=new Date(e.at);return `<div class="li au-row ${e.patientId?'click':''}" ${e.patientId?`data-act="openPatient" data-id="${esc(e.patientId)}"`:''}><span class="chip ${AUDIT_TONE[e.action]||''}">${esc(AUDIT_LBL[e.action]||e.action)}</span><div class="grow"><div class="t">${e.patientId?esc(patientName(e.patientId))+' · ':''}${esc(e.detail||'')}</div><div class="s">${fmtDate(e.at.slice(0,10))} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} · ${who(e.by)}${e.role&&e.role!=='admin'?' ('+(e.role==='staff'?'سكرتارية':e.role==='doctor'?'طبيب':e.role)+')':''}${e.clinicId?' · '+esc(clinicName(e.clinicId)):''}</div></div></div>`}).join('')}</div>`:empty('لا عمليات مسجلة بعد','أي حذف أو تعديل على المبالغ والصلاحيات يُسجَّل هنا تلقائياً.')}</section>`};
 ACTIONS.auditReload=()=>{auditCache=null;render()};ACTIONS.auditKind=d=>{state.auf=d.v;render()};
 INPUTS.auq=v=>{state.auq=v;clearTimeout(window.__auT);window.__auT=setTimeout(render,250)};
+
+/* ---------- Before / after gallery for the public site: needs the patient's consent; no name or number is published ---------- */
+let galCache=null,galBusy=false;const galLocal=[];const GAL_MAX=24;
+const galCol=()=>Store.mode==='cloud'&&Store.db?Store.db.collection('publicGallery'):null;
+async function loadGal(){if(galBusy)return;galBusy=true;try{const c=galCol();galCache=c?(await c.get()).docs.map(d=>Object.assign({id:d.id},d.data())):galLocal.slice()}catch(e){galCache=[];galCache.err=(e&&e.code)||'error'}galBusy=false;galCache.sort((a,b)=>(b.at||'').localeCompare(a.at||''));scheduleRender()}
+async function shrinkImg(file,max=1000){if(!file||!/^image\//.test(file.type))fail('اختر صورة');const url=URL.createObjectURL(file);
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('تعذّر فتح الصورة'));i.src=url});
+    const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    let q=.78,d=c.toDataURL('image/jpeg',q);while(d.length>400000&&q>.4){q-=.1;d=c.toDataURL('image/jpeg',q)}if(d.length>440000)fail('الصورة كبيرة، جرّب صورة أصغر');return d}finally{URL.revokeObjectURL(url)}}
+async function galSave(id,doc){const c=galCol();if(c)await tracked(()=>c.doc(id).set(doc));else{const i=galLocal.findIndex(x=>x.id===id);const r=Object.assign({id},doc);if(i>=0)galLocal[i]=r;else galLocal.unshift(r)}}
+async function galDel(id){const c=galCol();if(c)await tracked(()=>c.doc(id).delete());else{const i=galLocal.findIndex(x=>x.id===id);if(i>=0)galLocal.splice(i,1)}}
+function galleryForm(){if(!isAdmin())return noPerm();if(galCache&&galCache.length>=GAL_MAX)return toast(`الحد ${GAL_MAX} صورة. احذف وحدة قديمة أولاً`,'warn');
+  const pick=(k,l)=>`<label class="gal-pick" data-k="${k}"><input type="file" accept="image/*" data-gal="${k}" hidden><span class="gal-ph">${ic('plus',20)}<b>${l}</b><small>اضغط لاختيار صورة</small></span><img alt="" hidden></label>`;
+  formModal({title:'نشر صورة قبل وبعد',sub:'تظهر بموقع العيادات بدون اسم المريض أو رقمه',wide:true,fields:[
+    {k:'pics',type:'html',html:`<div class="gal-picks">${pick('before','قبل العلاج')}${pick('after','بعد العلاج')}</div>`},
+    {k:'patient',label:'المريض (لا يُنشر، يُسجّل بملفه أنه وافق)',type:'patient',req:true},
+    {k:'cat',label:'نوع العلاج',type:'select',opts:TX_CATS.map(c=>[c[1],c[1]]),half:true},{k:'title',label:'العنوان',half:true,ph:'مثال: تيجان زيركون للأسنان الأمامية'},
+    {k:'note',label:'وصف قصير (اختياري)',ph:'مثال: 4 جلسات خلال أسبوعين'},
+    {k:'consent',label:'المريض وافق على نشر صوره بموقع العيادات بدون اسمه',type:'checkbox',req:true}],
+    values:{cat:TX_CATS[1][1]},submit:'نشر',
+    onChange:(v,form)=>{form.querySelectorAll('[data-gal]').forEach(inp=>{if(inp.dataset.bound)return;inp.dataset.bound='1';inp.addEventListener('change',()=>{const f=inp.files[0];const lab=inp.closest('.gal-pick');const im=lab.querySelector('img');if(f){im.src=URL.createObjectURL(f);im.hidden=false;lab.classList.add('has')}})})},
+    onSubmit:async(v,form)=>{if(!v.consent)fail('لازم موافقة المريض قبل النشر');if(!v.patient)fail('اختر المريض من القائمة');
+      const fb=form.querySelector('[data-gal=before]').files[0],fa=form.querySelector('[data-gal=after]').files[0];if(!fb||!fa)fail('اختر صورة قبل وصورة بعد');
+      const [before,after]=await Promise.all([shrinkImg(fb),shrinkImg(fa)]);const id=uid(),at=new Date().toISOString();
+      await galSave(id,{kind:'gallery',title:String(v.title||'').slice(0,80),cat:v.cat||'',note:String(v.note||'').slice(0,160),before,after,show:true,at,by:Store.me||''});
+      const p=get('patients',v.patient);if(p)await put('patients',Object.assign(clone(p),{galleryConsent:(p.galleryConsent||[]).concat([{galId:id,date:TODAY,by:Store.me||''}])}));
+      audit('gallery_add',`${v.title||v.cat||''}`,{patientId:v.patient,col:'publicGallery',id});galCache=null;toast('انتشرت بالمعرض','good')}});
+  setTimeout(()=>{const f=document.querySelector('.modal [data-gal]');if(f)f.dispatchEvent(new Event('input',{bubbles:true}))},0)}
+PAGES.gallery=()=>{
+  if(!isAdmin())return `<section class="card">${empty('لا صلاحية','المعرض للإدارة فقط')}</section>`;
+  if(!galCache){setTimeout(()=>loadGal(),0);return `<section class="card pad"><div class="loader"><i></i>جارِ تحميل المعرض…</div></section>`}
+  const head=secHead('معرض قبل وبعد','صور تظهر للمرضى بموقع العيادات. تُنشر فقط بموافقة المريض، وبدون اسمه أو رقمه.',`<button class="btn primary" data-act="galNew">${ic('plus',16)} نشر صورة</button>`);
+  if(galCache.err==='permission-denied')return head+`<section class="card">${empty('المعرض يحتاج قواعد الحماية الجديدة','طبّق قواعد الإصدار 3 من Cloud Shell، وبعدها يشتغل المعرض.')}</section>`;
+  if(!galCache.length)return head+`<section class="card">${empty('ما أكو صور بعد','اضغط «نشر صورة»، اختر صورة قبل وبعد، وتأكد من موافقة المريض.',`<button class="btn primary sm" data-act="galNew">${ic('plus',16)} نشر صورة</button>`)}</section>`;
+  return head+`<p class="muted" style="margin:0;font-size:12.5px">${galCache.length} من ${GAL_MAX} صورة</p><div class="gal-adm">${galCache.map(g=>`<article class="card gal-it ${g.show===false?'off':''}"><div class="gal-two"><figure><img src="${esc(g.before)}" alt="قبل" loading="lazy"><figcaption>قبل</figcaption></figure><figure><img src="${esc(g.after)}" alt="بعد" loading="lazy"><figcaption>بعد</figcaption></figure></div>
+    <div class="pad" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="grow" style="min-width:0"><b>${esc(g.title||g.cat||'')}</b><div class="muted" style="font-size:12.5px">${esc(g.cat||'')}${g.at?' · '+fmtDate(g.at.slice(0,10)):''}${g.show===false?' · مخفية':''}</div></div>
+    <button class="btn sm ghost" data-act="galShow" data-id="${g.id}">${g.show===false?'إظهار':'إخفاء'}</button><button class="icon-btn danger" data-act="galDel" data-id="${g.id}" aria-label="حذف">${ic('trash',15)}</button></div></article>`).join('')}</div>`};
+ACTIONS.galNew=()=>galleryForm();
+ACTIONS.galShow=async d=>{const g=(galCache||[]).find(x=>x.id===d.id);if(!g)return;const n=Object.assign({},g,{show:g.show===false});delete n.id;await galSave(d.id,n);galCache=null;scheduleRender()};
+ACTIONS.galDel=d=>confirmBox('حذف هذه الصورة من الموقع نهائياً؟',async()=>{await galDel(d.id);audit('gallery_delete','',{col:'publicGallery',id:d.id});galCache=null;toast('انحذفت')});
 
 /* ---------- Forms ---------- */
 /* ---------- Suppliers: purchase lists with items, payments per list, balances ---------- */
