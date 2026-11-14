@@ -83,6 +83,10 @@ small.cur{font-size:.72em;color:var(--ink-3);font-weight:500;margin-inline-start
 .top-title{flex:1;min-width:160px}
 .top-title h1{font-size:23px}
 .top-title p{margin:0;font-size:12.5px;color:var(--ink-3)}
+.net-st{display:inline-flex;align-items:center;gap:5px;margin-inline-start:6px;font-size:11.5px;font-weight:600;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}.net-st[hidden]{display:none}
+.net-st::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}.net-st.ok{color:var(--good)}.net-st.wait{color:var(--ink-3)}.net-st.wait::before{animation:netp 1s infinite alternate}.net-st.warn{color:var(--warn)}.net-st.bad{color:var(--bad)}
+@keyframes netp{to{opacity:.25}}
+@media (max-width:560px){.net-st{display:flex;margin:2px 0 0}}
 .top-ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sel-wrap{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 10px;height:40px;color:var(--ink-2)}
 .sel-wrap select{border:0;background:transparent;height:38px;font-weight:500;color:var(--ink);max-width:180px;cursor:pointer}
@@ -819,14 +823,18 @@ async function initStore(){
   let pending=COLS.length;
   const done=()=>{if(Store.mode==='loading'){Store.mode='cloud'}scheduleRender()};
   setTimeout(()=>{if(Store.mode==='loading'){Store.mode='cloud';scheduleRender()}},9000);
-  Store.unsub={};Store.loadErr=null;
+  Store.unsub={};Store.loadErr=null;Store.denied=new Set();Store.deniedRetry=new Set();
   const sub=c=>{try{Store.unsub[c]&&Store.unsub[c]()}catch(e){}
     Store.unsub[c]=db.collection(c).onSnapshot(snap=>{
       const m=new Map();snap.docs.forEach(d=>{if(d.exists)m.set(d.id,Object.assign({},d.data(),{id:d.id}))});
       S[c]=m;if(!Store.ready.has(c)){Store.ready.add(c);pending--;memo={}}
       if(Store.ready.has(c)&&Store.loadErr&&COLS.every(x=>Store.ready.has(x)))Store.loadErr=null;
       if(pending<=0)done();else if(Store.mode!=='loading')scheduleRender();
-    },err=>{Store.loadErr=(err&&err.code)||'error';if(Store.mode==='loading')Store.mode='cloud';scheduleRender();setTimeout(()=>{if(!Store.ready.has(c))sub(c)},6000)})};
+    },err=>{const code=(err&&err.code)||'error';
+      /* a section this account is not allowed to read (e.g. money data for doctors): treat it as empty instead of waiting forever */
+      if(code==='permission-denied'){Store.denied.add(c);S[c]=new Map();if(!Store.ready.has(c)){Store.ready.add(c);pending--;memo={}}if(pending<=0)done();else scheduleRender();
+        if(!Store.deniedRetry.has(c)){Store.deniedRetry.add(c);setTimeout(()=>{if(Store.denied.has(c)){Store.denied.delete(c);sub(c)}},30000)}return}
+      Store.loadErr=code;if(Store.mode==='loading')Store.mode='cloud';scheduleRender();setTimeout(()=>{if(!Store.ready.has(c))sub(c)},6000)})};
   Store.resub=()=>COLS.filter(c=>!Store.ready.has(c)).forEach(sub);
   COLS.forEach(sub);
   /* slow network: keep asking for whatever has not arrived yet */
@@ -834,19 +842,33 @@ async function initStore(){
   try{Store.downloads=await window.claude.use('downloads')}catch(e){}
 }
 function writeErr(e){const c=e&&e.code;toast(c==='invalid_argument'||c==='permission-denied'?'لا تملك صلاحية التعديل على هذه البيانات':c==='quota_exceeded'?'امتلأت سعة قاعدة البيانات، احذف سجلات قديمة':c==='resource_exhausted'?'عمليات كثيرة بسرعة، انتظر لحظة وأعد المحاولة':'تعذّر الحفظ، تحقق من الاتصال وأعد المحاولة','bad')}
+/* ---------- connection & save status: shown under the page title ---------- */
+const NET={pending:0,since:0,lastOk:0,failed:0};
+async function tracked(job){NET.pending++;if(NET.pending===1)NET.since=Date.now();updateNet();
+  try{const r=await job();NET.lastOk=Date.now();NET.failed=0;return r}catch(e){NET.failed++;writeErr(e);throw e}
+  finally{NET.pending=Math.max(0,NET.pending-1);updateNet()}}
+function netState(){if(Store.mode==='local')return null;const off=typeof navigator!=='undefined'&&navigator.onLine===false;
+  if(Store.mode==='loading')return ['wait','جارِ الاتصال…'];
+  if(off)return ['bad',NET.pending?`بدون إنترنت · ${NET.pending} تعديل ينحفظ من يرجع الاتصال`:'بدون إنترنت · التعديلات تنحفظ من يرجع الاتصال'];
+  if(NET.pending)return Date.now()-NET.since>8000?['warn','الحفظ متأخر… تأكد من الإنترنت ولا تسكّر الصفحة']:['wait','جارِ الحفظ…'];
+  if(NET.failed)return ['warn','آخر تعديل ما انحفظ، أعد المحاولة'];
+  if(Store.loadErr)return ['warn','الاتصال ضعيف'];
+  return ['ok',NET.lastOk?'متصل · كل شي محفوظ':'متصل']}
+function updateNet(){const el=document.getElementById('net-st');if(!el)return;const s=netState();if(!s){el.hidden=true;return}el.hidden=false;el.className='net-st '+s[0];el.textContent=s[1];el.title=s[1]}
+addEventListener('online',updateNet);addEventListener('offline',updateNet);setInterval(()=>{if(NET.pending)updateNet()},3000);
 async function put(col,obj){
   if(col==='patients'&&role().kind==='staff'){if(!obj.id&&!can('addPatient'))fail('إضافة المرضى غير مسموحة لحسابك');if(obj.id&&S.patients.has(obj.id)&&!can('editPatient'))fail('تعديل بيانات المرضى غير مسموح لحسابك')}
   const id=obj.id||uid();const body=clone(obj);delete body.id;
   body.updatedAt=new Date().toISOString();if(!body.createdAt)body.createdAt=body.updatedAt;
   if(Store.me&&!body.createdBy)body.createdBy=Store.me;
   assertUnlocked(col,body,obj.id);
-  if(Store.mode!=='local'&&Store.db){try{await Store.db.collection(col).doc(id).set(body)}catch(e){writeErr(e);throw e}}
+  if(Store.mode!=='local'&&Store.db){await tracked(()=>Store.db.collection(col).doc(id).set(body))}
   else{S[col].set(id,Object.assign(body,{id}));saveLocal();scheduleRender()}
   return id;
 }
 async function del(col,id){
   assertUnlocked(col,null,id);
-  if(Store.mode!=='local'&&Store.db){try{await Store.db.collection(col).doc(id).delete()}catch(e){writeErr(e);throw e}}
+  if(Store.mode!=='local'&&Store.db){await tracked(()=>Store.db.collection(col).doc(id).delete())}
   else{S[col].delete(id);saveLocal();scheduleRender()}
 }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -1047,13 +1069,13 @@ const MONTH_PAGES=['clinic','chairs','safe','monthclose','debts','dashboard','ac
 function renderTop(){
   const showMonth=MONTH_PAGES.includes(state.page)&&!(state.page==='clinic'&&['today','patients','team'].includes(state.cTab||'today'));
   $('#top').innerHTML=`<button class="icon-btn only-m" data-act="toggleSide" aria-label="فتح القائمة">${ic('menu',20)}</button>${navDepth>0||state.page!==homeOf()?`<button class="icon-btn back-btn" data-act="navBack" aria-label="رجوع" title="رجوع">${ic('back',20)}</button>`:''}
-  <div class="top-title"><h1>${esc(isDoctor()&&state.page==='doctorsReport'?'تقرير عملي':state.page==='clinic'&&get('clinics',state.clinic)?get('clinics',state.clinic).name:(TITLES[state.page]||''))}</h1><p>${dayLabel(TODAY)} ${TODAY.slice(0,4)}</p></div>
+  <div class="top-title"><h1>${esc(isDoctor()&&state.page==='doctorsReport'?'تقرير عملي':state.page==='clinic'&&get('clinics',state.clinic)?get('clinics',state.clinic).name:(TITLES[state.page]||''))}</h1><p>${dayLabel(TODAY)} ${TODAY.slice(0,4)} <span id="net-st" class="net-st" role="status" aria-live="polite" hidden></span></p></div>
   <div class="top-ctl">
     ${role().kind==='pending'||optClinics().length<2?'':`<label class="sel-wrap">${ic('building',16)}<select id="g-clinic" data-chg="clinic" aria-label="العيادة"><option value="all">كل العيادات</option>${optClinics().map(([v,l])=>`<option value="${v}" ${state.clinic===v?'selected':''}>${esc(l)}</option>`).join('')}</select></label>`}
     ${showMonth?`<div class="month-nav" role="group" aria-label="الشهر"><button class="icon-btn" data-act="month" data-d="-1" aria-label="الشهر السابق">${ic('prev',16)}</button><b>${monthLabel(state.month)}${lockedMonth(state.month)?' · مقفل':''}</b><button class="icon-btn" data-act="month" data-d="1" aria-label="الشهر التالي">${ic('next',16)}</button></div>`:''}
     ${role().kind==='pending'?'':`<div class="qa"><button class="btn primary" data-act="qa" aria-expanded="${state.qa}">${ic('plus',16)}<span>إضافة</span></button>${state.qa?`<div class="qa-menu">${(isDoctor()?QA_DOCTOR:role().kind==='staff'?QA_STAFF.filter(([a])=>(!QA_PERM[a]||can(QA_PERM[a]))&&(a!=='oldPatient'||seeMoney())):QA).map(([a,l,i])=>`<button data-act="${a}">${ic(i,16)}${l}</button>`).join('')}</div>`:''}</div>`}
   </div>`;
-}
+  updateNet()}
 
 /* ---------- UI primitives ---------- */
 function toast(msg,kind='',sticky){const el=document.createElement('div');el.className='toast '+kind;el.textContent=msg;$('#toast').appendChild(el);if(!sticky){setTimeout(()=>el.classList.add('out'),2800);setTimeout(()=>el.remove(),3200)}return el}
