@@ -862,13 +862,39 @@ function netState(){if(Store.mode==='local')return null;const off=typeof navigat
   return ['ok',NET.lastOk?'متصل · كل شي محفوظ':'متصل']}
 function updateNet(){const el=document.getElementById('net-st');if(!el)return;const s=netState();if(!s){el.hidden=true;return}el.hidden=false;el.className='net-st '+s[0];el.textContent=s[1];el.title=s[1]}
 addEventListener('online',updateNet);addEventListener('offline',updateNet);setInterval(()=>{if(NET.pending)updateNet()},3000);
+/* ---------- safe saving when two devices edit the same record (also offline) ----------
+   Instead of overwriting the whole record, only the fields that changed are sent,
+   and lists such as payments and sessions are merged item by item: a payment added on one device
+   and another added on a second device both survive when the internet comes back. */
+const FV=()=>{try{return window.STANDALONE&&window.firebase&&firebase.firestore&&firebase.firestore.FieldValue||null}catch(e){return null}};
+const itemKey=x=>x&&typeof x==='object'&&x.id!=null&&x.id!==''?'id:'+x.id:'js:'+JSON.stringify(x);
+const isItemList=v=>Array.isArray(v)&&v.length>0&&v.every(x=>x&&typeof x==='object'&&!Array.isArray(x));
+function mergePlan(body,base){const first={},second={};const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  for(const k of new Set(Object.keys(body).concat(Object.keys(base)))){if(k==='id')continue;const nv=body[k],ov=base[k];
+    if(!(k in body)){first[k]={del:true};continue}
+    if(eq(nv,ov))continue;
+    if((isItemList(nv)||Array.isArray(nv)&&!nv.length)&&(isItemList(ov)||Array.isArray(ov)&&!ov.length)&&(nv.length||ov.length)){
+      const om=new Map(ov.map(x=>[itemKey(x),x])),nm=new Map(nv.map(x=>[itemKey(x),x]));const rm=[],add=[];
+      om.forEach((x,key)=>{const y=nm.get(key);if(!y)rm.push(x);else if(!eq(x,y)){rm.push(x);add.push(y)}});
+      nm.forEach((y,key)=>{if(!om.has(key))add.push(y)});
+      if(rm.length){first[k]={remove:rm};if(add.length)second[k]={union:add}}else if(add.length)first[k]={union:add};continue}
+    first[k]={set:nv}}
+  return {first,second}}
+async function mergeWrite(ref,body,base,fv){
+  if(!base||!fv||typeof ref.update!=='function')return ref.set(body);
+  const {first,second}=mergePlan(body,base);const conv=o=>{const u={};for(const [k,v] of Object.entries(o))u[k]=v.del?fv.delete():v.remove?fv.arrayRemove(...v.remove):v.union?fv.arrayUnion(...v.union):v.set;return u};
+  if(!Object.keys(first).length&&!Object.keys(second).length)return;
+  /* both updates are queued right away (in order) so nothing waits on the internet between them */
+  try{const jobs=[];if(Object.keys(first).length)jobs.push(ref.update(conv(first)));if(Object.keys(second).length)jobs.push(ref.update(conv(second)));await Promise.all(jobs)}
+  catch(e){if(e&&e.code==='not-found')return ref.set(body);throw e}}
 async function put(col,obj){
   if(col==='patients'&&role().kind==='staff'){if(!obj.id&&!can('addPatient'))fail('إضافة المرضى غير مسموحة لحسابك');if(obj.id&&S.patients.has(obj.id)&&!can('editPatient'))fail('تعديل بيانات المرضى غير مسموح لحسابك')}
   const id=obj.id||uid();const body=clone(obj);delete body.id;
   body.updatedAt=new Date().toISOString();if(!body.createdAt)body.createdAt=body.updatedAt;
   if(Store.me&&!body.createdBy)body.createdBy=Store.me;
   assertUnlocked(col,body,obj.id);
-  if(Store.mode!=='local'&&Store.db){await tracked(()=>Store.db.collection(col).doc(id).set(body))}
+  if(Store.mode!=='local'&&Store.db){const ref=Store.db.collection(col).doc(id);const base=obj.id?S[col].get(obj.id):null;
+    await tracked(()=>mergeWrite(ref,body,base,FV()))}
   else{S[col].set(id,Object.assign(body,{id}));saveLocal();scheduleRender()}
   return id;
 }
