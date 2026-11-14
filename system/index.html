@@ -2537,11 +2537,14 @@ const newestTid=pid=>(all('treatments').filter(x=>x.patientId===pid).sort((a,b)=
 const nextApptLine=t=>{const a=all('appointments').filter(x=>x.patientId===t.patientId&&x.date>=TODAY&&!['cancelled','done','noshow'].includes(x.status)).sort(byTime).find(x=>x.treatmentId?x.treatmentId===t.id:newestTid(t.patientId)===t.id);return a?`<div class="next-appt">${ic('calendar',15)}<span>الجلسة القادمة: <b>${dayLabel(a.date)} · ${t12(a.time)}</b>${a.doctorId?' · '+esc(docName(a.doctorId)):''}${a.chair?' · '+chairLbl(a.chair):''}</span>${remChip(a)}</div>`:''};
 
 /* ---------- Website bookings: requests patients send from the public site, and the clinic list the site shows ---------- */
-const BK_ST={new:['طلب جديد','warn'],booked:['تم الحجز','good'],rejected:['تعذّر الحجز','muted']};
+const BK_ST={new:['طلب جديد','warn'],booked:['تم الحجز','info'],done:['حضر','good'],cancelled:['ألغى المريض','muted'],rejected:['تعذّر الحجز','muted']};
+/* the booking follows its appointment: attended → done, cancelled → cancelled */
+const bkStatus=b=>{const s=b.status||'new';if(s==='booked'&&b.apptId){const a=get('appointments',b.apptId);if(a&&['arrived','done'].includes(a.status))return 'done';if(a&&a.status==='cancelled')return 'cancelled';if(!a&&Store.ready.has('appointments'))return 'cancelled'}return BK_ST[s]?s:'new'};
+const bkTab=s=>s==='rejected'?'cancelled':s;
 const PERIOD_TIME={'صباحاً':'10:00','عصراً':'16:00','مساءً':'19:00'};
 const okDate=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||'');
 const bkScope=b=>isAdmin()?(state.clinic==='all'||!b.clinicId||b.clinicId===state.clinic):(!b.clinicId||(roleClinicIds()||[]).includes(b.clinicId));
-const bkNew=()=>all('bookings').filter(b=>(b.status||'new')==='new'&&bkScope(b));
+const bkNew=()=>all('bookings').filter(b=>bkStatus(b)==='new'&&bkScope(b));
 /* clinic location for patient messages */
 const locClinicFor=p=>{const na=nextApptFor(p.id);if(na&&myClinic(na.clinicId))return get('clinics',na.clinicId);if(myClinic(p.clinicId))return get('clinics',p.clinicId);return get('clinics',(roleClinicIds()||[])[0])||get('clinics',p.clinicId)};
 const locBtn=p=>{const c=locClinicFor(p);if(!p.phone||!c||!clinicMapUrl(c))return '';return waBtn(p.phone,`مرحباً ${p.name||''} 🌿\nهذا موقع ${c.name}:\n${clinicLocText(c)}${c.hours?'\n🕓 أوقات الدوام: '+c.hours:''}\n${siteLine}\nبانتظاركم.\n${SIGN}`,'📍 إرسال الموقع')};
@@ -2560,32 +2563,47 @@ const withMap=(txt,c)=>{const u=clinicMapUrl(c);if(txt.includes('{map}'))return 
 /* coordinates from "36.34, 43.13" or from a Google Maps link that carries them */
 function parseLoc(s){s=normDigits(String(s||''));const m=s.match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/);if(m)return {lat:+m[1],lng:+m[2]};return null}
 function publicClinics(){return all('clinics').filter(c=>c.active!==false&&c.onSite!==false).sort(byName).map(c=>{const loc=parseLoc(c.mapLoc);const url=!loc&&/^https?:\/\//.test(String(c.mapLoc||'').trim())?String(c.mapLoc).trim():'';
-  return {id:c.id,name:c.name||'',area:c.area||'',address:c.address||'',phone:c.phone||'',hours:c.hours||'',lat:loc?loc.lat:null,lng:loc?loc.lng:null,mapUrl:url}})}
+  const bk=c.bkFrom&&c.bkTo&&tmin(c.bkTo)>tmin(c.bkFrom)?{bkFrom:c.bkFrom,bkTo:c.bkTo,bkSlot:num(c.bkSlot)||30,bkOff:(c.bkOff||['5']).map(Number),chairs:Math.max(1,num(c.chairs)||1)}:{};
+  const docs=all('doctors').filter(d=>d.active!==false&&(d.clinicIds||[]).includes(c.id)).sort(byName).map(d=>({id:d.id,name:d.name||'',sp:d.specialty||''}));
+  return Object.assign({id:c.id,name:c.name||'',area:c.area||'',address:c.address||'',phone:c.phone||'',hours:c.hours||'',lat:loc?loc.lat:null,lng:loc?loc.lng:null,mapUrl:url,doctors:docs},bk)})}
+/* busy times for the next 3 weeks: start minute, length, doctor. No names, phones or procedures leave the system */
+const BUSY_DAYS=21;
+function publicBusy(){const end=addDays(TODAY,BUSY_DAYS);const out={};const add=(cid,date,time,dur,did)=>{if(!cid||!okDate(date)||!time)return;((out[cid]=out[cid]||{})[date]=out[cid][date]||[]).push([tmin(time),num(dur)||30,did||''])};
+  for(const a of all('appointments')){if(a.date<TODAY||a.date>end||['cancelled','noshow'].includes(a.status))continue;add(a.clinicId,a.date,a.time,a.dur,a.doctorId)}
+  for(const b of all('bookings')){if((b.status||'new')!=='new'||!b.time||!/^\d{2}:\d{2}$/.test(b.time)||b.date<TODAY||b.date>end)continue;const c=get('clinics',b.clinicId);add(b.clinicId,b.date,b.time,(c&&c.bkSlot)||30,b.doctorId)}
+  Object.values(out).forEach(o=>Object.values(o).forEach(l=>l.sort((x,y)=>x[0]-y[0])));return out}
 let pubSyncT=null;
 function syncPublicSite(){if(!window.STANDALONE||Store.mode!=='cloud'||!Store.db||!isAdmin()||Store.preview)return;if(!Store.ready.has('clinics')||!Store.ready.has('publicSite'))return;
-  const cur=JSON.stringify((get('publicSite','clinics')||{}).clinics||null),next=publicClinics();if(cur===JSON.stringify(next))return;
-  clearTimeout(pubSyncT);pubSyncT=setTimeout(()=>{Store.db.collection('publicSite').doc('clinics').set({clinics:next,updatedAt:new Date().toISOString()}).catch(()=>{})},800)}
+  const cur=JSON.stringify((get('publicSite','clinics')||{}).clinics||null),next=publicClinics();
+  const bc=(get('publicSite','busy')||{}),bn=Store.ready.has('appointments')&&Store.ready.has('bookings')?publicBusy():null;
+  const busyChanged=bn&&(JSON.stringify(bc.days||null)!==JSON.stringify(bn)||bc.from!==TODAY);
+  if(cur===JSON.stringify(next)&&!busyChanged)return;
+  clearTimeout(pubSyncT);pubSyncT=setTimeout(()=>{const at=new Date().toISOString();
+    if(cur!==JSON.stringify(next))Store.db.collection('publicSite').doc('clinics').set({clinics:next,updatedAt:at}).catch(()=>{});
+    if(busyChanged)Store.db.collection('publicSite').doc('busy').set({days:bn,from:TODAY,updatedAt:at}).catch(()=>{})},800)}
 PAGES.bookings=()=>{
-  const tab=state.bkTab||'new';const list=all('bookings').filter(bkScope).filter(b=>(b.status||'new')===tab).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
-  const cnt=k=>all('bookings').filter(bkScope).filter(b=>(b.status||'new')===k).length;
-  const card=b=>{const c=get('clinics',b.clinicId);const ex=phoneKey(b.phone)?all('patients').find(p=>phoneKey(p.phone)===phoneKey(b.phone)):null;const ap=b.apptId?get('appointments',b.apptId):null;
-    return `<article class="card bk"><div class="bk-h"><div><h3>${esc(b.name||'—')}</h3><div class="meta"><span dir="ltr">${esc(b.phone||'')}</span>${ex?` · ${chip('مريض مسجّل','info')}`:` · ${chip('مريض جديد')}`}</div></div>${chip(BK_ST[b.status||'new'][0],BK_ST[b.status||'new'][1])}</div>
-    <dl class="bk-d"><div><dt>العيادة</dt><dd>${esc(c?c.name:(b.clinicName||'أي عيادة'))}</dd></div><div><dt>سبب الزيارة</dt><dd>${esc(b.service||'—')}</dd></div><div><dt>اليوم المفضّل</dt><dd>${okDate(b.date)?esc(dayLabel(b.date)):'أقرب موعد'}${b.period?' · '+esc(b.period):''}</dd></div><div><dt>وصل الطلب</dt><dd>${b.createdAt?fmtDate(b.createdAt.slice(0,10))+' · '+esc(new Date(b.createdAt).toLocaleTimeString('ar-IQ',{hour:'numeric',minute:'2-digit'})):'—'}</dd></div></dl>
+  const tab=state.bkTab||'new';const list=all('bookings').filter(bkScope).filter(b=>bkTab(bkStatus(b))===tab).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  const cnt=k=>all('bookings').filter(bkScope).filter(b=>bkTab(bkStatus(b))===k).length;
+  const card=b=>{const c=get('clinics',b.clinicId);const ex=phoneKey(b.phone)?all('patients').find(p=>phoneKey(p.phone)===phoneKey(b.phone)):null;const ap=b.apptId?get('appointments',b.apptId):null;const st=bkStatus(b);const wd=b.doctorId?get('doctors',b.doctorId):null;
+    return `<article class="card bk"><div class="bk-h"><div><h3>${esc(b.name||'—')}</h3><div class="meta"><span dir="ltr">${esc(b.phone||'')}</span>${ex?` · ${chip('مريض مسجّل','info')}`:` · ${chip('مريض جديد')}`}</div></div>${chip(BK_ST[st][0],BK_ST[st][1])}</div>
+    <dl class="bk-d"><div><dt>العيادة</dt><dd>${esc(c?c.name:(b.clinicName||'أي عيادة'))}</dd></div><div><dt>سبب الزيارة</dt><dd>${esc(b.service||'—')}</dd></div><div><dt>${b.time?'الوقت المطلوب':'اليوم المفضّل'}</dt><dd>${okDate(b.date)?esc(dayLabel(b.date)):'أقرب موعد'}${b.time?' · <b>'+esc(t12(b.time))+'</b>':b.period?' · '+esc(b.period):''}</dd></div>${b.doctorId?`<div><dt>الطبيب المطلوب</dt><dd>${esc(wd?'د. '+wd.name:'—')}</dd></div>`:''}<div><dt>وصل الطلب</dt><dd>${b.createdAt?fmtDate(b.createdAt.slice(0,10))+' · '+esc(new Date(b.createdAt).toLocaleTimeString('ar-IQ',{hour:'numeric',minute:'2-digit'})):'—'}</dd></div></dl>
     ${b.note?`<p class="note" style="margin:0">${esc(b.note)}</p>`:''}${ap?`<div class="next-appt">${ic('calendar',15)}<span>الموعد: <b>${dayLabel(ap.date)} · ${t12(ap.time)}</b>${ap.doctorId?' · '+esc(docName(ap.doctorId)):''}</span>${remChip(ap)}</div>`:''}
-    <footer>${(b.status||'new')==='new'?`<button class="btn sm primary" data-act="bkBook" data-id="${b.id}">${ic('calendar',15)} حجز موعد</button>`:''}${waBtn(b.phone,`مرحباً ${b.name||''}، استلمنا طلب حجزك في ${c?c.name:'عيادات د. هدى ياسين'}.`,'واتساب')}<a class="btn sm ghost" href="tel:+${waNum(b.phone)}">${ic('phone',15)} اتصال</a>${(b.status||'new')==='new'?`<button class="btn sm ghost danger" data-act="bkReject" data-id="${b.id}">تعذّر الحجز</button>`:`<button class="btn sm ghost" data-act="bkReopen" data-id="${b.id}">إرجاع للجديدة</button>`}${isAdmin()?`<button class="icon-btn" data-act="bkDel" data-id="${b.id}" aria-label="حذف الطلب">${ic('trash',15)}</button>`:''}</footer></article>`};
+    <footer>${st==='new'?`<button class="btn sm primary" data-act="bkBook" data-id="${b.id}">${ic('calendar',15)} حجز موعد</button>`:''}${waBtn(b.phone,`مرحباً ${b.name||''}، استلمنا طلب حجزك في ${c?c.name:'عيادات د. هدى ياسين'}.`,'واتساب')}<a class="btn sm ghost" href="tel:+${waNum(b.phone)}">${ic('phone',15)} اتصال</a>${st==='new'?`<button class="btn sm ghost danger" data-act="bkReject" data-id="${b.id}">تعذّر الحجز</button>`:st==='booked'?`<button class="btn sm ghost danger" data-act="bkCancel" data-id="${b.id}">ألغى المريض</button>`:st==='done'?'':`<button class="btn sm ghost" data-act="bkReopen" data-id="${b.id}">إرجاع للجديدة</button>`}${isAdmin()?`<button class="icon-btn" data-act="bkDel" data-id="${b.id}" aria-label="حذف الطلب">${ic('trash',15)}</button>`:''}</footer></article>`};
   return `${secHead('طلبات الحجز من الموقع','يملأ المريض نموذج الحجز في موقع العيادات، ويصل الطلب هنا. اضغطي «حجز موعد» لتحديد الوقت وإرسال التأكيد له.',`<a class="btn" href="${esc(location.href.split('/system')[0]+'/')}" target="_blank" rel="noopener">${ic('file',16)} فتح الموقع</a>`)}
-  <div class="sec-head">${seg('bkTab',tab,[['new','جديدة',cnt('new')],['booked','تم الحجز',cnt('booked')],['rejected','تعذّر الحجز',cnt('rejected')]])}</div>
+  <div class="sec-head">${seg('bkTab',tab,[['new','جديدة',cnt('new')],['booked','محجوزة',cnt('booked')],['done','حضروا',cnt('done')],['cancelled','ملغاة / تعذّرت',cnt('cancelled')]])}</div>
   ${list.length?`<div class="grid-cards">${list.map(card).join('')}</div>`:`<section class="card">${empty(tab==='new'?'لا توجد طلبات جديدة':'لا يوجد شيء هنا',tab==='new'?'عندما يحجز مريض من الموقع يظهر طلبه هنا فوراً.':'')}</section>`}`;
 };
 ACTIONS.bkTab=d=>{state.bkTab=d.v;render()};
 ACTIONS.bkBook=d=>{const b=get('bookings',d.id);if(!b)return;
   const ex=phoneKey(b.phone)?all('patients').find(p=>phoneKey(p.phone)===phoneKey(b.phone)):null;
-  const form=apptForm({clinicId:b.clinicId||defaultClinic(),date:okDate(b.date)&&b.date>=TODAY?b.date:TODAY,time:PERIOD_TIME[b.period]||'16:00',procedure:b.service||'',notes:b.note||'',bookingId:b.id},ex?ex.id:undefined);
+  const form=apptForm({clinicId:b.clinicId||defaultClinic(),date:okDate(b.date)&&b.date>=TODAY?b.date:TODAY,time:/^\d{2}:\d{2}$/.test(b.time||'')?b.time:(PERIOD_TIME[b.period]||'16:00'),...(b.doctorId&&get('doctors',b.doctorId)?{doctorId:b.doctorId}:{}),...(b.time&&get('clinics',b.clinicId)?.bkSlot?{dur:String(get('clinics',b.clinicId).bkSlot)}:{}),procedure:b.service||'',notes:b.note||'',bookingId:b.id},ex?ex.id:undefined);
   if(!ex&&form){const pi=form.querySelector('#f_patient');if(pi){pi.value=b.name||'';pi.dispatchEvent(new Event('input',{bubbles:true}))}setTimeout(()=>{const ph=form.querySelector('#f_newPhone');if(ph){ph.value=b.phone||'';ph.dispatchEvent(new Event('input',{bubbles:true}))}},30)}};
 ACTIONS.bkReject=d=>{const b=get('bookings',d.id);if(!b)return;const c=get('clinics',b.clinicId);
   confirmBox(`تسجيل أن الحجز تعذّر لـ ${b.name||''}؟ يمكنك مراسلته بالواتساب لاقتراح وقت آخر.`,async()=>{await put('bookings',Object.assign(clone(b),{status:'rejected',handledAt:new Date().toISOString(),handledBy:Store.me||''}));toast('سُجّل');
     if(b.phone)setTimeout(()=>openModal(`<div class="m-head"><div><h3>مراسلة ${esc(b.name||'')}</h3><p>اقترح عليه وقتاً آخر</p></div><button class="icon-btn" data-act="closeModal" aria-label="إغلاق">${ic('x')}</button></div><div class="m-body"><p style="margin:0">نعتذر، الوقت الذي طلبه غير متاح.</p></div><div class="m-foot"><span class="sp"></span>${waBtn(b.phone,`مرحباً ${b.name||''}، شكراً لطلبك الحجز في ${c?c.name:'عيادات د. هدى ياسين'}. الوقت المطلوب غير متاح، هل يناسبكم موعد آخر؟`,'إرسال بالواتساب')}</div>`),80)},'تعذّر الحجز')};
-ACTIONS.bkReopen=async d=>{const b=get('bookings',d.id);if(b){await put('bookings',Object.assign(clone(b),{status:'new'}));toast('أُرجع إلى الطلبات الجديدة')}};
+ACTIONS.bkReopen=async d=>{const b=get('bookings',d.id);if(b){const n=Object.assign(clone(b),{status:'new'});delete n.apptId;await put('bookings',n);toast('أُرجع إلى الطلبات الجديدة')}};
+ACTIONS.bkCancel=d=>{const b=get('bookings',d.id);if(!b)return;const a=b.apptId?get('appointments',b.apptId):null;
+  confirmBox(`تسجيل أن ${b.name||'المريض'} ألغى الحجز؟${a?' ويُلغى موعده بالجدول ويتحرر الوقت.':''}`,async()=>{if(a)await put('appointments',Object.assign(clone(a),{status:'cancelled'}));await put('bookings',Object.assign(clone(b),{status:'cancelled',handledAt:new Date().toISOString(),handledBy:Store.me||''}));toast('سُجّل الإلغاء')},'ألغى المريض')};
 ACTIONS.bkDel=d=>confirmBox('حذف هذا الطلب نهائياً؟',async()=>{await del('bookings',d.id);toast('حُذف')});
 const bkCard=()=>{if(!window.STANDALONE||!can('p_appointments'))return '';const l=bkNew();if(!l.length)return '';
   return `<section class="card" style="border-color:color-mix(in srgb,var(--warn) 45%,var(--line))"><div class="card-h"><h3>${ic('calendar',18)} طلبات حجز جديدة من الموقع</h3><a class="btn ghost sm" href="#bookings" data-act="go" data-page="bookings">كل الطلبات</a></div><div class="list">${l.slice(0,5).map(b=>`<div class="li"><div class="grow"><div class="t">${esc(b.name||'—')} · <span dir="ltr">${esc(b.phone||'')}</span></div><div class="s">${esc((get('clinics',b.clinicId)||{}).name||b.clinicName||'أي عيادة')} · ${esc(b.service||'')} · ${okDate(b.date)?esc(dayLabel(b.date)):'أقرب موعد'}${b.period?' '+esc(b.period):''}</div></div><button class="btn sm primary" data-act="bkBook" data-id="${b.id}">حجز موعد</button></div>`).join('')}</div></section>`};
@@ -3832,16 +3850,18 @@ function clinicForm(c){c=c||{};const k=c.costs||{};const st=c.id?all('staff').fi
   {k:'address',label:'العنوان التفصيلي',half:true,ph:'مثال: قرب جامع ...، مقابل صيدلية ...'},{k:'hours',label:'أوقات الدوام',half:true,ph:'مثال: السبت–الخميس، 4 عصراً – 9 مساءً'},
   {k:'mapLoc',label:'الموقع على الخريطة',ph:'36.3400, 43.1300  أو رابط Google Maps',hint:'الإحداثيات تُظهر خريطة داخل الموقع. الرابط القصير يظهر كزر فقط.'},
   {k:'onSite',label:'إظهار هذه العيادة في الموقع واستقبال الحجوزات لها',type:'checkbox'},
+  {k:'bkFrom',label:'الحجز من الساعة',type:'time',third:true,show:v=>v.onSite},{k:'bkTo',label:'إلى الساعة',type:'time',third:true,show:v=>v.onSite},{k:'bkSlot',label:'مدة الموعد',type:'select',third:true,opts:[['15','15 دقيقة'],['20','20 دقيقة'],['30','30 دقيقة'],['45','45 دقيقة'],['60','ساعة']],show:v=>v.onSite},
+  {k:'bkOff',label:'أيام العطلة (ما ينحجز بيها)',type:'checks',opts:DAYS_AR.map((d,i)=>[String(i),d]),show:v=>v.onSite,hint:'المريض يشوف بالموقع الأوقات الفارغة فقط حسب مواعيد العيادة، بدون أي أسماء.'},
   {k:'s6',type:'section',label:'أخرى'},
   {k:'active',label:'العيادة فعّالة',type:'checkbox'},{k:'notes',label:'ملاحظات',type:'textarea',rows:2}],
-  values:Object.assign({active:true,onSite:true,rentPeriod:'1',...Object.fromEntries(SLOTS.flatMap(i=>[['nd'+i+'Pay','percent'],['nd'+i+'Percent',40]])),docIds:c.id?all('doctors').filter(d=>(d.clinicIds||[]).includes(c.id)).map(d=>d.id):[]},c,k),
+  values:Object.assign({active:true,onSite:true,rentPeriod:'1',bkFrom:'16:00',bkTo:'21:00',bkSlot:'30',bkOff:['5'],...Object.fromEntries(SLOTS.flatMap(i=>[['nd'+i+'Pay','percent'],['nd'+i+'Percent',40]])),docIds:c.id?all('doctors').filter(d=>(d.clinicIds||[]).includes(c.id)).map(d=>d.id):[]},c,k),
   extra:'<div class="plan-preview" id="fix-prev"></div>',
   onChange:(v,form)=>{const el=form.querySelector('#fix-prev');if(!el)return;const rent=num(v.rent)/Math.max(1,num(v.rentPeriod)||1);const elec=num(v.power)+num(v.genAmps)*num(v.genPrice);const oth=['transport','water','net','clean','maint','other'].reduce((a,x)=>a+num(v[x]),0);const sal=sum(st,x=>x.salary)+sum(newSecs(v),x=>x.salary);const dsal=sum((v.docIds||[]).map(id=>get('doctors',id)).filter(Boolean),d=>docSalaryShare(d,c.id||'__new',true))+sum(newDocs(v).filter(x=>x.pay!=='percent'),x=>x.salary);const tot=rent+elec+oth+sal+dsal;
     el.textContent=tot>0?`الكلفة الثابتة الشهرية التقديرية: ${fmt(tot)} د.ع (إيجار ${fmt(rent)} · كهرباء ومولدة ${fmt(elec)} · مصاريف أخرى ${fmt(oth)} · رواتب السكرتارية ${fmt(sal)}${dsal?` · رواتب الأطباء الثابتة ${fmt(dsal)}`:''}). لا تشمل نِسَب الأطباء من العمل والمختبر والمواد.`:''},
   danger:c.id?{onClick:()=>{const used=['patients','treatments','appointments','staff','expenses'].some(col=>all(col).some(x=>x.clinicId===c.id));if(used)return toast('للعيادة سجلات مرتبطة. ألغِ خيار «فعّالة» بدلاً من الحذف','warn');confirmBox('حذف العيادة؟',async()=>{await del('clinics',c.id);if(state.clinic===c.id)state.clinic='all'})}}:null,
   onSubmit:async v=>{const nds=newDocs(v),nss=newSecs(v);const bs=nss.find(x=>!x.salary);if(bs)fail('أدخل راتب '+bs.name);const bd=nds.find(x=>x.pay!=='percent'&&!x.salary);if(bd)fail('أدخل راتب د. '+bd.name);const bp=nds.find(x=>x.pay!=='salary'&&!x.percent);if(bp)fail('أدخل نسبة د. '+bp.name);
     const costs={power:num(v.power),genAmps:num(v.genAmps),genPrice:num(v.genPrice),transport:num(v.transport),water:num(v.water),net:num(v.net),clean:num(v.clean),maint:num(v.maint),other:num(v.other),otherLabel:v.otherLabel||''};
-    const doc=Object.assign(clone(c),{name:v.name,area:v.area,phone:v.phone,chairs:v.chairs,opened:v.opened,rent:num(v.rent),rentPeriod:v.rentPeriod,rentNext:v.rentNext,landlord:v.landlord,landlordPhone:v.landlordPhone,active:v.active,notes:v.notes,costs,address:v.address||'',hours:v.hours||'',mapLoc:v.mapLoc||'',onSite:!!v.onSite});
+    const doc=Object.assign(clone(c),{name:v.name,area:v.area,phone:v.phone,chairs:v.chairs,opened:v.opened,rent:num(v.rent),rentPeriod:v.rentPeriod,rentNext:v.rentNext,landlord:v.landlord,landlordPhone:v.landlordPhone,active:v.active,notes:v.notes,costs,address:v.address||'',hours:v.hours||'',mapLoc:v.mapLoc||'',onSite:!!v.onSite,bkFrom:v.bkFrom||'',bkTo:v.bkTo||'',bkSlot:num(v.bkSlot)||30,bkOff:(v.bkOff||[]).map(String)});
     const id=await put('clinics',doc);
     const sel=new Set(v.docIds||[]);
     for(const d of all('doctors')){const has=(d.clinicIds||[]).includes(id);if(has!==sel.has(d.id)){const n=clone(d);n.clinicIds=sel.has(d.id)?(n.clinicIds||[]).concat([id]):(n.clinicIds||[]).filter(x=>x!==id);await put('doctors',n)}}

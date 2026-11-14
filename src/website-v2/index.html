@@ -164,6 +164,16 @@ section.band{padding:96px 0}
 .when{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.when label{position:relative}
 .when input{position:absolute;opacity:0}.when span{display:flex;align-items:center;justify-content:center;height:46px;border:1px solid var(--line);border-radius:12px;background:var(--ivory);font-weight:500;cursor:pointer}
 .when input:checked+span{border-color:var(--emerald);background:var(--emerald);color:#fff}
+.book>div,.book-card form,.book-card .f{min-width:0}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.days button,.times button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--ivory);color:var(--ink);border-radius:12px}
+.days button{flex:0 0 auto;min-width:74px;padding:8px 10px;display:grid;gap:2px;text-align:center;scroll-snap-align:start}
+.days button b{font-size:18px;line-height:1.1}.days button small{font-size:12px;color:var(--ink-3)}
+.times{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+.times button{height:44px;font-weight:600;direction:ltr}
+.days button[aria-checked=true],.times button[aria-checked=true]{border-color:var(--emerald);background:var(--emerald);color:#fff}.days button[aria-checked=true] small{color:#e6f2ee}
+.times button:disabled{opacity:.38;cursor:not-allowed;text-decoration:line-through}
+.slot-note{display:block;margin-top:6px;color:var(--ink-3);font-size:13px}
 .book-acts{display:grid;gap:10px;margin-top:6px}.book-acts .btn{width:100%}
 #bk-msg{font-size:13.5px;color:var(--ink-3);margin:10px 0 0;text-align:center}#bk-msg.bad{color:#c0392b}
 .hp{position:absolute;top:0;inset-inline-start:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -330,8 +340,15 @@ footer a{text-decoration:none}footer a:hover{color:var(--gold-2)}
      <div class="f"><label for="bk-clinic">العيادة</label><select id="bk-clinic"></select></div>
      <div class="f"><label for="bk-svc">سبب الزيارة</label><select id="bk-svc"></select></div>
     </div>
+    <div class="f" id="bk-doc-f" hidden><label for="bk-doc">الطبيب</label><select id="bk-doc"></select></div>
+    <div id="bk-slots" hidden>
+     <div class="f"><label>اختر اليوم</label><div class="days" id="bk-days" role="radiogroup" aria-label="اليوم"></div></div>
+     <div class="f"><label>الأوقات المتاحة</label><div class="times" id="bk-times" role="radiogroup" aria-label="الوقت"></div><small class="slot-note" id="bk-slot-note"></small></div>
+    </div>
+    <div id="bk-legacy">
     <div class="f"><label for="bk-date">اليوم المفضّل (اختياري)</label><input id="bk-date" type="date"></div>
     <div class="f"><label>الوقت المفضّل</label><div class="when"><label><input type="radio" name="when" value="صباحاً"><span>صباحاً</span></label><label><input type="radio" name="when" value="عصراً" checked><span>عصراً</span></label><label><input type="radio" name="when" value="مساءً"><span>مساءً</span></label></div></div>
+    </div>
     <div class="f"><label for="bk-note">ملاحظات (اختياري)</label><textarea id="bk-note" maxlength="400" placeholder="مثال: ألم بضرس العقل من يومين"></textarea></div>
     <div class="hp" aria-hidden="true"><label>اتركه فارغاً<input id="bk-web" tabindex="-1" autocomplete="off"></label></div>
     <div class="book-acts"><button class="btn em" id="bk-send" type="submit"><svg class="i"><use href="#i-cal"/></svg>إرسال طلب الحجز</button><a class="btn wa" id="bk-wa" target="_blank" rel="noopener"><svg class="i"><use href="#i-wa"/></svg>أو احجز عبر الواتساب</a></div>
@@ -451,32 +468,62 @@ document.querySelectorAll('[data-wa="main"]').forEach(a=>{a.href=waLink(SITE.wha
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const MONTHS=['كانون الثاني','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
 const normDigits=s=>String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
-let DB=null;
+let DB=null;const T0=Date.now();
+let BUSY={},BUSY_FROM='';
 function initDB(){try{const C=window.FIREBASE_CONFIG;if(!window.firebase||!C||!C.firebase)return;firebase.initializeApp(C.firebase);DB=firebase.firestore();
-  DB.collection('publicSite').doc('clinics').get().then(d=>{const l=d.exists&&(d.data()||{}).clinics;if(Array.isArray(l)&&l.length){SITE.clinics=l;renderClinics()}}).catch(()=>{})}catch(e){DB=null}}
+  DB.collection('publicSite').doc('clinics').get().then(d=>{const l=d.exists&&(d.data()||{}).clinics;if(Array.isArray(l)&&l.length){SITE.clinics=l;renderClinics();renderSlots()}}).catch(()=>{});
+  DB.collection('publicSite').doc('busy').get().then(d=>{const v=d.exists?d.data()||{}:{};BUSY=v.days||{};BUSY_FROM=v.from||'';renderSlots()}).catch(()=>{})}catch(e){DB=null}}
+/* ---- available times: from the clinic's booking hours minus the busy times the system publishes (no names) ---- */
+const tm=t=>{const q=String(t||'0:0').split(':').map(Number);return q[0]*60+(q[1]||0)};
+const mt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+const t12=t=>{const m=tm(t),h=Math.floor(m/60),mm=String(m%60).padStart(2,'0');return `${h%12||12}:${mm} ${h<12?'ص':'م'}`};
+const curClinic=()=>SITE.clinics[+$('#bk-clinic').value]||SITE.clinics[0]||{};
+const hasSlots=c=>!!(c&&c.bkFrom&&c.bkTo&&tm(c.bkTo)>tm(c.bkFrom));
+let selDay='',selTime='';
+function slotsFor(c,day,did){const step=+c.bkSlot||30,chairs=Math.max(1,+c.chairs||1);const busy=((BUSY[c.id]||{})[day])||[];const now=new Date();const isToday=day===iso(now);const nowM=now.getHours()*60+now.getMinutes()+60;const out=[];
+  for(let m=tm(c.bkFrom);m+step<=tm(c.bkTo);m+=step){const ov=busy.filter(([s,d])=>s<m+step&&m<s+d);
+    const free=!(isToday&&m<nowM)&&(did?!ov.some(x=>x[2]===did)&&ov.length<chairs:ov.length<chairs);out.push([mt(m),free])}return out}
+function bkDays(c){const off=(c.bkOff||[5]).map(Number);const out=[];const d=new Date();for(let i=0;out.length<12&&i<21;i++){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()+i);if(!off.includes(x.getDay()))out.push(iso(x))}return out}
+function renderSlots(){const c=curClinic();const docs=(c.doctors||[]);const df=$('#bk-doc-f');df.hidden=!docs.length;
+  const sel=$('#bk-doc');const keep=sel.value;sel.innerHTML='<option value="">أي طبيب متاح</option>'+docs.map(d=>`<option value="${esc(d.id)}">د. ${esc(d.name)}${d.sp&&d.sp!=='أسنان عام'?' · '+esc(d.sp):''}</option>`).join('');if(docs.some(d=>d.id===keep))sel.value=keep;
+  const on=hasSlots(c);$('#bk-slots').hidden=!on;$('#bk-legacy').hidden=on;if(!on){selDay=selTime='';updWa();return}
+  const days=bkDays(c);if(!days.includes(selDay)){selDay='';selTime=''}
+  const did=sel.value;const free=day=>slotsFor(c,day,did).some(x=>x[1]);if(!selDay)selDay=days.find(free)||days[0]||'';
+  $('#bk-days').innerHTML=days.map(dv=>{const x=new Date(dv+'T12:00');const n=free(dv);return `<button type="button" role="radio" aria-checked="${dv===selDay}" data-day="${dv}" ${n?'':'style="opacity:.5"'}><small>${dv===iso(new Date())?'اليوم':DAYS[x.getDay()]}</small><b>${x.getDate()}</b><small>${MONTHS[x.getMonth()]}</small></button>`}).join('');
+  const sl=selDay?slotsFor(c,selDay,did):[];if(selTime&&!sl.some(x=>x[0]===selTime&&x[1]))selTime='';
+  $('#bk-times').innerHTML=sl.map(([t,f])=>`<button type="button" role="radio" aria-checked="${t===selTime}" data-time="${t}" ${f?'':'disabled aria-disabled="true"'}>${t12(t)}</button>`).join('')||'<span class="slot-note">ما أكو أوقات بهذا اليوم</span>';
+  $('#bk-slot-note').textContent=sl.length&&!sl.some(x=>x[1])?'كل الأوقات محجوزة بهذا اليوم، اختر يوماً آخر.':'العيادة تأكد موعدك بالواتساب بعد الطلب.';updWa()}
+document.addEventListener('click',e=>{const d=e.target.closest('[data-day]'),t=e.target.closest('[data-time]');if(d){selDay=d.dataset.day;selTime='';renderSlots()}else if(t&&!t.disabled){selTime=t.dataset.time;renderSlots()}});
+$('#bk-clinic').addEventListener('change',()=>{selTime='';renderSlots()});$('#bk-doc').addEventListener('change',()=>{selTime='';renderSlots()});
 document.addEventListener('DOMContentLoaded',initDB);
-const bkData=()=>{const f=$('#bk');const c=SITE.clinics[+$('#bk-clinic').value]||SITE.clinics[0]||{};const dv=$('#bk-date').value;
+const bkData=()=>{const f=$('#bk');const c=curClinic();const slots=hasSlots(c);const dv=slots?selDay:$('#bk-date').value;const time=slots?selTime:'';
   let day='أقرب موعد متاح';if(dv){const d=new Date(dv+'T12:00');day=`${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`}
-  return {c,dv,day,name:$('#bk-name').value.trim(),phone:normDigits($('#bk-phone').value).replace(/[^\d+]/g,''),svc:$('#bk-svc').value,when:(f.querySelector('input[name=when]:checked')||{}).value||'',note:$('#bk-note').value.trim()}};
-const bkText=x=>`مرحباً، أود حجز موعد\nالاسم: ${x.name}\nالهاتف: ${x.phone}\nالعيادة: ${x.c.name||''}\nسبب الزيارة: ${x.svc}\nاليوم المفضّل: ${x.day}${x.when?' · '+x.when:''}${x.note?'\nملاحظات: '+x.note:''}`;
+  const when=time?(tm(time)<720?'صباحاً':tm(time)<1080?'عصراً':'مساءً'):(slots?'':(f.querySelector('input[name=when]:checked')||{}).value||'');
+  const doc=(c.doctors||[]).find(d=>d.id===$('#bk-doc').value)||null;
+  return {c,dv,day,time,doc,name:$('#bk-name').value.trim(),phone:normDigits($('#bk-phone').value).replace(/[^\d+]/g,''),svc:$('#bk-svc').value,when,note:$('#bk-note').value.trim()}};
+const whenTxt=x=>x.time?' · الساعة '+t12(x.time):x.when?' · '+x.when:'';
+const bkText=x=>`مرحباً، أود حجز موعد\nالاسم: ${x.name}\nالهاتف: ${x.phone}\nالعيادة: ${x.c.name||''}\nسبب الزيارة: ${x.svc}\n${x.doc?'الطبيب: د. '+x.doc.name+'\n':''}الموعد المطلوب: ${x.day}${whenTxt(x)}${x.note?'\nملاحظات: '+x.note:''}`;
 const updWa=()=>{const x=bkData();$('#bk-wa').href=waLink(phoneOf(x.c),bkText(x))};
-$('#bk').addEventListener('input',updWa);$('#bk').addEventListener('change',updWa);updWa();
+$('#bk').addEventListener('input',updWa);$('#bk').addEventListener('change',updWa);updWa();renderSlots();
 const msgEl=$('#bk-msg');const say=(t,bad)=>{msgEl.textContent=t;msgEl.classList.toggle('bad',!!bad)};
-function showDone(x){$('#bk').hidden=true;const d=$('#bk-done');d.hidden=false;$('#bk-done-sum').textContent=`${x.name} · ${x.c.name||''} · ${x.day}${x.when?' '+x.when:''}`;$('#bk-done-wa').href=waLink(phoneOf(x.c),bkText(x));d.focus()}
-$('#bk-again').addEventListener('click',()=>{$('#bk-done').hidden=true;const f=$('#bk');f.hidden=false;f.reset();$('#bk-send').disabled=false;say('نستخدم اسمك ورقمك فقط للتواصل معك بخصوص موعدك.');updWa()});
+function showDone(x){$('#bk').hidden=true;const d=$('#bk-done');d.hidden=false;$('#bk-done-sum').textContent=`${x.name} · ${x.c.name||''}${x.doc?' · د. '+x.doc.name:''} · ${x.day}${whenTxt(x)}`;$('#bk-done-wa').href=waLink(phoneOf(x.c),bkText(x));d.focus()}
+$('#bk-again').addEventListener('click',()=>{$('#bk-done').hidden=true;const f=$('#bk');f.hidden=false;f.reset();selTime='';renderSlots();$('#bk-send').disabled=false;say('نستخدم اسمك ورقمك فقط للتواصل معك بخصوص موعدك.');updWa()});
 $('#bk').addEventListener('submit',async e=>{
   e.preventDefault();const f=e.currentTarget;let ok=true;const x=bkData();
   const mark=(id,bad)=>{$(id).closest('.f').classList.toggle('bad',bad);if(bad)ok=false};
   mark('#bk-name',x.name.length<2||x.name.length>70);mark('#bk-phone',x.phone.replace(/\D/g,'').length<10||x.phone.length>20);
   if(!ok){f.querySelector('.bad input')?.focus();return}
-  if($('#bk-web').value){showDone(x);return}
+  if(hasSlots(x.c)&&!x.time){say('اختر وقتاً من الأوقات المتاحة.',true);$('#bk-times').scrollIntoView({behavior:'smooth',block:'center'});return}
+  if($('#bk-web').value||Date.now()-T0<3000){showDone(x);return}
+  let hist=[];try{hist=JSON.parse(localStorage.getItem('bk-hist')||'[]').filter(t=>Date.now()-t<864e5)}catch(_){}
+  if(hist.length>=3){say('وصلت عدة طلبات منك اليوم. سنتواصل معك، أو راسلنا بالواتساب.',true);return}
   let last=0;try{last=+localStorage.getItem('bk-last')||0}catch(_){}
   if(Date.now()-last<60000){say('أرسلت طلباً قبل قليل. سنتواصل معك قريباً، أو راسلنا بالواتساب.',true);return}
   if(!DB){say('تعذّر الاتصال، أرسل طلبك عبر الواتساب من الزر أعلاه.',true);return}
   const btn=$('#bk-send');btn.disabled=true;say('جارِ إرسال طلبك…');
   try{
-    await Promise.race([DB.collection('bookings').add({name:x.name,phone:x.phone,clinicId:x.c.id||'',clinicName:x.c.name||'',service:x.svc.slice(0,60),date:x.dv||'',period:x.when,note:x.note.slice(0,400),status:'new',source:'site',createdAt:new Date().toISOString()}),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),12000))]);
-    try{localStorage.setItem('bk-last',String(Date.now()))}catch(_){}
+    await Promise.race([DB.collection('bookings').add({name:x.name,phone:x.phone,clinicId:x.c.id||'',clinicName:x.c.name||'',service:x.svc.slice(0,60),date:x.dv||'',period:x.when,...(x.time?{time:x.time}:{}),...(x.doc?{doctorId:x.doc.id}:{}),note:x.note.slice(0,400),status:'new',source:'site',createdAt:new Date().toISOString()}),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),12000))]);
+    try{localStorage.setItem('bk-last',String(Date.now()));localStorage.setItem('bk-hist',JSON.stringify(hist.concat([Date.now()])))}catch(_){}
     showDone(x);
   }catch(err){btn.disabled=false;say('تعذّر إرسال الطلب الآن. أرسله عبر الواتساب وسنرد عليك.',true)}
 });
